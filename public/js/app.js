@@ -94,7 +94,8 @@ const loadingTitle = document.getElementById('loadingTitle');
 const loadingStatus = document.getElementById('loadingStatus');
 const loadingTxHash = document.getElementById('loadingTxHash');
 // loadingRecipient is hidden in new design, but we can keep logic safe
-const loadingRecipient = document.getElementById('loadingRecipient') || { innerText: '' };
+// loadingRecipient is hidden in new design, but we can keep logic safe
+const loadingRecipient = { innerText: '' }; // Mock object to prevent errors if referenced, but never displayed
 
 function showLoading(title = 'Processing Payment') {
     loadingTitle.innerText = title;
@@ -168,7 +169,8 @@ window.payAndSolve = async (tier) => {
         const freshData = await priceRes.json();
 
         if (freshData.receiverAddress) RECIPIENT_ADDRESS = freshData.receiverAddress;
-        loadingRecipient.innerText = RECIPIENT_ADDRESS.slice(0, 18) + '...';
+        // Privacy: Do not display recipient address in UI
+        // loadingRecipient.innerText = RECIPIENT_ADDRESS.slice(0, 18) + '...';
 
         const ethAmount = freshData[tier];
 
