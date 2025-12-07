@@ -238,7 +238,11 @@ window.payAndSolve = async (tier) => {
 
                     // Render Markdown Result
                     const resultContent = document.getElementById('result-content');
-                    if (window.marked) {
+                    if (window.marked && window.DOMPurify) {
+                        const rawHtml = window.marked.parse(result.solution);
+                        resultContent.innerHTML = window.DOMPurify.sanitize(rawHtml);
+                    } else if (window.marked) {
+                        console.warn('DOMPurify not found, using raw marked output (Risk of XSS)');
                         resultContent.innerHTML = window.marked.parse(result.solution);
                     } else {
                         resultContent.innerText = result.solution;
