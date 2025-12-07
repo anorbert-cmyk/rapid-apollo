@@ -43,19 +43,32 @@ async function connectWallet() {
         try {
             showToast('Connecting', 'Opening MetaMask...');
             provider = new ethers.BrowserProvider(window.ethereum);
+
+            // Network Check (Mainnet = 0x1)
+            const network = await provider.getNetwork();
+            if (network.chainId !== 1n) {
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x1' }],
+                    });
+                    // Re-initialize provider after switch just to be safe
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                } catch (switchError) {
+                    // This error code means the chain has not been added to MetaMask (unlikely for Mainnet, but consistent handling)
+                    if (switchError.code === 4902) {
+                        alert("Ethereum Mainnet not found in your wallet. Please add it manually.");
+                    } else {
+                        showToast('Error', 'Please switch to Ethereum Mainnet to continue.');
+                        return false;
+                    }
+                }
+            }
+
             signer = await provider.getSigner();
             userAddress = await signer.getAddress();
 
-            // Update New UI
-            document.getElementById('wallet-text').innerText = userAddress.slice(0, 6) + '...' + userAddress.slice(-4);
-            document.getElementById('walletAddress').innerText = ''; // Clear duplicate if any
-
-            // Style update for connected state
-            const btn = document.getElementById('btn-connect-wallet');
-            btn.classList.remove('bg-white/5');
-            btn.classList.add('bg-green-500/20', 'border-green-500/50', 'text-green-300');
-
-            showToast('Connected', 'Wallet connected successfully!');
+            showToast('Connected', 'Mainnet Wallet connected.');
             return true;
         } catch (err) {
             console.error(err);

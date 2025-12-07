@@ -22,10 +22,9 @@ export const verifyTransaction = async (txHash: string, expectedTier: string): P
             return { valid: false, message: `Invalid recipient: sent to ${tx.to}` };
         }
 
-        // Check Chain ID (Sepolia = 11155111)
-        // Hardcoding Sepolia ID for safety. In prod this could be env var.
-        if (tx.chainId !== 11155111n) {
-            return { valid: false, message: `Invalid network. Expected Sepolia (11155111), got ${tx.chainId}` };
+        // Check Chain ID (Ethereum Mainnet = 1)
+        if (tx.chainId !== 1n) {
+            return { valid: false, message: `Invalid network. Expected Ethereum Mainnet (1), got ${tx.chainId}` };
         }
 
         // Check Amount logic with Price Service

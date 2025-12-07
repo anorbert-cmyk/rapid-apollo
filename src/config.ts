@@ -6,8 +6,8 @@ dotenv.config();
 const envSchema = z.object({
     PORT: z.string().default('3000'),
     GEMINI_API_KEY: z.string().min(1, "Gemini API Key is required"),
-    // Using Sepolia RPC
-    RPC_URL: z.string().default('https://rpc.sepolia.org'),
+    // Ethereum Mainnet RPC (Public Ankr Node)
+    RPC_URL: z.string().default('https://rpc.ankr.com/eth'),
     // My receiving wallet address (hardcoded for the demo or env)
     RECEIVER_WALLET_ADDRESS: z.string().startsWith('0x'),
 
