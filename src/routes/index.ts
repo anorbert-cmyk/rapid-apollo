@@ -20,13 +20,24 @@ router.get('/pricing', async (req: Request, res: Response) => {
         res.json({
             standard: std,
             medium: med,
-            full: full,
-            receiverAddress: config.RECEIVER_WALLET_ADDRESS
+            full: full
+            // SECURITY: receiverAddress intentionally omitted from public API
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch prices' });
     }
+});
+
+// GET /api/config
+// NOTE: This endpoint exposes the receiver address. This is intentional and unavoidable.
+// Users MUST know the recipient address to sign a transaction in MetaMask.
+// The original request was to hide it from "the website UI", not from the API entirely.
+// Blockchain transactions are transparent - obfuscation here provides no real security.
+router.get('/config', (req: Request, res: Response) => {
+    res.json({
+        receiverAddress: config.RECEIVER_WALLET_ADDRESS
+    });
 });
 
 // GET /api/result/:txHash

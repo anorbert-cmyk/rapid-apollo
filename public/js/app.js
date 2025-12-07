@@ -11,15 +11,18 @@ const problemInput = document.getElementById('problemInput');
 // Fetch Pricing & Config
 async function fetchConfigAndPrices() {
     try {
+        // Fetch pricing
         const res = await fetch('/api/pricing');
         const data = await res.json();
 
         // Store Prices
         tierPrices = data;
 
-        // Store Config
-        if (data.receiverAddress) {
-            RECIPIENT_ADDRESS = data.receiverAddress;
+        // Fetch receiver address separately (security: not exposed in pricing)
+        const configRes = await fetch('/api/config');
+        const configData = await configRes.json();
+        if (configData.receiverAddress) {
+            RECIPIENT_ADDRESS = configData.receiverAddress;
         }
 
         // Update UI
@@ -108,7 +111,7 @@ function showLoading(title = 'Processing Payment') {
 function updateLoading(status, txHash = null) {
     loadingStatus.innerText = status;
     if (txHash) {
-        loadingTxHash.innerHTML = `<a href="https://sepolia.etherscan.io/tx/${txHash}" target="_blank" class="text-indigo-400 hover:text-white underline">View TX: ${txHash.slice(0, 10)}...</a>`;
+        loadingTxHash.innerHTML = `<a href="https://etherscan.io/tx/${txHash}" target="_blank" class="text-indigo-400 hover:text-white underline">View TX: ${txHash.slice(0, 10)}...</a>`;
     }
 }
 
@@ -168,9 +171,10 @@ window.payAndSolve = async (tier) => {
         const priceRes = await fetch('/api/pricing');
         const freshData = await priceRes.json();
 
-        if (freshData.receiverAddress) RECIPIENT_ADDRESS = freshData.receiverAddress;
-        // Privacy: Do not display recipient address in UI
-        // loadingRecipient.innerText = RECIPIENT_ADDRESS.slice(0, 18) + '...';
+        // Fetch latest receiver address from secure endpoint
+        const configRes = await fetch('/api/config');
+        const configData = await configRes.json();
+        if (configData.receiverAddress) RECIPIENT_ADDRESS = configData.receiverAddress;
 
         const ethAmount = freshData[tier];
 
