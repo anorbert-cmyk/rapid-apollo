@@ -19,7 +19,14 @@ import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 
 // Load OpenAPI Spec
-const swaggerDocument = yaml.load(path.join(__dirname, './docs/swagger.yaml'));
+let swaggerDocument: any;
+try {
+    const yamlPath = path.join(__dirname, './docs/swagger.yaml');
+    logger.info('Loading Swagger spec from path', { path: yamlPath });
+    swaggerDocument = yaml.load(yamlPath);
+} catch (error) {
+    logger.error('Failed to load Swagger spec', error as Error);
+}
 
 // Initialize error monitoring
 initErrorMonitoring();
@@ -94,7 +101,12 @@ app.use('/api/admin', adminRoutes);
 app.use(errorMonitoringMiddleware);
 
 // API Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+if (swaggerDocument) {
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    logger.info('Swagger UI enabled at /api-docs');
+} else {
+    app.use('/api-docs', (req, res) => res.status(503).json({ error: 'Docs unavailable' }));
+}
 
 // ===== GRACEFUL SHUTDOWN =====
 
