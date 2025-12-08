@@ -335,11 +335,18 @@
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-6">
-                    <a href="javascript:void(0)" onclick="enterDashboard()" id="nav-dashboard-link"
-                        class="hidden text-xs font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2">
+                <div class="hidden md:flex items-center gap-4">
+                    <!-- Admin Button (Hidden by default, shown for admin wallet) -->
+                    <button id="nav-admin-btn"
+                        class="hidden text-xs font-bold text-purple-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 px-3 py-2 rounded-lg border border-purple-500/20">
+                        <i class="ph-fill ph-chart-pie-slice"></i> Admin
+                    </button>
+
+                    <!-- Dashboard Button (Hidden by default, shown after purchase) -->
+                    <button id="nav-dashboard-btn"
+                        class="hidden text-xs font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg border border-indigo-500/20">
                         <i class="ph-fill ph-circles-four"></i> Dashboard
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Connect Wallet Button -->
@@ -1021,7 +1028,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="js/app.js?v=1.7"></script>
+    <script src="js/app.js?v=1.8"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {

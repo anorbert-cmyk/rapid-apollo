@@ -267,52 +267,6 @@ window.payAndSolve = async (tier) => {
         document.getElementById('eth-medium').innerText = `~${freshData.medium} ETH`;
         document.getElementById('eth-full').innerText = `~${freshData.full} ETH`;
 
-        // ===== TEST MODE: Full Tier is FREE for testing =====
-        if (tier === 'full') {
-            loadingTitle.innerText = '🧪 TEST MODE';
-            updateLoading('Bypassing payment for testing...');
-
-            // Generate mock TX hash
-            const mockTxHash = '0x' + 'TEST' + Date.now().toString(16).padStart(60, '0');
-
-            // Call test endpoint instead
-            const response = await fetch('/api/solve-test', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    problemStatement: problem,
-                    txHash: mockTxHash,
-                    tier: tier,
-                    testMode: true
-                })
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                const loadingState = document.getElementById('loadingState');
-                const successState = document.getElementById('successState');
-                const btnEnterDashboard = document.getElementById('btn-enter-dashboard');
-
-                loadingState.classList.add('hidden');
-                successState.classList.remove('hidden');
-
-                saveSession({
-                    txHash: result.txHash,
-                    problem: problem,
-                    solution: result.solution,
-                    tier: tier,
-                    timestamp: Date.now()
-                });
-
-                btnEnterDashboard.onclick = () => window.enterDashboard();
-            } else {
-                alert("Error: " + result.error);
-            }
-            return; // Exit early for test mode
-        }
-        // ===== END TEST MODE =====
-
         // CORRECTED PRICING MAPPING
         const tierCostUSD = tier === 'standard' ? 19 : tier === 'medium' ? 49 : 199;
         const rate = (tierCostUSD / parseFloat(ethAmount)).toFixed(2);
@@ -464,9 +418,12 @@ function saveSession(data) {
     currentSession = data;
     renderHistoryUI();
 
-    // Show Nav Link
-    const navLink = document.getElementById('nav-dashboard-link');
-    if (navLink) navLink.classList.remove('hidden');
+    // Show Dashboard Button in Navbar
+    const navDashboardBtn = document.getElementById('nav-dashboard-btn');
+    if (navDashboardBtn) {
+        navDashboardBtn.classList.remove('hidden');
+        navDashboardBtn.onclick = () => window.enterDashboard();
+    }
 }
 
 function loadSession() {
@@ -476,8 +433,14 @@ function loadSession() {
         if (sessionHistory.length > 0) {
             // Load the most recent session by default
             currentSession = sessionHistory[0];
-            const navLink = document.getElementById('nav-dashboard-link');
-            if (navLink) navLink.classList.remove('hidden');
+
+            // Show Dashboard Button in Navbar
+            const navDashboardBtn = document.getElementById('nav-dashboard-btn');
+            if (navDashboardBtn) {
+                navDashboardBtn.classList.remove('hidden');
+                navDashboardBtn.onclick = () => window.enterDashboard();
+            }
+
             renderHistoryUI();
         }
     }
@@ -683,14 +646,25 @@ async function checkAdminStatus(address) {
             isAdmin = true;
             showToast('Admin Mode', 'Platform Analytics Unlocked');
 
-            // Unlock Analytics Tab in UI if present
+            // Show Admin Button in Navbar
+            const navAdminBtn = document.getElementById('nav-admin-btn');
+            if (navAdminBtn) {
+                navAdminBtn.classList.remove('hidden');
+                navAdminBtn.onclick = () => {
+                    // Navigate to admin analytics view
+                    window.switchView('analytics');
+                    window.refreshAdminStats();
+                };
+            }
+
+            // Legacy: Unlock Analytics Tab in Dashboard UI if present
             const navAnalytics = document.getElementById('nav-analytics');
             if (navAnalytics) {
                 navAnalytics.innerHTML = `
                      <i class="ph-fill ph-chart-pie-slice text-lg"></i>
                      <span class="text-xs font-bold tracking-widest uppercase">Admin Stats</span>
                  `;
-                navAnalytics.onclick = () => window.refreshAdminStats(); // Fix: call refresh logic/switch view
+                navAnalytics.onclick = () => window.refreshAdminStats();
                 navAnalytics.classList.remove('opacity-50', 'cursor-not-allowed');
                 navAnalytics.classList.add('text-indigo-400');
             }
