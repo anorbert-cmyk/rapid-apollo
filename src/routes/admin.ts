@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { verifyMessage } from 'ethers';
 import { statsStore, transactionLogStore } from '../store';
 import { config } from '../config';
+import { checkAndMarkSignature } from '../utils/signatureStore';
+import { logger } from '../utils/logger';
 
 const router = Router();
 const ADMIN_WALLET = config.ADMIN_WALLET_ADDRESS.toLowerCase();
@@ -37,6 +39,12 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
         if (recovered.toLowerCase() !== ADMIN_WALLET) {
             return res.status(403).json({ error: 'Invalid admin signature' });
+        }
+
+        // Prevent signature replay attacks
+        if (!checkAndMarkSignature(signature, address)) {
+            logger.warn('Signature replay attempt on admin endpoint', { wallet: address });
+            return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }
 
         next();

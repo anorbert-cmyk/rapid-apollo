@@ -9,6 +9,7 @@ import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore, tr
 import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
 import { verifyMessage } from 'ethers';
+import { checkAndMarkSignature } from '../utils/signatureStore';
 
 // Simple UUID Helper
 function generateUUID() {
@@ -68,6 +69,12 @@ router.post('/share/create', async (req: Request, res: Response) => {
         const recovered = verifyMessage(message, signature);
         if (recovered.toLowerCase() !== address.toLowerCase()) {
             return res.status(403).json({ error: 'Invalid signature' });
+        }
+
+        // Prevent signature replay attacks
+        if (!checkAndMarkSignature(signature, address)) {
+            logger.warn('Signature replay attempt on share/create', { wallet: address });
+            return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }
 
         const uuid = generateUUID();
@@ -231,6 +238,12 @@ router.post('/history', async (req: Request, res: Response) => {
 
         if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
             return res.status(403).json({ error: 'Invalid signature' });
+        }
+
+        // 3. Prevent signature replay attacks
+        if (!checkAndMarkSignature(signature, walletAddress)) {
+            logger.warn('Signature replay attempt on history', { wallet: walletAddress });
+            return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }
 
         // 3. Fetch History

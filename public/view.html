@@ -168,10 +168,11 @@
                 document.getElementById('problem-content').innerText = data.problem;
                 document.getElementById('date-display').innerText = new Date(data.date).toLocaleString();
 
-                // Markdown Parse
-                document.getElementById('solution-content').innerHTML = marked.parse(
+                // Markdown Parse with XSS Protection
+                const rawHtml = marked.parse(
                     (typeof data.solution === 'string' ? data.solution : JSON.stringify(data.solution, null, 2))
                 );
+                document.getElementById('solution-content').innerHTML = DOMPurify.sanitize(rawHtml);
 
                 // Copy Code Logic
                 document.querySelectorAll('pre code').forEach((block) => {
