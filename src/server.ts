@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import apiRoutes from './routes';
+import path from 'path';
 import adminRoutes from './routes/admin';
 
 const app = express();
@@ -68,7 +69,8 @@ app.use(cors({
 app.use(express.json({ limit: '10kb' })); // Limit body size to prevent large payload attacks
 
 // Static files
-app.use(express.static('public'));
+// Static files - served from 'public' directory from root (up one level from dist)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== ROUTES =====
 app.use('/api', apiRoutes);
