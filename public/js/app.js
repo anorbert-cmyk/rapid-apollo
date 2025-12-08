@@ -153,7 +153,7 @@ function showToast(title, message) {
     setTimeout(() => {
         // Animate Out: Add hidden/offset state
         toast.classList.add('translate-y-20', 'opacity-0');
-    }, 4000);
+    }, 8000); // 8 seconds to read
 }
 
 // Connect Wallet Modal Logic
