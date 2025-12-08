@@ -966,68 +966,136 @@
             </div>
 
             <!-- VIEW: ANALYTICS (Fully Functional) -->
-            <div id="view-analytics" class="hidden animate-slide-up h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- KPI Card 1: Total Solves -->
-                <div class="dash-panel p-6 flex flex-col items-center justify-center">
-                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Total Solves</div>
-                    <div id="stat-solves" class="text-4xl font-bold text-white">0</div>
-                </div>
+            <div id="view-analytics" class="hidden animate-slide-up h-full overflow-y-auto">
+                <!-- Row 1: Main KPIs -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- KPI Card 1: Total Solves -->
+                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
+                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Total Solves
+                        </div>
+                        <div id="stat-solves" class="text-3xl font-bold text-white">0</div>
+                    </div>
 
-                <!-- KPI Card 2: Revenue ETH -->
-                <div class="dash-panel p-6 flex flex-col items-center justify-center">
-                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Revenue (ETH)</div>
-                    <div id="stat-revenue" class="text-4xl font-bold text-green-400">0.0000</div>
-                </div>
+                    <!-- KPI Card 2: Revenue ETH -->
+                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
+                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Revenue (ETH)
+                        </div>
+                        <div id="stat-revenue" class="text-3xl font-bold text-green-400">0.0000</div>
+                    </div>
 
-                <!-- KPI Card 3: Top Tier -->
-                <div class="dash-panel p-6 flex flex-col items-center justify-center">
-                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Top Tier</div>
-                    <div id="stat-top-tier" class="text-4xl font-bold text-purple-400">-</div>
-                </div>
+                    <!-- KPI Card 3: Unique Users -->
+                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
+                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Unique Users
+                        </div>
+                        <div id="stat-users" class="text-3xl font-bold text-blue-400">0</div>
+                    </div>
 
-                <!-- Tier Distribution Chart -->
-                <div class="dash-panel p-6 lg:col-span-2">
-                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">Tier Distribution</h3>
-                    <div class="h-48">
-                        <canvas id="chart-tiers"></canvas>
+                    <!-- KPI Card 4: Avg Order Value -->
+                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
+                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Avg Order (ETH)
+                        </div>
+                        <div id="stat-aov" class="text-3xl font-bold text-yellow-400">0.0000</div>
                     </div>
                 </div>
 
-                <!-- Conversion Funnel -->
-                <div class="dash-panel p-6">
-                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">Conversion Funnel</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Landing</span> <span
-                                    class="text-green-400">100%</span></div>
-                            <div class="w-full bg-gray-800 h-2 rounded-full">
-                                <div class="bg-indigo-500 h-full w-full"></div>
+                <!-- Row 2: Charts and Top Tier -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- Tier Distribution Chart -->
+                    <div class="dash-panel p-4 lg:col-span-2">
+                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Tier Distribution
+                        </h3>
+                        <div class="h-40">
+                            <canvas id="chart-tiers"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Top Tier + Status -->
+                    <div class="dash-panel p-4 flex flex-col">
+                        <div class="flex-1 flex flex-col items-center justify-center mb-4">
+                            <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Top Tier
+                            </div>
+                            <div id="stat-top-tier" class="text-3xl font-bold text-purple-400">-</div>
+                        </div>
+                        <div class="border-t border-white/10 pt-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-mono text-gray-500 uppercase">Server Status</span>
+                                <span id="stat-server-status" class="flex items-center gap-2 text-xs">
+                                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                                    <span class="text-green-400">Online</span>
+                                </span>
                             </div>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Connected</span>
-                                <span class="text-green-400">42%</span>
+                    </div>
+                </div>
+
+                <!-- Row 3: Recent Transactions -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <!-- Recent Transactions List -->
+                    <div class="dash-panel p-4">
+                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Recent Transactions
+                        </h3>
+                        <div id="recent-transactions" class="space-y-2 max-h-48 overflow-y-auto">
+                            <div class="text-xs text-gray-500 italic">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Funnel -->
+                    <div class="dash-panel p-4">
+                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Conversion Funnel
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span class="text-white">Landing</span>
+                                    <span class="text-green-400">100%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full">
+                                    <div class="bg-indigo-500 h-full w-full rounded-full"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-800 h-2 rounded-full">
-                                <div class="bg-indigo-500 h-full w-[42%]"></div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span class="text-white">Connected</span>
+                                    <span class="text-green-400">42%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full">
+                                    <div class="bg-indigo-500 h-full w-[42%] rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span class="text-white">Payment
+                                        Started</span> <span class="text-yellow-400">18%</span></div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full">
+                                    <div class="bg-indigo-500 h-full w-[18%] rounded-full"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span class="text-white">Paid</span>
+                                    <span class="text-red-400">2.1%</span>
+                                </div>
+                                <div class="w-full bg-gray-800 h-2 rounded-full">
+                                    <div class="bg-indigo-500 h-full w-[2%] rounded-full"></div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Payment
-                                    Started</span>
-                                <span class="text-yellow-400">18%</span>
-                            </div>
-                            <div class="w-full bg-gray-800 h-2 rounded-full">
-                                <div class="bg-indigo-500 h-full w-[18%]"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Paid</span> <span
-                                    class="text-red-400">2.1%</span></div>
-                            <div class="w-full bg-gray-800 h-2 rounded-full">
-                                <div class="bg-indigo-500 h-full w-[2.1%]"></div>
-                            </div>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Quick Actions -->
+                <div class="dash-panel p-4">
+                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Quick Actions</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="window.refreshAdminStats()"
+                            class="px-4 py-2 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded hover:bg-indigo-500/30 transition flex items-center gap-2">
+                            <i class="ph-bold ph-arrows-clockwise"></i> Refresh Data
+                        </button>
+                        <button onclick="window.exportAdminCSV && window.exportAdminCSV()"
+                            class="px-4 py-2 bg-green-500/20 text-green-400 text-xs font-bold rounded hover:bg-green-500/30 transition flex items-center gap-2">
+                            <i class="ph-bold ph-file-csv"></i> Export CSV
+                        </button>
+                        <a href="https://etherscan.io/address/0xa14504ffe5E9A245c9d4079547Fa16fA0A823114"
+                            target="_blank"
+                            class="px-4 py-2 bg-purple-500/20 text-purple-400 text-xs font-bold rounded hover:bg-purple-500/30 transition flex items-center gap-2">
+                            <i class="ph-bold ph-arrow-square-out"></i> View on Etherscan
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1056,7 +1124,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="js/app.js?v=2.1"></script>
+    <script src="js/app.js?v=2.2"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {
