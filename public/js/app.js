@@ -1143,3 +1143,21 @@ window.switchView = (viewName) => {
         activeNav.classList.add('sidebar-item-active');
     }
 };
+
+// ===========================================
+// UI HELPERS
+// ===========================================
+
+// Toggle Input/History View in HUD
+window.toggleInputView = (showHistory) => {
+    const inputPanel = document.getElementById('input-view-panel');
+    const historyPanel = document.getElementById('history-view-panel');
+
+    if (!inputPanel || !historyPanel) return;
+
+    if (showHistory) {
+        historyPanel.classList.remove('hidden');
+    } else {
+        historyPanel.classList.add('hidden');
+    }
+};

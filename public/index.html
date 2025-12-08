@@ -748,436 +748,616 @@
     <!-- DASHBOARD APP (HIDDEN BY DEFAULT)          -->
     <!-- ========================================== -->
     <main id="app-dashboard"
-        class="hidden min-h-screen bg-[#030014] relative p-4 md:p-6 overflow-hidden transition-all duration-500">
+        class="hidden h-screen w-full bg-[#030014] fixed inset-0 overflow-hidden transition-all duration-500 z-[60]">
 
-        <!-- Sidebar / Navigation -->
-        <aside
-            class="fixed left-6 top-6 bottom-6 w-20 hud-card rounded-2xl flex flex-col items-center py-8 z-50 hidden md:flex border border-white/5">
-            <a href="javascript:location.reload()"
-                class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center mb-10 shadow-lg shadow-indigo-500/30 hover:bg-indigo-500 transition cursor-pointer">
-                <i class="ph-bold ph-strategy text-white text-xl"></i>
-            </a>
-
-            <nav class="flex-1 flex flex-col gap-6 w-full px-4">
-                <button onclick="switchView('dashboard')" id="nav-dashboard"
-                    class="sidebar-item-active w-full h-10 rounded-xl flex items-center justify-center transition group relative">
-                    <i class="ph-fill ph-squares-four text-lg"></i>
-                    <span
-                        class="absolute left-14 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10">Dashboard</span>
-                </button>
-                <button onclick="switchView('analytics')" id="nav-analytics"
-                    class="w-full h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                    <i class="ph-bold ph-chart-line-up text-lg"></i>
-                    <span
-                        class="absolute left-14 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10">Growth</span>
-                </button>
-                <button onclick="switchView('team')" id="nav-team"
-                    class="w-full h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                    <i class="ph-bold ph-users text-lg"></i>
-                    <span
-                        class="absolute left-14 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10">Team</span>
-                </button>
-                <button onclick="switchView('settings')" id="nav-settings"
-                    class="w-full h-10 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                    <i class="ph-bold ph-gear text-lg"></i>
-                    <span
-                        class="absolute left-14 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10">Config</span>
-                </button>
-            </nav>
-
+        <!-- Ambient Background for Dashboard -->
+        <div class="fixed inset-0 pointer-events-none">
             <div
-                class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 opacity-80 cursor-pointer hover:scale-110 transition border border-white/20">
+                class="absolute top-[-20%] left-[-10%] w-[70vw] h-[70vw] bg-indigo-900/10 rounded-full blur-[150px] mix-blend-screen animate-pulse-slow">
             </div>
-        </aside>
+            <div
+                class="absolute bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] bg-purple-900/10 rounded-full blur-[150px] mix-blend-screen">
+            </div>
+        </div>
 
-        <!-- Main Content Area -->
-        <div class="md:ml-28 h-full max-w-7xl mx-auto flex flex-col gap-6">
+        <div class="flex h-full w-full relative z-10">
+            <!-- Sidebar: Premium Glass Rail -->
+            <aside
+                class="w-20 lg:w-24 flex-shrink-0 flex flex-col items-center py-8 z-50 border-r border-white/5 bg-[#030014]/50 backdrop-blur-xl">
+                <a href="javascript:location.reload()"
+                    class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-12 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:bg-indigo-500 transition cursor-pointer group">
+                    <i class="ph-bold ph-strategy text-white text-2xl group-hover:scale-110 transition-transform"></i>
+                </a>
 
-            <!-- Top Bar -->
-            <header class="flex justify-between items-center mb-2">
-                <div>
-                    <h1 class="text-2xl font-bold text-white flex items-center gap-3">
-                        Strategic Dashboard
+                <nav class="flex-1 flex flex-col gap-8 w-full px-4 items-center">
+                    <button onclick="switchView('dashboard')" id="nav-dashboard"
+                        class="sidebar-item-active w-12 h-12 rounded-xl flex items-center justify-center transition group relative">
+                        <i class="ph-fill ph-squares-four text-xl"></i>
                         <span
-                            class="text-[10px] font-mono bg-green-900/30 text-green-400 px-2 py-0.5 rounded border border-green-500/30">ACTIVE
-                            SESSION</span>
-                    </h1>
-                    <p class="text-xs text-gray-500 font-mono mt-1" id="tx-display">TX: Loading...</p>
+                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Dashboard</span>
+                    </button>
+                    <button onclick="switchView('analytics')" id="nav-analytics"
+                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
+                        <i class="ph-bold ph-chart-line-up text-xl"></i>
+                        <span
+                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Growth</span>
+                    </button>
+                    <button onclick="switchView('team')" id="nav-team"
+                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
+                        <i class="ph-bold ph-users text-xl"></i>
+                        <span
+                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Team</span>
+                    </button>
+                    <button onclick="switchView('settings')" id="nav-settings"
+                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
+                        <i class="ph-bold ph-gear text-xl"></i>
+                        <span
+                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Config</span>
+                    </button>
+                </nav>
+
+                <div
+                    class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 opacity-80 cursor-pointer hover:ring-2 ring-indigo-500/50 transition border border-white/20">
                 </div>
-                <div class="flex gap-4">
-                    <div class="hud-card px-4 py-2 rounded-lg flex items-center gap-2 border border-white/5">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse" id="status-dot"></div>
-                        <span class="text-xs font-mono text-gray-400" id="status-text">Synchronizing...</span>
-                    </div>
-                </div>
-            </header>
+            </aside>
 
-            <!-- VIEW: DASHBOARD (DEFAULT) -->
-            <div id="view-dashboard" class="grid grid-cols-12 grid-rows-[auto_auto] gap-6 flex-1 animate-slide-up">
+            <!-- Main Content Area: Fluid Grid -->
+            <div class="flex-1 flex flex-col h-full overflow-hidden">
 
-                <!-- 1. INPUT CONTEXT (Left Top) -->
-                <div class="col-span-12 md:col-span-4 dash-panel p-6 flex flex-col">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Session Context</h3>
-                        <div class="flex gap-2">
-                            <button
-                                onclick="document.getElementById('history-panel').classList.add('hidden'); document.getElementById('input-panel').classList.remove('hidden');"
-                                class="text-[10px] font-mono text-indigo-400 hover:text-white transition">INPUT</button>
-                            <button
-                                onclick="document.getElementById('input-panel').classList.add('hidden'); document.getElementById('history-panel').classList.remove('hidden');"
-                                class="text-[10px] font-mono text-gray-500 hover:text-white transition">HISTORY</button>
-                        </div>
-                    </div>
-
-                    <!-- INPUT VIEW -->
-                    <div id="input-panel">
-                        <div class="bg-black/40 rounded-lg p-4 border border-white/5 font-mono text-xs text-gray-300 leading-relaxed h-32 overflow-y-auto"
-                            id="problem-display">
-                            Loading input...
-                        </div>
-                        <div class="mt-4 flex gap-2">
-                            <span
-                                class="px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] text-indigo-300">Sector:
-                                Fintech</span>
-                            <span
-                                class="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] text-red-300">Urgency:
-                                High</span>
-                        </div>
-                    </div>
-
-                    <!-- HISTORY VIEW (Hidden by default) -->
-                    <div id="history-panel" class="hidden h-40 overflow-y-auto pr-1">
-                        <div id="history-list" class="space-y-2">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. DIAGNOSIS ENGINE (Middle Top) -->
-                <div class="col-span-12 md:col-span-4 dash-panel p-6 relative overflow-hidden group">
-                    <div class="flex justify-between items-start mb-6">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Logic Engine v8.0</h3>
-                        <i class="ph-fill ph-cpu text-green-400 animate-pulse"></i>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Diagnosis: Trust Decay</span>
-                            <span class="text-red-400 font-mono">DETECTED</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden">
-                            <div class="bg-red-500 h-full w-[0%] transition-all duration-1000 ease-out delay-200"
-                                id="bar-risk"></div>
-                        </div>
-
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-400">Strategy: Labor Illusion</span>
-                            <span class="text-green-400 font-mono">APPLIED</span>
-                        </div>
-                        <div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden">
-                            <div class="bg-green-500 h-full w-[0%] transition-all duration-1000 ease-out"
-                                id="bar-ambiguity"></div>
-                        </div>
-
-                        <div
-                            class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] font-mono text-indigo-200 mt-2">
-                            OUTPUT STATUS: <br>
-                            <span class="text-white font-bold text-sm">Full Strategic Report Generated</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. ROI CALCULATOR (Right Top) -->
-                <div class="col-span-12 md:col-span-4 dash-panel p-6 flex flex-col justify-between">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Projected Impact</h3>
-                        <div class="flex gap-1">
-                            <button onclick="updateChart('1M')"
-                                class="text-[10px] text-gray-500 hover:text-white px-1">1M</button>
-                            <button onclick="updateChart('6M')"
-                                class="text-[10px] text-white font-bold px-1 border-b border-green-500">6M</button>
-                            <button onclick="updateChart('1Y')"
-                                class="text-[10px] text-gray-500 hover:text-white px-1">1Y</button>
-                        </div>
-                    </div>
+                <!-- Top Bar: Floating Glass -->
+                <header
+                    class="h-20 flex-shrink-0 flex justify-between items-center px-8 border-b border-white/5 bg-[#030014]/20 backdrop-blur-sm">
                     <div>
-                        <div class="text-4xl font-bold text-white mb-1" id="roi-value">+$18,500<span
-                                class="text-sm text-gray-500 font-normal">/mo</span></div>
-                        <div class="text-xs text-green-400 font-mono flex items-center gap-1">
-                            <i class="ph-bold ph-trend-up"></i> +14% Completion Rate Uplift
-                        </div>
+                        <h1 class="text-xl font-bold text-white flex items-center gap-3 tracking-tight">
+                            Strategic Dashboard
+                            <span
+                                class="text-[9px] font-mono bg-green-500/10 text-green-400 px-2 py-0.5 rounded border border-green-500/20 tracking-wider">LIVE_SESSION</span>
+                        </h1>
+                        <p class="text-[10px] text-gray-500 font-mono mt-0.5 flex gap-2">
+                            <span id="tx-display">TX: INITIALIZING...</span>
+                        </p>
                     </div>
-                    <div class="h-16 mt-4 relative">
-                        <canvas id="roiChart" height="60"></canvas>
-                    </div>
-                </div>
-
-                <!-- 4. STRATEGIC OUTPUT (Bottom Left - Large - FULL REPORT) -->
-                <div class="col-span-12 md:col-span-8 dash-panel p-6 flex flex-col h-[500px]">
-                    <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-4">
-                        <div class="flex gap-6">
-                            <button onclick="switchTab('doc')" id="tab-doc"
-                                class="text-xs font-bold text-white border-b-2 border-indigo-500 pb-4 -mb-4.5 transition-colors">Full
-                                Report</button>
-                            <button onclick="switchTab('wireframes')" id="tab-wireframes"
-                                class="text-xs font-medium text-gray-500 hover:text-white transition-colors pb-4 -mb-4.5">Visuals</button>
-                            <button onclick="switchTab('map')" id="tab-map"
-                                class="text-xs font-medium text-gray-500 hover:text-white transition-colors pb-4 -mb-4.5">Resilience
-                                Map</button>
-                        </div>
-                        <button onclick="shareResult()" id="btn-share"
-                            class="text-xs font-mono text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 active:scale-95 transition flex items-center gap-2">
-                            <i class="ph-bold ph-share-network"></i> SHARE
-                        </button>
-                        <button onclick="exportPDF()"
-                            class="text-xs font-mono text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 active:scale-95 transition">
-                            <i class="ph-bold ph-file-pdf"></i> DOWNLOAD REPORT
-                        </button>
-                    </div>
-
-                    <!-- Logic Hook: Result Content ID -->
-                    <div class="overflow-y-auto pr-2 text-sm text-gray-300 font-sans leading-relaxed flex-1 relative space-y-8"
-                        id="result-content">
-                        <!-- Content injected by JS -->
-                        <div class="flex items-center justify-center h-full text-gray-500 animate-pulse font-mono">
-                            > Decrypting strategy payload...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 5. FIGMA PROMPTS (Bottom Right) -->
-                <div class="col-span-12 md:col-span-4 flex flex-col gap-6">
-
-                    <!-- Terminal Log -->
-                    <div
-                        class="dash-panel p-4 flex-1 bg-black/90 font-mono text-[10px] overflow-hidden flex flex-col border-indigo-500/20">
-                        <div class="text-gray-500 border-b border-gray-800 pb-2 mb-2 flex justify-between">
-                            <span>GENERATION_LOG</span>
-                            <span class="text-green-500 animate-pulse">● LIVE</span>
-                        </div>
-                        <div class="space-y-1 text-gray-400 overflow-y-auto h-full" id="terminal-log">
-                            <div>> Initializing connection...</div>
-                        </div>
-                    </div>
-
-                    <!-- Figma Code Block -->
-                    <div class="dash-panel p-6 h-48 flex flex-col relative group">
+                    <div class="flex gap-4">
                         <div
-                            class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition duration-500">
-                        </div>
-                        <div class="flex justify-between items-start mb-2 relative z-10">
-                            <h3 class="text-xs font-mono text-gray-400 uppercase">Figma AI Prompt</h3>
-                            <i class="ph-bold ph-figma-logo text-purple-400"></i>
-                        </div>
-                        <div class="bg-black/50 border border-purple-500/20 rounded p-3 text-[10px] font-mono text-purple-200 overflow-y-auto relative z-10 flex-1"
-                            id="figma-code">
-                            High-fidelity mobile UI...
-                        </div>
-                        <button onclick="copyFigmaCode()" id="copy-btn"
-                            class="mt-2 w-full py-2 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded text-[10px] font-bold font-mono transition relative z-10 border border-purple-500/30">
-                            COPY GENERATION PROMPT
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- VIEW: ANALYTICS (Fully Functional) -->
-            <div id="view-analytics" class="hidden animate-slide-up h-full overflow-y-auto">
-                <!-- Row 1: Main KPIs -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <!-- KPI Card 1: Total Solves -->
-                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
-                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Total Solves
-                        </div>
-                        <div id="stat-solves" class="text-3xl font-bold text-white">0</div>
-                    </div>
-
-                    <!-- KPI Card 2: Revenue ETH -->
-                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
-                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Revenue (ETH)
-                        </div>
-                        <div id="stat-revenue" class="text-3xl font-bold text-green-400">0.0000</div>
-                    </div>
-
-                    <!-- KPI Card 3: Unique Users -->
-                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
-                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Unique Users
-                        </div>
-                        <div id="stat-users" class="text-3xl font-bold text-blue-400">0</div>
-                    </div>
-
-                    <!-- KPI Card 4: Avg Order Value -->
-                    <div class="dash-panel p-4 flex flex-col items-center justify-center">
-                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Avg Order (ETH)
-                        </div>
-                        <div id="stat-aov" class="text-3xl font-bold text-yellow-400">0.0000</div>
-                    </div>
-                </div>
-
-                <!-- Row 2: Charts and Top Tier -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-                    <!-- Tier Distribution Chart -->
-                    <div class="dash-panel p-4 lg:col-span-2">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Tier Distribution
-                        </h3>
-                        <div class="h-40">
-                            <canvas id="chart-tiers"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Top Tier + Status -->
-                    <div class="dash-panel p-4 flex flex-col">
-                        <div class="flex-1 flex flex-col items-center justify-center mb-4">
-                            <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Top Tier
+                            class="hud-card px-4 py-2 rounded-lg flex items-center gap-3 border border-white/5 bg-black/40">
+                            <div class="flex gap-1 h-3 items-end">
+                                <div class="w-1 h-2 bg-indigo-500/50 rounded-sm animate-pulse"></div>
+                                <div class="w-1 h-3 bg-indigo-500 rounded-sm animate-pulse"
+                                    style="animation-delay: 0.1s"></div>
+                                <div class="w-1 h-1.5 bg-indigo-500/50 rounded-sm animate-pulse"
+                                    style="animation-delay: 0.2s"></div>
                             </div>
-                            <div id="stat-top-tier" class="text-3xl font-bold text-purple-400">-</div>
+                            <span class="text-[10px] font-mono text-gray-400" id="status-text">SYSTEM_OPTIMAL</span>
                         </div>
-                        <div class="border-t border-white/10 pt-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-mono text-gray-500 uppercase">Server Status</span>
-                                <span id="stat-server-status" class="flex items-center gap-2 text-xs">
-                                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                                    <span class="text-green-400">Online</span>
-                                </span>
+                    </div>
+                </header>
+
+                <!-- Scrollable Content -->
+                <div class="flex-1 overflow-y-auto p-8 scroll-smooth">
+
+                    <!-- VIEW: DASHBOARD (Bento Grid) -->
+                    <div id="view-dashboard"
+                        class="w-full grid grid-cols-1 md:grid-cols-12 gap-6 animate-slide-up pb-8">
+
+                        <!-- ROW 1: METRICS & CONTEXT -->
+
+                        <!-- 1. INPUT CONTEXT (Span 3) -->
+                        <div
+                            class="col-span-12 md:col-span-3 dash-panel p-5 flex flex-col h-64 relative group overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500">
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Row 3: Recent Transactions -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                    <!-- Recent Transactions List -->
-                    <div class="dash-panel p-4">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Recent Transactions
-                        </h3>
-                        <div id="recent-transactions" class="space-y-2 max-h-48 overflow-y-auto">
-                            <div class="text-xs text-gray-500 italic">Loading...</div>
-                        </div>
-                    </div>
-
-                    <!-- Conversion Funnel -->
-                    <div class="dash-panel p-4">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Conversion Funnel
-                        </h3>
-                        <div class="space-y-3">
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-white">Landing</span>
-                                    <span id="funnel-landing-pct" class="text-green-400">100%</span>
-                                </div>
-                                <div class="w-full bg-gray-800 h-2 rounded-full">
-                                    <div id="funnel-landing-bar"
-                                        class="bg-indigo-500 h-full rounded-full transition-all duration-500"
-                                        style="width: 100%"></div>
+                            <div class="flex justify-between items-start mb-4 relative z-10">
+                                <h3
+                                    class="text-[10px] font-mono text-gray-400 uppercase tracking-widest flex gap-2 items-center">
+                                    <i class="ph-bold ph-terminal-window"></i> Vector
+                                </h3>
+                                <div class="flex gap-1">
+                                    <button onclick="toggleInputView('input')" id="btn-input-view"
+                                        class="w-1.5 h-1.5 rounded-full bg-indigo-400"></button>
+                                    <button onclick="toggleInputView('history')" id="btn-history-view"
+                                        class="w-1.5 h-1.5 rounded-full bg-gray-600 hover:bg-gray-400 transition"></button>
                                 </div>
                             </div>
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-white">Connected</span>
-                                    <span id="funnel-connected-pct" class="text-green-400">--%</span>
+
+                            <!-- INPUT CONTENT -->
+                            <div id="input-panel" class="flex-1 flex flex-col relative z-10">
+                                <div class="flex-1 bg-black/20 rounded border border-white/5 p-3 text-xs text-gray-300 font-mono leading-relaxed overflow-y-auto"
+                                    id="problem-display">
+                                    Loading input vector...
                                 </div>
-                                <div class="w-full bg-gray-800 h-2 rounded-full">
-                                    <div id="funnel-connected-bar"
-                                        class="bg-indigo-500 h-full rounded-full transition-all duration-500"
-                                        style="width: 20%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-white">Payment Started</span>
-                                    <span id="funnel-payment-pct" class="text-yellow-400">--%</span>
-                                </div>
-                                <div class="w-full bg-gray-800 h-2 rounded-full">
-                                    <div id="funnel-payment-bar"
-                                        class="bg-indigo-500 h-full rounded-full transition-all duration-500"
-                                        style="width: 4%"></div>
+                                <div class="mt-3 flex gap-2 flex-wrap">
+                                    <span
+                                        class="px-2 py-1 bg-white/5 rounded text-[9px] text-gray-400 border border-white/5">PRIORITY:
+                                        HIGH</span>
+                                    <span
+                                        class="px-2 py-1 bg-white/5 rounded text-[9px] text-gray-400 border border-white/5">CAT:
+                                        STRATEGY</span>
                                 </div>
                             </div>
-                            <div>
-                                <div class="flex justify-between text-xs mb-1">
-                                    <span class="text-white">Paid</span>
-                                    <span id="funnel-paid-pct" class="text-red-400">--%</span>
+
+                            <!-- HISTORY CONTENT (Hidden) -->
+                            <div id="history-panel" class="hidden flex-1 relative z-10 overflow-y-auto pr-1">
+                                <div id="history-list" class="space-y-1.5"></div>
+                            </div>
+                        </div>
+
+                        <!-- 2. DIAGNOSIS VISUALIZER (Span 5) -->
+                        <div
+                            class="col-span-12 md:col-span-5 dash-panel p-5 h-64 relative overflow-hidden flex flex-col">
+                            <div class="absolute top-0 right-0 p-3 opacity-20">
+                                <i class="ph-duotone ph-brain text-6xl text-indigo-500"></i>
+                            </div>
+                            <h3
+                                class="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-4 flex gap-2 items-center">
+                                <i class="ph-bold ph-activity"></i> Logic Engine v8.0
+                            </h3>
+
+                            <div class="flex-1 flex flex-col justify-center gap-6 relative z-10">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1.5">
+                                        <span class="text-gray-400 font-mono">TRUST_DECAY_DETECTED</span>
+                                        <span class="text-red-400 font-bold">CRITICAL</span>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-800/50 h-1.5 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+                                        <div class="bg-gradient-to-r from-red-600 to-red-400 h-full w-[0%] transition-all duration-1000"
+                                            id="bar-risk"></div>
+                                    </div>
                                 </div>
-                                <div class="w-full bg-gray-800 h-2 rounded-full">
-                                    <div id="funnel-paid-bar"
-                                        class="bg-indigo-500 h-full rounded-full transition-all duration-500"
-                                        style="width: 2%"></div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1.5">
+                                        <span class="text-gray-400 font-mono">STRATEGIC_AMBIGUITY</span>
+                                        <span class="text-yellow-400 font-bold">RESOLVING...</span>
+                                    </div>
+                                    <div
+                                        class="w-full bg-gray-800/50 h-1.5 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+                                        <div class="bg-gradient-to-r from-yellow-600 to-yellow-400 h-full w-[0%] transition-all duration-1000 delay-300"
+                                            id="bar-ambiguity"></div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center gap-3">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <div>
+                                        <div class="text-[10px] text-indigo-300 font-mono leading-tight">STATUS</div>
+                                        <div class="text-xs text-white font-bold">Optimization Complete</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Row 4: Transaction History Table -->
-                <div class="dash-panel p-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Transaction History</h3>
-                        <div class="flex items-center gap-2">
-                            <input type="text" id="tx-search-input" placeholder="Search wallet address..."
-                                class="px-3 py-1.5 bg-black/30 border border-white/10 rounded text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-64"
-                                oninput="window.filterTransactions(this.value)">
-                            <button onclick="window.loadTransactionHistory()"
-                                class="px-3 py-1.5 bg-indigo-500/20 text-indigo-400 text-xs rounded hover:bg-indigo-500/30 transition">
-                                <i class="ph-bold ph-arrows-clockwise"></i>
+                        <!-- 3. ACTION / ROI (Span 4) -->
+                        <div
+                            class="col-span-12 md:col-span-4 dash-panel p-5 h-64 flex flex-col relative overflow-hidden">
+                            <!-- Background Chart Bloom -->
+                            <div
+                                class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-green-500/10 to-transparent pointer-events-none">
+                            </div>
+
+                            <div class="flex justify-between items-start mb-2 relative z-10">
+                                <h3 class="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Projected
+                                    Impact</h3>
+                                <div class="bg-white/5 rounded-full p-1 flex">
+                                    <button
+                                        class="px-2 py-0.5 text-[9px] text-white bg-white/10 rounded-full">1M</button>
+                                    <button
+                                        class="px-2 py-0.5 text-[9px] text-gray-500 hover:text-white transition">1Y</button>
+                                </div>
+                            </div>
+
+                            <div class="relative z-10">
+                                <div class="text-4xl font-bold text-white tracking-tighter" id="roi-value">+$18.5k</div>
+                                <div class="text-xs text-green-400 font-mono mt-1 flex items-center gap-1">
+                                    <i class="ph-bold ph-trend-up"></i> 14% Efficiency Gain
+                                </div>
+                            </div>
+
+                            <div class="flex-1 mt-4 relative z-10 min-h-0">
+                                <canvas id="roiChart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+
+
+                        <!-- ROW 2: MAIN OUTPUT -->
+
+                        <!-- 4. STRATEGIC REPORT (Span 8) -->
+                        <div
+                            class="col-span-12 md:col-span-8 dash-panel p-0 flex flex-col h-[600px] relative overflow-hidden">
+                            <!-- Tabs Header -->
+                            <div class="flex justify-between items-center px-6 py-4 border-b border-white/5 bg-white/2">
+                                <div class="flex gap-6">
+                                    <button onclick="switchTab('doc')" id="tab-doc"
+                                        class="text-xs font-bold text-white border-b-2 border-indigo-500 pb-4 -mb-4.5 transition-colors tracking-wide h-full">REPORT_V1</button>
+                                    <button onclick="switchTab('wireframes')" id="tab-wireframes"
+                                        class="text-xs font-medium text-gray-500 hover:text-white transition-colors pb-4 -mb-4.5 tracking-wide">VISUALS</button>
+                                    <button onclick="switchTab('map')" id="tab-map"
+                                        class="text-xs font-medium text-gray-500 hover:text-white transition-colors pb-4 -mb-4.5 tracking-wide">RESILIENCE_MAP</button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="shareResult()"
+                                        class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition">
+                                        <i class="ph-bold ph-share-network"></i>
+                                    </button>
+                                    <button onclick="exportPDF()"
+                                        class="w-8 h-8 rounded bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 flex items-center justify-center text-indigo-400 hover:text-white transition shadow-lg shadow-indigo-500/10">
+                                        <i class="ph-bold ph-download-simple"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Content Container -->
+                            <div class="flex-1 overflow-y-auto p-8 relative custom-scrollbar space-y-8"
+                                id="result-content">
+                                <div
+                                    class="flex flex-col items-center justify-center h-full text-gray-500 font-mono space-y-4">
+                                    <div
+                                        class="w-12 h-12 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin">
+                                    </div>
+                                    <span class="animate-pulse tracking-widest text-xs">> DECRYPTING_PAYLOAD...</span>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Fade -->
+                            <div
+                                class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#131524] to-transparent pointer-events-none">
+                            </div>
+                        </div>
+
+                        <!-- 5. SIDEBAR WIDGETS (Span 4) -->
+                        <div class="col-span-12 md:col-span-4 flex flex-col gap-6 h-[600px]">
+
+                            <!-- Terminal -->
+                            <div
+                                class="dash-panel p-4 flex-1 bg-black/80 font-mono text-[10px] overflow-hidden flex flex-col border-indigo-500/10 shadow-inner">
+                                <div
+                                    class="text-gray-500 border-b border-gray-800 pb-2 mb-2 flex justify-between uppercase tracking-wider">
+                                    <span>System_Log</span>
+                                    <span class="text-green-500 flex items-center gap-1"><span
+                                            class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                                        ONLINE</span>
+                                </div>
+                                <div class="space-y-1.5 text-gray-400 overflow-y-auto h-full scrollbar-hide"
+                                    id="terminal-log">
+                                    <div>> System initialized...</div>
+                                </div>
+                            </div>
+
+                            <!-- Figma Prompt -->
+                            <div
+                                class="dash-panel p-5 h-1/2 flex flex-col relative group overflow-hidden border-purple-500/20">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-transparent opacity-50">
+                                </div>
+                                <div class="flex justify-between items-start mb-3 relative z-10">
+                                    <h3
+                                        class="text-[10px] font-mono text-purple-300 uppercase tracking-widest flex gap-2 items-center">
+                                        <i class="ph-bold ph-figma-logo"></i> Generator
+                                    </h3>
+                                </div>
+                                <div class="bg-black/40 border border-purple-500/20 rounded-lg p-3 text-[10px] font-mono text-purple-200 overflow-y-auto flex-1 relative z-10 shadow-inner"
+                                    id="figma-code">
+                                    // High-fidelity UI prompt...
+                                </div>
+                                <button onclick="copyFigmaCode()"
+                                    class="mt-3 w-full py-2.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded border border-purple-500/30 text-[10px] font-bold font-mono transition uppercase tracking-widest relative z-10 flex items-center justify-center gap-2 group-hover:shadow-[0_0_15px_rgba(147,51,234,0.3)]">
+                                    <i class="ph-bold ph-copy"></i> Copy Prompt
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Analytics View Placeholder (Same structure as before but full width) -->
+                    <!-- VIEW: ANALYTICS (Fully Functional) -->
+                    <div id="view-analytics"
+                        class="hidden animate-slide-up h-full overflow-y-auto custom-scrollbar pb-12">
+
+                        <div class="max-w-[1600px] mx-auto">
+                            <!-- Section Title -->
+                            <div class="mb-6 flex items-end justify-between border-b border-white/5 pb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white tracking-tight">System Analytics</h2>
+                                    <p class="text-xs text-gray-400 font-mono mt-1">REAL_TIME_DATA_FEED // ADMIN_ACCESS
+                                    </p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span
+                                        class="px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] text-indigo-300 font-mono">v1.2.0
+                                        STABLE</span>
+                                </div>
+                            </div>
+
+                            <!-- Row 1: Main KPIs -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                                <div
+                                    class="dash-panel p-6 flex flex-col justify-between h-32 relative overflow-hidden group">
+                                    <div
+                                        class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition group-hover:scale-110 duration-500">
+                                        <i class="ph-duotone ph-check-circle text-5xl text-white"></i>
+                                    </div>
+                                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">
+                                        Total Solves</div>
+                                    <div>
+                                        <div id="stat-solves" class="text-4xl font-bold text-white">0</div>
+                                        <div class="text-[10px] text-green-400 font-mono mt-1">+12% vs last week</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="dash-panel p-6 flex flex-col justify-between h-32 relative overflow-hidden group">
+                                    <div
+                                        class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition group-hover:scale-110 duration-500">
+                                        <i class="ph-duotone ph-currency-eth text-5xl text-green-400"></i>
+                                    </div>
+                                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">
+                                        Revenue (ETH)</div>
+                                    <div>
+                                        <div id="stat-revenue" class="text-4xl font-bold text-green-400">0.0000</div>
+                                        <div class="text-[10px] text-green-600 font-mono mt-1">Pending: 0.05 ETH</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="dash-panel p-6 flex flex-col justify-between h-32 relative overflow-hidden group">
+                                    <div
+                                        class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition group-hover:scale-110 duration-500">
+                                        <i class="ph-duotone ph-users text-5xl text-blue-400"></i>
+                                    </div>
+                                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">
+                                        Unique Users</div>
+                                    <div>
+                                        <div id="stat-users" class="text-4xl font-bold text-blue-400">0</div>
+                                        <div class="text-[10px] text-blue-500 font-mono mt-1">Active: 12</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="dash-panel p-6 flex flex-col justify-between h-32 relative overflow-hidden group">
+                                    <div
+                                        class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition group-hover:scale-110 duration-500">
+                                        <i class="ph-duotone ph-chart-bar text-5xl text-yellow-400"></i>
+                                    </div>
+                                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-1">Avg
+                                        Order (ETH)</div>
+                                    <div>
+                                        <div id="stat-aov" class="text-4xl font-bold text-yellow-400">0.0000</div>
+                                        <div class="text-[10px] text-yellow-600 font-mono mt-1">Target: 0.05</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Deep Dive -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+
+                                <!-- Tier Distribution (Span 8) -->
+                                <div class="col-span-12 md:col-span-8 dash-panel p-6 min-h-[300px]">
+                                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-6">Tier
+                                        Distribution</h3>
+                                    <div class="h-64 w-full">
+                                        <canvas id="chart-tiers"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Server Status & Top Tier (Span 4) -->
+                                <div class="col-span-12 md:col-span-4 flex flex-col gap-6">
+                                    <div
+                                        class="dash-panel p-6 flex-1 flex flex-col items-center justify-center relative">
+                                        <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">
+                                            Most Popular Tier</div>
+                                        <div id="stat-top-tier"
+                                            class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+                                            -</div>
+                                        <div
+                                            class="mt-4 px-3 py-1 bg-white/5 rounded-full text-[10px] text-gray-400 font-mono border border-white/5">
+                                            64% of volume
+                                        </div>
+                                    </div>
+
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <span class="text-[10px] font-mono text-gray-500 uppercase">System
+                                                Status</span>
+                                            <span id="stat-server-status" class="flex items-center gap-2 text-xs">
+                                                <span class="flex h-2 w-2 relative">
+                                                    <span
+                                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                    <span
+                                                        class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                                </span>
+                                                <span class="text-green-400 font-bold">OPERATIONAL</span>
+                                            </span>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                                                <span>Uptime</span>
+                                                <span class="text-white">99.99%</span>
+                                            </div>
+                                            <div class="flex justify-between text-[10px] text-gray-500 font-mono">
+                                                <span>Latency</span>
+                                                <span class="text-white">24ms</span>
+                                            </div>
+                                            <div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-2">
+                                                <div class="bg-green-500 h-full w-[98%]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Transactions & Funnel -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+
+                                <!-- Recent Transactions (Span 8) -->
+                                <div class="col-span-12 md:col-span-8 dash-panel p-6 h-[400px] flex flex-col">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                            Transaction History</h3>
+                                        <div class="flex items-center gap-3">
+                                            <div class="relative">
+                                                <i
+                                                    class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+                                                <input type="text" id="tx-search-input" placeholder="Search address..."
+                                                    class="pl-8 pr-3 py-1.5 bg-black/30 border border-white/10 rounded text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 w-48 transition-all focus:w-64"
+                                                    oninput="window.filterTransactions(this.value)">
+                                            </div>
+                                            <button onclick="window.loadTransactionHistory()"
+                                                class="w-8 h-8 flex items-center justify-center bg-indigo-500/10 text-indigo-400 rounded hover:bg-indigo-500/20 transition">
+                                                <i class="ph-bold ph-arrows-clockwise"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 overflow-auto custom-scrollbar -mx-2 px-2">
+                                        <table class="w-full text-xs text-left">
+                                            <thead class="sticky top-0 bg-[#0f111a] z-10">
+                                                <tr class="text-gray-500 border-b border-white/5">
+                                                    <th class="py-3 px-2 font-mono font-normal">WALLET</th>
+                                                    <th class="py-3 px-2 font-mono font-normal">TIER</th>
+                                                    <th class="py-3 px-2 font-mono font-normal">DATE</th>
+                                                    <th class="py-3 px-2 font-mono font-normal">TX HASH</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tx-history-body" class="font-mono text-gray-300">
+                                                <tr>
+                                                    <td colspan="4" class="py-12 text-center text-gray-600 italic">
+                                                        Attempting to fetch ledger data...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="tx-history-stats"
+                                        class="text-[10px] text-gray-600 mt-4 font-mono text-right border-t border-white/5 pt-3">
+                                        Syncing ledger...
+                                    </div>
+                                </div>
+
+                                <!-- Funnel (Span 4) -->
+                                <div class="col-span-12 md:col-span-4 dash-panel p-6 h-[400px] flex flex-col">
+                                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-6">
+                                        Conversion Impact</h3>
+
+                                    <div class="flex-1 flex flex-col justify-center space-y-6">
+                                        <!-- Step 1 -->
+                                        <div class="relative">
+                                            <div class="flex justify-between text-xs mb-2">
+                                                <span class="text-white font-bold">Landing Page</span>
+                                                <span id="funnel-landing-pct"
+                                                    class="text-green-400 font-mono">100%</span>
+                                            </div>
+                                            <div
+                                                class="h-14 bg-white/5 rounded-lg border border-white/5 relative overflow-hidden">
+                                                <div id="funnel-landing-bar"
+                                                    class="absolute inset-y-0 left-0 bg-indigo-900/40 border-r border-indigo-500/50 transition-all duration-1000"
+                                                    style="width: 100%"></div>
+                                                <div
+                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-gray-400 font-mono">
+                                                    <i class="ph-bold ph-eye mr-2"></i> Total Visitors
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 2 -->
+                                        <div class="relative">
+                                            <div class="flex justify-between text-xs mb-2">
+                                                <span class="text-white font-bold">Wallet Connect</span>
+                                                <span id="funnel-connected-pct"
+                                                    class="text-indigo-400 font-mono">--%</span>
+                                            </div>
+                                            <div
+                                                class="h-14 bg-white/5 rounded-lg border border-white/5 relative overflow-hidden">
+                                                <div id="funnel-connected-bar"
+                                                    class="absolute inset-y-0 left-0 bg-indigo-700/40 border-r border-indigo-400/50 transition-all duration-1000"
+                                                    style="width: 0%"></div>
+                                                <div
+                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-gray-400 font-mono">
+                                                    <i class="ph-bold ph-plug mr-2"></i> Handshake
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Step 3 -->
+                                        <div class="relative">
+                                            <div class="flex justify-between text-xs mb-2">
+                                                <span class="text-white font-bold">Conversion</span>
+                                                <span id="funnel-paid-pct" class="text-green-400 font-mono">--%</span>
+                                            </div>
+                                            <div
+                                                class="h-14 bg-white/5 rounded-lg border border-white/5 relative overflow-hidden">
+                                                <div id="funnel-paid-bar"
+                                                    class="absolute inset-y-0 left-0 bg-green-500/20 border-r border-green-500/50 transition-all duration-1000"
+                                                    style="width: 0%"></div>
+                                                <div
+                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-gray-400 font-mono">
+                                                    <i class="ph-bold ph-coins mr-2"></i> Minted
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Row 4: Quick Actions -->
+                            <div class="dash-panel p-6 flex flex-wrap items-center gap-4">
+                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mr-4">Data Exports
+                                </h3>
+                                <button onclick="window.refreshAdminStats()"
+                                    class="px-4 py-2.5 bg-indigo-500/10 text-indigo-400 text-xs font-bold rounded-lg border border-indigo-500/20 hover:bg-indigo-500/20 transition flex items-center gap-2">
+                                    <i class="ph-bold ph-arrows-clockwise"></i> Refresh Feed
+                                </button>
+                                <button onclick="window.exportAdminCSV && window.exportAdminCSV()"
+                                    class="px-4 py-2.5 bg-gray-800 text-gray-300 text-xs font-bold rounded-lg border border-white/10 hover:bg-gray-700 transition flex items-center gap-2">
+                                    <i class="ph-bold ph-file-csv"></i> Download CSV
+                                </button>
+                                <div class="h-6 w-px bg-white/10 mx-2"></div>
+                                <a href="https://etherscan.io/address/0xa14504ffe5E9A245c9d4079547Fa16fA0A823114"
+                                    target="_blank"
+                                    class="text-xs font-mono text-gray-500 hover:text-white transition flex items-center gap-2">
+                                    CONTRACT: 0xa14...3114 <i class="ph-bold ph-arrow-square-out"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- VIEW: TEAM -->
+                    <div id="view-team"
+                        class="hidden animate-slide-up h-full flex flex-col items-center justify-center p-8">
+                        <div class="dash-panel p-12 text-center max-w-lg mx-auto">
+                            <i class="ph-duotone ph-users-three text-6xl text-gray-600 mb-6"></i>
+                            <h2 class="text-2xl text-white font-bold mb-2">Team Management</h2>
+                            <p class="text-gray-400 mb-6">Collaborate with your organization. This feature is coming in
+                                v2.1.</p>
+                            <button
+                                class="px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 cursor-not-allowed">
+                                Feature Locked
                             </button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs">
-                            <thead>
-                                <tr class="border-b border-white/10 text-gray-500 uppercase">
-                                    <th class="text-left py-2 px-2 font-mono">Wallet</th>
-                                    <th class="text-left py-2 px-2 font-mono">Tier</th>
-                                    <th class="text-left py-2 px-2 font-mono">Date</th>
-                                    <th class="text-left py-2 px-2 font-mono">TX Hash</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tx-history-body" class="text-white">
-                                <tr>
-                                    <td colspan="4" class="py-4 text-center text-gray-500 italic">Click refresh to
-                                        load...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="tx-history-stats" class="text-[10px] text-gray-500 mt-2 font-mono">Showing 0 transactions
-                    </div>
-                </div>
 
-                <!-- Row 5: Quick Actions -->
-                <div class="dash-panel p-4">
-                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Quick Actions</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="window.refreshAdminStats()"
-                            class="px-4 py-2 bg-indigo-500/20 text-indigo-400 text-xs font-bold rounded hover:bg-indigo-500/30 transition flex items-center gap-2">
-                            <i class="ph-bold ph-arrows-clockwise"></i> Refresh Data
-                        </button>
-                        <button onclick="window.exportAdminCSV && window.exportAdminCSV()"
-                            class="px-4 py-2 bg-green-500/20 text-green-400 text-xs font-bold rounded hover:bg-green-500/30 transition flex items-center gap-2">
-                            <i class="ph-bold ph-file-csv"></i> Export CSV
-                        </button>
-                        <a href="https://etherscan.io/address/0xa14504ffe5E9A245c9d4079547Fa16fA0A823114"
-                            target="_blank"
-                            class="px-4 py-2 bg-purple-500/20 text-purple-400 text-xs font-bold rounded hover:bg-purple-500/30 transition flex items-center gap-2">
-                            <i class="ph-bold ph-arrow-square-out"></i> View on Etherscan
-                        </a>
+                    <!-- VIEW: SETTINGS -->
+                    <div id="view-settings"
+                        class="hidden animate-slide-up h-full flex flex-col items-center justify-center p-8">
+                        <div class="dash-panel p-12 text-center max-w-lg mx-auto">
+                            <i class="ph-duotone ph-gear text-6xl text-gray-600 mb-6"></i>
+                            <h2 class="text-2xl text-white font-bold mb-2">System Settings</h2>
+                            <p class="text-gray-400 mb-6">Configure API keys, webhooks, and security preferences.</p>
+                            <button
+                                class="px-6 py-2 bg-indigo-500/20 border border-indigo-500/40 rounded-lg text-indigo-300 hover:bg-indigo-500/30 transition">
+                                Open Config Panel
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
-
-            <!-- VIEW: TEAM (Fully Functional) -->
-            <div id="view-team" class="hidden animate-slide-up h-full">
-                <!-- ... -->
-            </div>
-
-            <!-- VIEW: SETTINGS (Fully Functional) -->
-            <div id="view-settings" class="hidden animate-slide-up h-full">
-                <!-- ... -->
-            </div>
-
         </div>
+
     </main>
 
     <!-- TOAST NOTIFICATION -->
