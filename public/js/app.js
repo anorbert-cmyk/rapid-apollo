@@ -267,6 +267,52 @@ window.payAndSolve = async (tier) => {
         document.getElementById('eth-medium').innerText = `~${freshData.medium} ETH`;
         document.getElementById('eth-full').innerText = `~${freshData.full} ETH`;
 
+        // ===== TEST MODE: Full Tier is FREE for testing =====
+        if (tier === 'full') {
+            loadingTitle.innerText = '🧪 TEST MODE';
+            updateLoading('Bypassing payment for testing...');
+
+            // Generate mock TX hash
+            const mockTxHash = '0x' + 'TEST' + Date.now().toString(16).padStart(60, '0');
+
+            // Call test endpoint instead
+            const response = await fetch('/api/solve-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    problemStatement: problem,
+                    txHash: mockTxHash,
+                    tier: tier,
+                    testMode: true
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                const loadingState = document.getElementById('loadingState');
+                const successState = document.getElementById('successState');
+                const btnEnterDashboard = document.getElementById('btn-enter-dashboard');
+
+                loadingState.classList.add('hidden');
+                successState.classList.remove('hidden');
+
+                saveSession({
+                    txHash: result.txHash,
+                    problem: problem,
+                    solution: result.solution,
+                    tier: tier,
+                    timestamp: Date.now()
+                });
+
+                btnEnterDashboard.onclick = () => window.enterDashboard();
+            } else {
+                alert("Error: " + result.error);
+            }
+            return; // Exit early for test mode
+        }
+        // ===== END TEST MODE =====
+
         // CORRECTED PRICING MAPPING
         const tierCostUSD = tier === 'standard' ? 19 : tier === 'medium' ? 49 : 199;
         const rate = (tierCostUSD / parseFloat(ethAmount)).toFixed(2);
