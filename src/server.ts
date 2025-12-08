@@ -8,6 +8,9 @@ import adminRoutes from './routes/admin';
 
 const app = express();
 
+// Security: Trust Proxy (Required for Railway/Load Balancers)
+app.set('trust proxy', 1);
+
 // ===== SECURITY MIDDLEWARE =====
 
 // Helmet: Secure HTTP headers
