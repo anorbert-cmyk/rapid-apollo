@@ -1,4 +1,24 @@
-console.log("App script running v1.1");
+console.log("App script running v2.0");
+
+// ===========================================
+// CLIENT-SIDE CONSTANTS
+// ===========================================
+const APP_CONFIG = {
+    // UI Timing
+    TOAST_DURATION_MS: 8000,
+    MODAL_TRANSITION_MS: 300,
+    SIGNATURE_TIMEOUT_MS: 5 * 60 * 1000, // 5 minutes
+
+    // Limits
+    MIN_PROBLEM_LENGTH: 10,
+    MAX_PROBLEM_LENGTH: 10000,
+    MAX_RECENT_TX_DISPLAY: 5,
+
+    // API Version
+    API_VERSION: 'v1',
+    API_BASE: '/api' // Can be changed to '/api/v1' when ready
+};
+
 let provider, signer, userAddress;
 let tierPrices = { standard: 0, medium: 0, full: 0 };
 let RECIPIENT_ADDRESS = null; // Will be fetched from backend
@@ -153,7 +173,7 @@ function showToast(title, message) {
     setTimeout(() => {
         // Animate Out: Add hidden/offset state
         toast.classList.add('translate-y-20', 'opacity-0');
-    }, 8000); // 8 seconds to read
+    }, APP_CONFIG.TOAST_DURATION_MS);
 }
 
 // Connect Wallet Modal Logic

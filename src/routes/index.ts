@@ -3,6 +3,8 @@ import { verifyTransaction } from '../services/paymentService';
 import { solveProblem } from '../services/aiService';
 import { getTierPriceETH, Tier } from '../services/priceService';
 import { config } from '../config';
+import { CONSTANTS } from '../constants';
+import { logger } from '../utils/logger';
 import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore, transactionLogStore } from '../store';
 import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
@@ -25,8 +27,10 @@ async function addToUserHistory(walletAddress: string, resultData: any) {
     if (!current.find((r: any) => r.txHash === resultData.txHash)) {
         current.unshift(resultData); // Add to top
     }
-    // Limit to last 50 items?
-    if (current.length > 50) current.length = 50;
+    // Limit to configured max
+    if (current.length > CONSTANTS.MAX_USER_HISTORY) {
+        current.length = CONSTANTS.MAX_USER_HISTORY;
+    }
 
     await userHistoryStore.set(walletAddress, current);
 }
@@ -183,8 +187,10 @@ router.post('/solve', async (req: Request, res: Response) => {
                 timestamp: new Date().toISOString(),
                 txHash: txHash
             });
-            // Keep last 500 transactions
-            if (txLog.length > 500) txLog.length = 500;
+            // Keep last N transactions (configurable)
+            if (txLog.length > CONSTANTS.MAX_TRANSACTIONS_LOG) {
+                txLog.length = CONSTANTS.MAX_TRANSACTIONS_LOG;
+            }
             await transactionLogStore.set('all', txLog);
         }
 

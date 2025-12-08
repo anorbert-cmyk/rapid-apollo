@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
+import { CONSTANTS } from './constants';
+import { logger } from './utils/logger';
+import { walletRateLimiter } from './utils/walletRateLimiter';
 import apiRoutes from './routes';
 import path from 'path';
 import adminRoutes from './routes/admin';
@@ -22,13 +25,17 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
-// Rate Limiting: 100 requests per 15 minutes per IP
+// Rate Limiting: IP-based (using constants)
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
+    windowMs: CONSTANTS.RATE_LIMIT_WINDOW_MS,
+    max: CONSTANTS.RATE_LIMIT_MAX_REQUESTS,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many requests, please try again later.' }
+    message: { error: 'Too many requests, please try again later.' },
+    handler: (req, res) => {
+        logger.warn('IP rate limit exceeded', { ip: req.ip });
+        res.status(429).json({ error: 'Too many requests, please try again later.' });
+    }
 });
 app.use(limiter);
 
@@ -42,18 +49,41 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10kb' })); // Limit body size to prevent large payload attacks
 
-// Static files
 // Static files - served from 'public' directory from root (up one level from dist)
 app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== ROUTES =====
+
+// Per-wallet rate limiting for payment endpoints
+app.use('/api/solve', walletRateLimiter);
+app.use('/api/v1/solve', walletRateLimiter);
+
+// API v1 Routes (new versioned endpoints)
+app.use('/api/v1', apiRoutes);
+app.use('/api/v1/admin', adminRoutes);
+
+// Legacy Routes (backward compatibility - will be deprecated)
 app.use('/api', apiRoutes);
-app.use('/api/admin', adminRoutes); // Admin analytics & stats
+app.use('/api/admin', adminRoutes);
+
+// ===== SERVER START =====
 
 app.listen(config.PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${config.PORT}`);
-    console.log(`🔒 Security: Helmet + Rate Limiting enabled`);
+    logger.info('Server started', {
+        port: config.PORT,
+        env: config.NODE_ENV,
+        apiVersion: CONSTANTS.API_VERSION
+    });
+
+    logger.info('Security enabled', {
+        helmet: true,
+        rateLimiting: true,
+        walletRateLimiting: true
+    });
+
     if (config.NODE_ENV !== 'production') {
-        console.log(`💰 Wallet: ${config.RECEIVER_WALLET_ADDRESS}`);
+        logger.debug('Development mode', {
+            wallet: config.RECEIVER_WALLET_ADDRESS
+        });
     }
 });
