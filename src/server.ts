@@ -15,6 +15,11 @@ import {
 import apiRoutes from './routes';
 import path from 'path';
 import adminRoutes from './routes/admin';
+import swaggerUi from 'swagger-ui-express';
+import yaml from 'yamljs';
+
+// Load OpenAPI Spec
+const swaggerDocument = yaml.load(path.join(__dirname, './docs/swagger.yaml'));
 
 // Initialize error monitoring
 initErrorMonitoring();
@@ -49,7 +54,11 @@ const limiter = rateLimit({
         res.status(429).json({ error: 'Too many requests, please try again later.' });
     }
 });
-app.use(limiter);
+
+// Disable rate limiting in test environment (Playwright runs parallel tests)
+if (config.NODE_ENV !== 'test') {
+    app.use(limiter);
+}
 
 // CORS: Configure allowed origins (use ALLOWED_ORIGIN env var in production)
 app.use(cors({
@@ -83,6 +92,9 @@ app.use('/api/admin', adminRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMonitoringMiddleware);
+
+// API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // ===== GRACEFUL SHUTDOWN =====
 

@@ -1,0 +1,163 @@
+openapi: 3.0.0
+info:
+  title: Aether Logic API
+  description: Crypto-gated AI Strategy Engine API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local Development Server
+
+paths:
+  /api/health:
+    get:
+      summary: Health Check
+      description: Returns the health status of the API
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /api/pricing:
+    get:
+      summary: Get Pricing Tiers
+      description: Returns current pricing for all service tiers in ETH
+      responses:
+        '200':
+          description: Pricing data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  standard:
+                    type: string
+                    example: "0.01"
+                  medium:
+                    type: string
+                    example: "0.025"
+                  full:
+                    type: string
+                    example: "0.1"
+
+  /api/config:
+    get:
+      summary: Get Public Configuration
+      description: Returns public configuration including the receiver wallet address
+      responses:
+        '200':
+          description: Config data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receiverAddress:
+                    type: string
+                    description: The wallet address to send payments to
+
+  /api/solve:
+    post:
+      summary: Submit Problem & Generate Strategy
+      description: Main endpoint. Verifies payment on-chain and generates AI strategy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - problemStatement
+                - txHash
+                - tier
+              properties:
+                problemStatement:
+                  type: string
+                  minLength: 10
+                  maxLength: 10000
+                txHash:
+                  type: string
+                  description: The transaction hash of the payment
+                tier:
+                  type: string
+                  enum: [standard, medium, full]
+      responses:
+        '200':
+          description: Strategy generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  problem:
+                    type: string
+                  solution:
+                    type: string
+                    description: Markdown formatted solution
+                  tier:
+                    type: string
+        '400':
+          description: Invalid input or validation failed
+        '402':
+          description: Payment required / invalid transaction
+        '409':
+          description: Transaction already used (Double-spend protection)
+
+  /api/history:
+    post:
+      summary: Sync Session History
+      description: Retrieve past sessions for a verified wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - walletAddress
+                - signature
+                - timestamp
+              properties:
+                walletAddress:
+                  type: string
+                signature:
+                  type: string
+                  description: Signed message to prove ownership
+                timestamp:
+                  type: number
+                  description: Current timestamp for anti-replay
+      responses:
+        '200':
+          description: History synced
+        '401':
+          description: Token/Timestamp expired
+        '403':
+          description: Invalid signature
+
+  /api/share/{uuid}:
+    get:
+      summary: Get Shared Result
+      description: Retrieve a specific shared result by UUID
+      parameters:
+        - in: path
+          name: uuid
+          schema:
+            type: string
+          required: true
+          description: Unique share ID
+      responses:
+        '200':
+          description: Shared content found
+        '404':
+          description: Link expired or invalid
