@@ -710,8 +710,25 @@ function renderMarkdownWithUX(content, containerId) {
     });
 }
 
+// ==========================================
+// AETHER LOGIC V1.0 - CORE APP
+// ==========================================
 
-// ------------------------------------------
+// --- GLOBAL ERROR BOUNDARY ---
+window.addEventListener('unhandledrejection', (event) => {
+    console.error("Critical Failure:", event.reason);
+    showToast("Logic Engine Disrupted. Retrying...", "error");
+});
+
+window.addEventListener('error', (event) => {
+    console.error("System Error:", event.error);
+    // Don't show toast for minor asset 404s
+    if (event.target.tagName !== 'IMG') {
+        showToast("Unexpected Anomalies Detected.", "error");
+    }
+});
+
+// --- STATE MANAGEMENT ---------------------------------------
 // SHARING & UX
 // ------------------------------------------
 
