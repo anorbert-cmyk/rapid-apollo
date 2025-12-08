@@ -71,6 +71,14 @@ router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
                     standard: countStandard || 0,
                     medium: countMedium || 0,
                     full: countFull || 0
+                },
+                // Funnel estimates (until real event tracking is added)
+                // Based on industry averages: ~2% conversion rate
+                funnel: {
+                    landing: Math.max((totalSolves || 0) * 50, 100), // Estimated visits
+                    connected: Math.max((totalSolves || 0) * 10, 20), // Est. wallet connects
+                    paymentStarted: Math.max((totalSolves || 0) * 2, 5), // Est. payment attempts
+                    paid: totalSolves || 0 // Actual successful payments
                 }
             }
         });

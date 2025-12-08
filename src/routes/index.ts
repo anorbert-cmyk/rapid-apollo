@@ -203,52 +203,6 @@ router.post('/solve', async (req: Request, res: Response) => {
     }
 });
 
-// ===== TEST ENDPOINT (NO PAYMENT VERIFICATION) =====
-// Used for testing the full flow without real ETH payment
-router.post('/solve-test', async (req: Request, res: Response) => {
-    try {
-        const { problemStatement, txHash, tier, testMode } = req.body;
-
-        // Only allow full tier in test mode
-        if (tier !== 'full' || !testMode) {
-            return res.status(403).json({ error: 'Test mode only available for full tier' });
-        }
-
-        // Validate input
-        if (!problemStatement || problemStatement.length < 10) {
-            return res.status(400).json({ error: 'Problem statement too short' });
-        }
-
-        console.log(`🧪 TEST MODE: Processing without payment verification [Tier: ${tier}]`);
-
-        // Skip payment verification, go straight to AI
-        const solution = await solveProblem(problemStatement, tier);
-
-        const resultData = {
-            txHash: txHash || 'TEST-' + Date.now(),
-            tier,
-            problem: problemStatement,
-            solution,
-            timestamp: new Date().toISOString(),
-            testMode: true
-        };
-
-        // Still save to result store (for dashboard/sharing to work)
-        await resultStore.set(txHash, {
-            data: resultData,
-            timestamp: Date.now()
-        });
-
-        // Update stats (test purchases still count for analytics)
-        updateStats(tier);
-
-        return res.json({ success: true, ...resultData });
-
-    } catch (error) {
-        console.error('Test solve error:', error);
-        return res.status(500).json({ error: 'Test solve failed' });
-    }
-});
 
 // POST /api/history - Secure Sync
 router.post('/history', async (req: Request, res: Response) => {

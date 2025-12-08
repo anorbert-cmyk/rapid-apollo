@@ -14,11 +14,45 @@ app.set('trust proxy', 1);
 
 // ===== SECURITY MIDDLEWARE =====
 
-// Helmet: Secure HTTP headers
+// Helmet: Secure HTTP headers with comprehensive CSP
 app.use(helmet({
-    // TEMPORARILY DISABLED: CSP was blocking too many CDN resources.
-    // TODO: Re-enable with properly expanded allowlists once functionality is confirmed.
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'", // Required for inline event handlers
+                "https://cdnjs.cloudflare.com", // ethers.js, marked, chart.js
+                "https://cdn.jsdelivr.net", // Phosphor Icons JS
+                "https://unpkg.com" // Alternative CDN
+            ],
+            styleSrc: [
+                "'self'",
+                "'unsafe-inline'", // Required for inline styles
+                "https://fonts.googleapis.com",
+                "https://cdn.jsdelivr.net" // Phosphor Icons CSS
+            ],
+            fontSrc: [
+                "'self'",
+                "https://fonts.gstatic.com",
+                "https://cdn.jsdelivr.net"
+            ],
+            imgSrc: [
+                "'self'",
+                "data:",
+                "https://etherscan.io"
+            ],
+            connectSrc: [
+                "'self'",
+                "https://rpc.ankr.com", // Ethereum RPC
+                "https://api.coingecko.com", // Price API
+                "https://etherscan.io"
+            ],
+            frameSrc: ["'none'"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: []
+        }
+    },
     crossOriginEmbedderPolicy: false
 }));
 

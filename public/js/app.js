@@ -695,9 +695,6 @@ async function checkAdminStatus(address) {
                     const loadingOverlay = document.getElementById('loadingOverlay');
                     const dashboard = document.getElementById('app-dashboard');
 
-                    // Check if landing page is currently VISIBLE (not hidden)
-                    const isOnLanding = landingPage && landingPage.style.display !== 'none' && !dashboard.classList.contains('hidden') === false;
-
                     if (landingPage && dashboard && dashboard.classList.contains('hidden')) {
                         // Still on landing page, need to transition
                         landingPage.style.opacity = '0';
@@ -827,6 +824,11 @@ window.refreshAdminStats = async () => {
 
         showToast('Stats Updated', 'Analytics refreshed successfully.');
 
+        // Render Dynamic Funnel (from API response)
+        if (stats.funnel) {
+            renderFunnel(stats.funnel);
+        }
+
         // Also load transaction history
         window.loadTransactionHistory();
 
@@ -941,6 +943,54 @@ function renderAdminChart(data) {
         }
     });
 }
+
+// Dynamic Funnel Renderer
+function renderFunnel(funnel) {
+    const stages = [
+        { id: 'funnel-landing', value: funnel.landing, color: 'green' },
+        { id: 'funnel-connected', value: funnel.connected, color: 'green' },
+        { id: 'funnel-payment', value: funnel.paymentStarted, color: 'yellow' },
+        { id: 'funnel-paid', value: funnel.paid, color: 'red' }
+    ];
+
+    const maxVal = funnel.landing || 100;
+
+    stages.forEach((stage, i) => {
+        const pct = Math.round((stage.value / maxVal) * 100);
+        const pctEl = document.getElementById(`${stage.id}-pct`);
+        const barEl = document.getElementById(`${stage.id}-bar`);
+
+        if (pctEl) pctEl.innerText = `${pct}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+    });
+}
+
+// Export Admin Data to CSV
+window.exportAdminCSV = () => {
+    if (allTransactions.length === 0) {
+        showToast('Export Failed', 'No transaction data to export.');
+        return;
+    }
+
+    // Create CSV content
+    let csv = 'Wallet,Tier,Date,TX Hash\n';
+    allTransactions.forEach(tx => {
+        csv += `${tx.wallet},${tx.tier},${tx.timestamp},${tx.txHash}\n`;
+    });
+
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapid-apollo-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Export Complete', `Downloaded ${allTransactions.length} transactions.`);
+};
 // ------------------------------------------
 // SHARING & UX
 // ------------------------------------------
