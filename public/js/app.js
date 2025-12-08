@@ -1,3 +1,4 @@
+console.log("App script running v1.1");
 let provider, signer, userAddress;
 let tierPrices = { standard: 0, medium: 0, full: 0 };
 let RECIPIENT_ADDRESS = null; // Will be fetched from backend
@@ -161,7 +162,9 @@ function showConnectModal() {
 
     // Wire up button
     btnModalConnect.onclick = async () => {
+        console.log("Initialize Session clicked");
         const connected = await connectWallet();
+        debugger;
         if (connected) {
             hideConnectModal();
         }
@@ -761,94 +764,7 @@ window.addEventListener('error', (event) => {
     }
 });
 
-// --- STATE MANAGEMENT ---------------------------------------
-// SHARING & UX
-// ------------------------------------------
-
-window.shareResult = async () => {
-    // We need the txHash of the CURRENTLY displayed result.
-    // In our current app, 'resultStore' (UI side) isn't explicitly tracking the txHash of the *displayed* item easily unless we store it.
-    // Let's assume the txHash is in the DOM or global state. 
-    // Ideally, when we render a result, we save 'currentDisplayedTx' in a variable.
-
-    // For now, let's grab it from the DOM or a global if we set one.
-    // Hack: We'll set 'window.currentTxHash' whenever we render a result.
-
-    if (!window.currentTxHash || !currentSigner) {
-        alert("No active result to share or wallet disconnected.");
-        return;
-    }
-
-    try {
-        const timestamp = Date.now();
-        const message = `Authorize Share for TX ${window.currentTxHash} at ${timestamp}`;
-
-        // UX: Show "Signing..."
-        const btn = document.getElementById('btn-share');
-        if (btn) btn.innerText = "Signing...";
-
-        const signature = await currentSigner.signMessage(message);
-        if (btn) btn.innerText = "Generating...";
-
-        const res = await fetch('/api/share/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                txHash: window.currentTxHash,
-                address: userAddress,
-                signature,
-                timestamp
-            })
-        });
-
-        if (!res.ok) throw new Error("Share creation failed");
-        const { link } = await res.json();
-
-        // Show Link
-        const shareUrl = `${window.location.origin}/view.html?id=${link}`;
-        // Simple Prompt for now (or a nice modal if time permits)
-        prompt("Copy your secure share link:", shareUrl);
-
-    } catch (e) {
-        console.error(e);
-        alert("Failed to share result.");
-    } finally {
-        const btn = document.getElementById('btn-share');
-        if (btn) btn.innerHTML = '<i class="ph-bold ph-share-network"></i> Share';
-    }
-};
-
-// Enhance Markdown Rendering with Copy Buttons
-function renderMarkdownWithUX(content, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    container.innerHTML = marked.parse(content);
-
-    // Safety check for XSS (though marked sanitizes if configured, DOMPurify is better)
-    if (window.DOMPurify) {
-        container.innerHTML = DOMPurify.sanitize(marked.parse(content));
-    }
-
-    // Add Copy Buttons
-    container.querySelectorAll('pre code').forEach((block) => {
-        const pre = block.parentElement;
-        // Check if button already exists
-        if (pre.querySelector('.copy-btn')) return;
-
-        pre.style.position = 'relative'; // Ensure positioning context
-
-        const btn = document.createElement('button');
-        btn.className = 'absolute top-2 right-2 px-2 py-1 bg-white/10 text-gray-400 text-[10px] rounded hover:bg-white/20 transition cursor-pointer';
-        btn.innerText = 'Copy';
-        btn.onclick = () => {
-            navigator.clipboard.writeText(block.innerText);
-            btn.innerText = 'Copied!';
-            setTimeout(() => btn.innerText = 'Copy', 2000);
-        };
-        pre.appendChild(btn);
-    });
-}
+// --- END OF DUPLICATE BLOCK CLEANUP ---
 
 
 // Dashboard View Switcher
