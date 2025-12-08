@@ -164,7 +164,6 @@ function showConnectModal() {
     btnModalConnect.onclick = async () => {
         console.log("Initialize Session clicked");
         const connected = await connectWallet();
-        debugger;
         if (connected) {
             hideConnectModal();
         }
@@ -469,7 +468,7 @@ window.enterDashboard = () => {
 
 // Secure Cloud Sync
 window.syncHistory = async () => {
-    if (!currentSigner || !currentAddress) {
+    if (!signer || !userAddress) {
         alert("Please connect your wallet first.");
         return;
     }
@@ -486,14 +485,14 @@ window.syncHistory = async () => {
         const message = `Authenticate to Rapid Apollo History: ${timestamp}`;
 
         // 2. Request Signature
-        const signature = await currentSigner.signMessage(message);
+        const signature = await signer.signMessage(message);
 
         // 3. Send to API
         const response = await fetch('/api/history', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                walletAddress: currentAddress,
+                walletAddress: userAddress,
                 signature,
                 timestamp
             })
@@ -596,12 +595,12 @@ const originalConnect = window.connectWallet; // If reusing, but easier to just 
 let adminChart = null;
 
 window.refreshAdminStats = async () => {
-    if (!isAdmin || !currentSigner) return;
+    if (!isAdmin || !signer) return;
 
     try {
         const timestamp = Date.now();
         const message = `Authenticate to Rapid Apollo Admin: ${timestamp}`;
-        const signature = await currentSigner.signMessage(message);
+        const signature = await signer.signMessage(message);
 
         const res = await fetch('/api/admin/stats', {
             method: 'POST',
@@ -669,7 +668,7 @@ function renderAdminChart(data) {
 
 window.shareResult = async () => {
     // We need the txHash of the CURRENTLY displayed result.
-    if (!window.currentTxHash || !currentSigner) {
+    if (!window.currentTxHash || !signer) {
         alert("No active result to share or wallet disconnected.");
         return;
     }
@@ -682,7 +681,7 @@ window.shareResult = async () => {
         const btn = document.getElementById('btn-share');
         if (btn) btn.innerText = "Signing...";
 
-        const signature = await currentSigner.signMessage(message);
+        const signature = await signer.signMessage(message);
         if (btn) btn.innerText = "Generating...";
 
         const res = await fetch('/api/share/create', {
