@@ -826,11 +826,94 @@ window.refreshAdminStats = async () => {
 
         showToast('Stats Updated', 'Analytics refreshed successfully.');
 
+        // Also load transaction history
+        window.loadTransactionHistory();
+
     } catch (e) {
         console.error("Admin Stats Error:", e);
         showToast("Error", "Failed to fetch admin stats");
     }
 };
+
+// Transaction History Table
+let allTransactions = [];
+
+window.loadTransactionHistory = async () => {
+    if (!isAdmin || !signer) return;
+
+    try {
+        const timestamp = Date.now();
+        const message = `Authenticate to Rapid Apollo Admin: ${timestamp}`;
+        const signature = await signer.signMessage(message);
+
+        const res = await fetch('/api/admin/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                address: userAddress,
+                signature,
+                timestamp
+            })
+        });
+
+        if (!res.ok) throw new Error("Auth Failed");
+        const { transactions, total } = await res.json();
+
+        allTransactions = transactions;
+        renderTransactionTable(transactions);
+
+        document.getElementById('tx-history-stats').innerText = `Showing ${transactions.length} of ${total} transactions`;
+
+    } catch (e) {
+        console.error("Load TX History Error:", e);
+    }
+};
+
+window.filterTransactions = (searchTerm) => {
+    if (!searchTerm) {
+        renderTransactionTable(allTransactions);
+        document.getElementById('tx-history-stats').innerText = `Showing ${allTransactions.length} transactions`;
+        return;
+    }
+
+    const filtered = allTransactions.filter(tx =>
+        tx.wallet.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    renderTransactionTable(filtered);
+    document.getElementById('tx-history-stats').innerText = `Showing ${filtered.length} of ${allTransactions.length} (filtered by: ${searchTerm.substring(0, 10)}...)`;
+};
+
+function renderTransactionTable(transactions) {
+    const tbody = document.getElementById('tx-history-body');
+    if (!tbody) return;
+
+    if (transactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-gray-500 italic">No transactions found.</td></tr>';
+        return;
+    }
+
+    let html = '';
+    transactions.forEach(tx => {
+        const tierColor = tx.tier === 'full' ? 'text-purple-400' : tx.tier === 'medium' ? 'text-indigo-400' : 'text-gray-400';
+        const date = new Date(tx.timestamp).toLocaleString();
+        const shortWallet = tx.wallet.substring(0, 6) + '...' + tx.wallet.substring(tx.wallet.length - 4);
+        const shortTx = tx.txHash.substring(0, 8) + '...';
+
+        html += `
+            <tr class="border-b border-white/5 hover:bg-white/5">
+                <td class="py-2 px-2 font-mono">
+                    <a href="https://etherscan.io/address/${tx.wallet}" target="_blank" class="text-blue-400 hover:underline">${shortWallet}</a>
+                </td>
+                <td class="py-2 px-2 font-mono ${tierColor} uppercase font-bold">${tx.tier}</td>
+                <td class="py-2 px-2 text-gray-400">${date}</td>
+                <td class="py-2 px-2 font-mono">
+                    <a href="https://etherscan.io/tx/${tx.txHash}" target="_blank" class="text-blue-400 hover:underline">${shortTx}</a>
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
 
 function renderAdminChart(data) {
     const ctx = document.getElementById('chart-tiers');

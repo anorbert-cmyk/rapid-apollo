@@ -3,7 +3,7 @@ import { verifyTransaction } from '../services/paymentService';
 import { solveProblem } from '../services/aiService';
 import { getTierPriceETH, Tier } from '../services/priceService';
 import { config } from '../config';
-import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore } from '../store';
+import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore, transactionLogStore } from '../store';
 import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
 import { verifyMessage } from 'ethers';
@@ -174,7 +174,21 @@ router.post('/solve', async (req: Request, res: Response) => {
             await addToUserHistory(payment.from.toLowerCase(), resultData);
         }
 
-        // 3. Update Admin Stats (NEW)
+        // 3. Log Transaction for Admin Table
+        if (payment.from) {
+            const txLog = (await transactionLogStore.get('all')) || [];
+            txLog.unshift({
+                wallet: payment.from.toLowerCase(),
+                tier: tier,
+                timestamp: new Date().toISOString(),
+                txHash: txHash
+            });
+            // Keep last 500 transactions
+            if (txLog.length > 500) txLog.length = 500;
+            await transactionLogStore.set('all', txLog);
+        }
+
+        // 4. Update Admin Stats
         // Fire and forget (don't block response)
         updateStats(tier);
 

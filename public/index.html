@@ -1079,7 +1079,43 @@
                     </div>
                 </div>
 
-                <!-- Row 4: Quick Actions -->
+                <!-- Row 4: Transaction History Table -->
+                <div class="dash-panel p-4 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Transaction History</h3>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="tx-search-input" placeholder="Search wallet address..."
+                                class="px-3 py-1.5 bg-black/30 border border-white/10 rounded text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 w-64"
+                                oninput="window.filterTransactions(this.value)">
+                            <button onclick="window.loadTransactionHistory()"
+                                class="px-3 py-1.5 bg-indigo-500/20 text-indigo-400 text-xs rounded hover:bg-indigo-500/30 transition">
+                                <i class="ph-bold ph-arrows-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="border-b border-white/10 text-gray-500 uppercase">
+                                    <th class="text-left py-2 px-2 font-mono">Wallet</th>
+                                    <th class="text-left py-2 px-2 font-mono">Tier</th>
+                                    <th class="text-left py-2 px-2 font-mono">Date</th>
+                                    <th class="text-left py-2 px-2 font-mono">TX Hash</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tx-history-body" class="text-white">
+                                <tr>
+                                    <td colspan="4" class="py-4 text-center text-gray-500 italic">Click refresh to
+                                        load...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="tx-history-stats" class="text-[10px] text-gray-500 mt-2 font-mono">Showing 0 transactions
+                    </div>
+                </div>
+
+                <!-- Row 5: Quick Actions -->
                 <div class="dash-panel p-4">
                     <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">Quick Actions</h3>
                     <div class="flex flex-wrap gap-3">
@@ -1124,7 +1160,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="js/app.js?v=2.2"></script>
+    <script src="js/app.js?v=2.3"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {

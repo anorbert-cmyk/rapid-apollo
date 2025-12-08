@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { verifyMessage } from 'ethers';
-import { statsStore } from '../store';
+import { statsStore, transactionLogStore } from '../store';
 import { config } from '../config';
 
 const router = Router();
@@ -76,6 +76,22 @@ router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
         });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+});
+
+// POST /api/admin/transactions - Get all transaction history
+router.post('/transactions', verifyAdmin, async (req: Request, res: Response) => {
+    try {
+        const transactions = (await transactionLogStore.get('all')) || [];
+
+        // Return all transactions (filtering handled client-side for simplicity)
+        res.json({
+            transactions: transactions,
+            total: transactions.length
+        });
+    } catch (error) {
+        console.error('Failed to fetch transactions:', error);
+        res.status(500).json({ error: 'Failed to fetch transactions' });
     }
 });
 

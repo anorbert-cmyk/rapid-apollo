@@ -119,6 +119,18 @@ export const shareStore: IStore<string> = process.env.REDIS_URL
     ? new RedisStore<string>('share', EXPIRATION_SEC * 7) // 7 Days expiration for links?
     : new MemoryStore<string>();
 
+// Transaction Log Store: Stores all transactions for admin viewing
+// Format: Array of {wallet, tier, timestamp, txHash}
+interface TransactionRecord {
+    wallet: string;
+    tier: string;
+    timestamp: string;
+    txHash: string;
+}
+export const transactionLogStore: IStore<TransactionRecord[]> = process.env.REDIS_URL
+    ? new RedisStore<TransactionRecord[]>('txlog', 0) // No expiration
+    : new MemoryStore<TransactionRecord[]>();
+
 // --- CLEANUP (Only needed for Memory) ---
 if (!process.env.REDIS_URL) {
     // Explicitly cast to MemoryStore to access the cleanup method
