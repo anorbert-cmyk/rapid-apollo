@@ -142,23 +142,20 @@ function showToast(title, message) {
 // Attach event listeners instead of using inline onclick for better reliability
 document.addEventListener('DOMContentLoaded', () => {
     // Standard Tier
-    const btnStandard = document.querySelector('button[onclick="payAndSolve(\'standard\')"]');
+    const btnStandard = document.getElementById('btn-pay-standard');
     if (btnStandard) {
-        btnStandard.removeAttribute('onclick');
         btnStandard.addEventListener('click', () => payAndSolve('standard'));
     }
 
     // Medium Tier
-    const btnMedium = document.querySelector('button[onclick="payAndSolve(\'medium\')"]');
+    const btnMedium = document.getElementById('btn-pay-medium');
     if (btnMedium) {
-        btnMedium.removeAttribute('onclick');
         btnMedium.addEventListener('click', () => payAndSolve('medium'));
     }
 
     // Full Tier
-    const btnFull = document.querySelector('button[onclick="payAndSolve(\'full\')"]');
+    const btnFull = document.getElementById('btn-pay-full');
     if (btnFull) {
-        btnFull.removeAttribute('onclick');
         btnFull.addEventListener('click', () => payAndSolve('full'));
     }
 });
