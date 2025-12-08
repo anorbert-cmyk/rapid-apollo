@@ -526,13 +526,41 @@ window.syncHistory = async () => {
 // Secure Cloud Sync
 // ... (keep syncHistory existing code)
 
-// Admin Configuration// CHECKS
-async function checkAdminStatus(address) {
-    showToast('Admin Mode', 'Platform Analytics Unlocked');
-}
-}
+// Admin Configuration
+let isAdmin = false;
 
-// Modify connectWallet to call check
+// CHECKS
+async function checkAdminStatus(address) {
+    if (!address) return;
+
+    try {
+        const res = await fetch('/api/admin/check-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address })
+        });
+        const data = await res.json();
+
+        if (data.isAdmin) {
+            isAdmin = true;
+            showToast('Admin Mode', 'Platform Analytics Unlocked');
+
+            // Unlock Analytics Tab in UI if present
+            const navAnalytics = document.getElementById('nav-analytics');
+            if (navAnalytics) {
+                navAnalytics.innerHTML = `
+                     <i class="ph-fill ph-chart-pie-slice text-lg"></i>
+                     <span class="text-xs font-bold tracking-widest uppercase">Admin Stats</span>
+                 `;
+                navAnalytics.onclick = () => window.refreshAdminStats(); // Fix: call refresh logic/switch view
+                navAnalytics.classList.remove('opacity-50', 'cursor-not-allowed');
+                navAnalytics.classList.add('text-indigo-400');
+            }
+        }
+    } catch (e) {
+        console.error("Auth Check Failed", e);
+    }
+}
 const originalConnect = window.connectWallet; // If reusing, but easier to just append logic if we can edit in place.
 // Since we are replacing sections, let's just hook into the existing connectWallet visually via the 'Connected' toast or similar?
 // No, better to add the check directly inside connectWallet logic if possible, or trigger it after.
