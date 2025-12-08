@@ -137,6 +137,32 @@ function showToast(title, message) {
     }, 4000);
 }
 
+// Connect Wallet Modal Logic
+const connectModal = document.getElementById('connectWalletModal');
+const btnModalConnect = document.getElementById('btn-modal-connect');
+
+function showConnectModal() {
+    loadingOverlay.classList.remove('hidden');
+    loadingOverlay.classList.add('flex');
+    connectModal.classList.remove('hidden');
+
+    // Wire up button (prevent duplicate listeners if possible, or just overwrite)
+    btnModalConnect.onclick = async () => {
+        const connected = await connectWallet();
+        if (connected) {
+            hideConnectModal();
+            // Optional: Auto-resume payment? 
+            // For now, let user click the package button again to confirm intent.
+        }
+    };
+}
+
+window.hideConnectModal = function () { // Global for onclick
+    connectModal.classList.add('hidden');
+    loadingOverlay.classList.add('hidden');
+    loadingOverlay.classList.remove('flex');
+}
+
 // Direct Pay & Solve Logic (Triggered by Card Buttons)
 // Direct Pay & Solve Logic (Triggered by Card Buttons)
 // Attach event listeners instead of using inline onclick for better reliability
@@ -161,10 +187,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.payAndSolve = async (tier) => {
-    // 1. Auto-Connect FIRST (User Feedback Priority)
+    // 1. Auto-Connect / Auth Check
     if (!userAddress) {
-        const connected = await connectWallet();
-        if (!connected) return; // Stop if connection failed or rejected
+        showConnectModal();
+        return;
     }
 
     const problem = document.getElementById('problemInput').value;
