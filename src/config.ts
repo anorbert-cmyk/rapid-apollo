@@ -5,11 +5,15 @@ dotenv.config();
 
 const envSchema = z.object({
     PORT: z.string().default('3000'),
+    NODE_ENV: z.string().default('development'),
     GEMINI_API_KEY: z.string().min(1, "Gemini API Key is required"),
     // Ethereum Mainnet RPC (Public Ankr Node)
     RPC_URL: z.string().default('https://rpc.ankr.com/eth'),
     // My receiving wallet address (hardcoded for the demo or env)
     RECEIVER_WALLET_ADDRESS: z.string().startsWith('0x'),
+
+    // CORS: Allowed origin for production (e.g., 'https://yourdomain.com')
+    ALLOWED_ORIGIN: z.string().default('*'),
 
     // Pricing Service
     ETH_PRICE_API_URL: z.string().default('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'),

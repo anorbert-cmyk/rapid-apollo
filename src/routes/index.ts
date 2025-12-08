@@ -3,14 +3,82 @@ import { verifyTransaction } from '../services/paymentService';
 import { solveProblem } from '../services/aiService';
 import { getTierPriceETH, Tier } from '../services/priceService';
 import { config } from '../config';
-import { resultStore, usedTxHashes } from '../store';
+import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore } from '../store';
 import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
+import { verifyMessage } from 'ethers';
+
+// Simple UUID Helper
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
 const router = Router();
 
+// Helper to push to history
+async function addToUserHistory(walletAddress: string, resultData: any) {
+    const current = (await userHistoryStore.get(walletAddress)) || [];
+    // Dedup by txHash
+    if (!current.find((r: any) => r.txHash === resultData.txHash)) {
+        current.unshift(resultData); // Add to top
+    }
+    // Limit to last 50 items?
+    if (current.length > 50) current.length = 50;
+
+    await userHistoryStore.set(walletAddress, current);
+}
+
+async function updateStats(tier: string) {
+    try {
+        // Increment Total Solves
+        const currentSolves = (await statsStore.get('total_solves')) || 0;
+        await statsStore.set('total_solves', currentSolves + 1);
+
+        // Increment Tier Count
+        const tierKey = `count_${tier}`;
+        const currentTier = (await statsStore.get(tierKey)) || 0;
+        await statsStore.set(tierKey, currentTier + 1);
+
+        // Track Revenue (Approximate based on current price)
+        const priceStr = await getTierPriceETH(tier as Tier);
+        const price = parseFloat(priceStr);
+        const currentRev = (await statsStore.get('total_revenue_eth')) || 0;
+        await statsStore.set('total_revenue_eth', currentRev + price);
+
+    } catch (e) {
+        console.error("Failed to update stats:", e);
+    }
+}
+
+// POST /api/share/create
+router.post('/share/create', async (req: Request, res: Response) => {
+    try {
+        const { txHash, address, signature, timestamp } = req.body;
+        // Verify Auth (Only owner can share)
+        if (!txHash || !address || !signature) return res.status(400).json({ error: 'Missing params' });
+
+        const message = `Authorize Share for TX ${txHash} at ${timestamp}`;
+        const recovered = verifyMessage(message, signature);
+        if (recovered.toLowerCase() !== address.toLowerCase()) {
+            return res.status(403).json({ error: 'Invalid signature' });
+        }
+
+        const uuid = generateUUID();
+        await shareStore.set(uuid, txHash);
+
+        return res.json({ success: true, link: uuid });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Share creation failed' });
+    }
+});
+
 // GET /api/pricing
-router.get('/pricing', async (req: Request, res: Response) => {
+router.get('/pricing', async (_req: Request, res: Response) => {
     try {
         const [std, med, full] = await Promise.all([
             getTierPriceETH(Tier.STANDARD),
@@ -34,27 +102,20 @@ router.get('/pricing', async (req: Request, res: Response) => {
 // Users MUST know the recipient address to sign a transaction in MetaMask.
 // The original request was to hide it from "the website UI", not from the API entirely.
 // Blockchain transactions are transparent - obfuscation here provides no real security.
-router.get('/config', (req: Request, res: Response) => {
+router.get('/config', (_req: Request, res: Response) => {
     res.json({
         receiverAddress: config.RECEIVER_WALLET_ADDRESS
     });
 });
 
 // GET /api/result/:txHash
+// SECURITY REMOVAL: Public access to results via TX Hash is insecure (sniping risk).
+// Results are now returned directly in the POST /solve response.
+/*
 router.get('/result/:txHash', async (req: Request, res: Response) => {
-    // Validate txHash format
-    const parseResult = txHashSchema.safeParse(req.params.txHash);
-    if (!parseResult.success) {
-        return res.status(400).json({ error: 'Invalid transaction hash format' });
-    }
-
-    const storedItem = await resultStore.get(req.params.txHash);
-    if (!storedItem) {
-        return res.status(404).json({ error: 'Result not found or expired' });
-    }
-    // Return the actual data payload
-    res.json(storedItem.data);
+   ... removed for security ...
 });
+*/
 
 // POST /api/solve
 router.post('/solve', async (req: Request, res: Response) => {
@@ -68,48 +129,28 @@ router.post('/solve', async (req: Request, res: Response) => {
 
         const { problemStatement, txHash, tier } = parseResult.data;
 
-        // ===== DOUBLE-SPEND PROTECTION (RACE CONDITION FIXED) =====
-        if (await usedTxHashes.has(txHash)) {
-            // const status = await usedTxHashes.get(txHash); // Not strictly needed unless checking state
-            // If it's a timestamp (number), it's already used.
-            // If we implement a 'pending' state, we could check for that too.
-            // For now, existence in the Map means it's strictly "in progress" or "done".
+        // ===== DOUBLE-SPEND PROTECTION (ATOMIC) =====
+        // Try to set the lock. If it fails, it means it already exists.
+        const acquiredLock = await usedTxHashes.setnx(txHash, Date.now() as any);
+
+        if (!acquiredLock) {
             console.log(`⚠️ Double-spend attempt or race condition: ${txHash}`);
             return res.status(409).json({ error: 'Transaction already processed or in progress' });
         }
 
-        // LOCK IMMEDIATELY to prevent race conditions
-        await usedTxHashes.set(txHash, Date.now());
-
         console.log(`Verifying payment for tx: ${txHash} [Tier: ${tier}]`);
 
-        let payment;
-        try {
-            payment = await verifyTransaction(txHash, tier);
-        } catch (err) {
-            // If verification crashes (network error), release the lock so they can try again?
-            // Safer to keep it locked to prevent spam, but for UX might need unlock.
-            // Decided: Keep locked for now to fail closed, or remove if strictly network error.
-            // For safety against replay attacks, failing closed is better.
-            console.error("Verification crashed", err);
-            await usedTxHashes.delete(txHash);
-            throw err;
-        }
+        // Verify Payment (Cast tier to Tier enum)
+        const payment = await verifyTransaction(txHash, tier as Tier);
 
         if (!payment.valid) {
             console.log(`Payment invalid: ${payment.message}`);
-            // If payment is invalid (e.g. insufficient funds), we MUST release the lock 
-            // so the user can try another transaction, BUT since the txHash is immutable on chain,
-            // if it's invalid now, it will likely stay invalid (unless it was 'Tx not found' and propagates later).
-            // However, if we leave it in 'usedTxHashes', they can never retry this hash.
-            // If valid=false, we should probably delete it to allow re-check (e.g. if it was "not found" yet).
             await usedTxHashes.delete(txHash);
             return res.status(402).json({ error: payment.message });
         }
 
-        // Payment is confirmed valid. Lock remains.
-        // Update timestamp to confirm finalization if needed, or just leave as is.
-        await usedTxHashes.set(txHash, Date.now()); // Update to final timestamp
+        // ... (Verification Success)
+        await usedTxHashes.set(txHash, Date.now() as any);
 
         console.log('Payment valid. Solving problem...');
         const solution = await solveProblem(problemStatement, tier);
@@ -122,13 +163,22 @@ router.post('/solve', async (req: Request, res: Response) => {
             timestamp: new Date().toISOString()
         };
 
-        // Save wrapped result with timestamp
+        // 1. Save individual result (legacy/backup)
         await resultStore.set(txHash, {
             data: resultData,
             timestamp: Date.now()
         });
 
-        return res.json({ success: true, txHash });
+        // 2. Save to User History (NEW)
+        if (payment.from) {
+            await addToUserHistory(payment.from.toLowerCase(), resultData);
+        }
+
+        // 3. Update Admin Stats (NEW)
+        // Fire and forget (don't block response)
+        updateStats(tier);
+
+        return res.json({ success: true, ...resultData });
 
     } catch (error) {
         console.error(error);
@@ -136,6 +186,65 @@ router.post('/solve', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid input data' });
         }
         return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST /api/history - Secure Sync
+router.post('/history', async (req: Request, res: Response) => {
+    try {
+        const { walletAddress, signature, timestamp } = req.body;
+
+        if (!walletAddress || !signature || !timestamp) {
+            return res.status(400).json({ error: 'Missing auth parameters' });
+        }
+
+        // 1. Check Timestamp (prevent replay attacks, allow 5 min window)
+        const now = Date.now();
+        if (Math.abs(now - timestamp) > 5 * 60 * 1000) {
+            return res.status(401).json({ error: 'Auth token expired' });
+        }
+
+        // 2. Verify Signature
+        const expectedMessage = `Authenticate to Rapid Apollo History: ${timestamp}`;
+        const recoveredAddress = verifyMessage(expectedMessage, signature);
+
+        if (recoveredAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+            return res.status(403).json({ error: 'Invalid signature' });
+        }
+
+        // 3. Fetch History
+        const history = (await userHistoryStore.get(walletAddress.toLowerCase())) || [];
+
+        return res.json({ success: true, history });
+
+    } catch (error) {
+        console.error("History Sync Error:", error);
+        return res.status(500).json({ error: 'Failed to sync history' });
+    }
+});
+
+// GET /api/share/:uuid
+// Public endpoint for the view-only page content fetch
+router.get('/share/:uuid', async (req: Request, res: Response) => {
+    try {
+        const { uuid } = req.params;
+        const txHash = await shareStore.get(uuid);
+
+        if (!txHash) return res.status(404).json({ error: 'Link expired or invalid' });
+
+        const resultWrapper = await resultStore.get(txHash);
+        if (!resultWrapper) return res.status(404).json({ error: 'Content not found' });
+
+        // Return only safe data
+        res.json({
+            problem: resultWrapper.data.problem,
+            solution: resultWrapper.data.solution,
+            tier: resultWrapper.data.tier,
+            date: resultWrapper.data.timestamp
+        });
+
+    } catch (e) {
+        res.status(500).json({ error: 'Fetch failed' });
     }
 });
 

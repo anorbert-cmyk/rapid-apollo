@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 
 export const solveProblem = async (problemStatement: string, tier: string) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         let instructions = "";
         if (tier === 'standard') {

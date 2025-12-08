@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { config } from './config';
 import apiRoutes from './routes';
+import adminRoutes from './routes/admin';
 
 const app = express();
 
@@ -32,9 +33,11 @@ app.use(helmet({
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             connectSrc: [
                 "'self'",
-                "https://sepolia.etherscan.io",
-                "wss://*",
-                "https://api.coingecko.com" // If price service runs on client? (It runs on server, but just in case)
+                "https://etherscan.io",
+                "https://api.etherscan.io",
+                "wss://mainnet.infura.io",
+                "wss://eth-mainnet.g.alchemy.com",
+                "https://api.coingecko.com"
             ]
         }
     },
@@ -51,9 +54,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS: Configure allowed origins (in production, restrict to your domain)
+// CORS: Configure allowed origins (use ALLOWED_ORIGIN env var in production)
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : '*',
+    origin: config.ALLOWED_ORIGIN,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 }));
@@ -70,5 +73,7 @@ app.use('/api', apiRoutes);
 app.listen(config.PORT, () => {
     console.log(`🚀 Server running on http://localhost:${config.PORT}`);
     console.log(`🔒 Security: Helmet + Rate Limiting enabled`);
-    console.log(`💰 Wallet: ${config.RECEIVER_WALLET_ADDRESS}`);
+    if (config.NODE_ENV !== 'production') {
+        console.log(`💰 Wallet: ${config.RECEIVER_WALLET_ADDRESS}`);
+    }
 });

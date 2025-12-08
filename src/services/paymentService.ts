@@ -4,61 +4,54 @@ import { Tier, getTierPriceUSD, getEthPrice } from './priceService';
 
 const provider = new ethers.JsonRpcProvider(config.RPC_URL);
 
-interface ValidationResult {
+export interface TransactionValidationResult {
     valid: boolean;
-    message: string;
+    message?: string;
+    from?: string; // Address of the sender
 }
 
-export const verifyTransaction = async (txHash: string, expectedTier: string): Promise<ValidationResult> => {
+// Helper function to get ETH price for a tier (derived from original logic)
+const getTierPriceETH = async (tier: Tier): Promise<number> => {
+    const usdPrice = getTierPriceUSD(tier);
+    const ethRate = await getEthPrice();
+    return usdPrice / ethRate;
+};
+
+export async function verifyTransaction(txHash: string, tier: Tier): Promise<TransactionValidationResult> {
     try {
         const tx = await provider.getTransaction(txHash);
 
         if (!tx) {
-            return { valid: false, message: 'Transaction not found on chain' };
+            return { valid: false, message: 'Transaction not found on chain yet.' };
         }
 
-        // Check Recipient
+        // Check 1: Recipient
         if (tx.to?.toLowerCase() !== config.RECEIVER_WALLET_ADDRESS.toLowerCase()) {
-            return { valid: false, message: `Invalid recipient: sent to ${tx.to}` };
+            return { valid: false, message: 'Invalid recipient address.' };
         }
 
-        // Check Chain ID (Ethereum Mainnet = 1)
+        // Check 2: Chain ID (Mainnet = 1)
         if (tx.chainId !== 1n) {
-            return { valid: false, message: `Invalid network. Expected Ethereum Mainnet (1), got ${tx.chainId}` };
+            return { valid: false, message: 'Incorrect network (must be Mainnet)' };
         }
 
-        // Check Amount logic with Price Service
-        let tierEnum: Tier;
-        if (expectedTier === 'standard') tierEnum = Tier.STANDARD;
-        else if (expectedTier === 'medium') tierEnum = Tier.MEDIUM;
-        else if (expectedTier === 'full') tierEnum = Tier.FULL;
-        else return { valid: false, message: 'Invalid tier specified' };
+        // Check Amount
+        const requiredAmount = await getTierPriceETH(tier);
+        const paidAmount = parseFloat(ethers.formatEther(tx.value));
 
-        const usdPrice = getTierPriceUSD(tierEnum);
-        const ethRate = await getEthPrice();
-        const expectedEth = usdPrice / ethRate;
-
-        // Allow 2% slippage because price might fluctuate between frontend load and backend check
-        const minimumEth = expectedEth * 0.98;
-        const txEthValue = Number(ethers.formatEther(tx.value));
-
-        // console.log(`Debug: User sent ${txEthValue} ETH. Required ~${expectedEth} ETH (rate: ${ethRate})`);
-
-        if (txEthValue < minimumEth) {
-            return { valid: false, message: `Insufficient amount. Sent ${txEthValue} ETH, required approx ${expectedEth} ETH ($${usdPrice})` };
+        // Allow small slippage (e.g. 0.0001 or 1%) if needed, but strict is better for now
+        if (paidAmount < requiredAmount * 0.995) {
+            return { valid: false, message: `Insufficient amount. Sent: ${paidAmount}, Required: ${requiredAmount}` };
         }
 
-        // Check Confirmations
+        // Check confirmations
         const receipt = await tx.wait(1);
+        if (!receipt) return { valid: false, message: "Transaction failed or pending" };
 
-        if (!receipt || receipt.status !== 1) {
-            return { valid: false, message: 'Transaction failed or reverted' };
-        }
+        return { valid: true, from: tx.from };
 
-        return { valid: true, message: 'Payment verified' };
-
-    } catch (error) {
-        console.error("Payment verification error:", error);
-        return { valid: false, message: 'Internal verification error' };
+    } catch (error: any) {
+        console.error('Payment verification failed:', error);
+        return { valid: false, message: error.message || 'Verification error' };
     }
-};
+}

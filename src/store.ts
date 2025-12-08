@@ -6,6 +6,7 @@ interface IStore<T> {
     set(key: string, value: T): Promise<void>;
     has(key: string): Promise<boolean>;
     delete(key: string): Promise<void>;
+    setnx(key: string, value: T): Promise<boolean>; // Atomic Set if Not Exists
 }
 
 interface StoredResult {
@@ -41,6 +42,11 @@ class MemoryStore<T> implements IStore<T> {
     async delete(key: string): Promise<void> {
         this.map.delete(key);
     }
+    async setnx(key: string, value: T): Promise<boolean> {
+        if (this.map.has(key)) return false;
+        this.map.set(key, value);
+        return true;
+    }
 
     // Internal method for cleanup logic (Memory only)
     cleanup(expirationMs: number) {
@@ -74,6 +80,16 @@ class RedisStore<T> implements IStore<T> {
     async delete(key: string): Promise<void> {
         await redisClient!.del(`${this.prefix}:${key}`);
     }
+    async setnx(key: string, value: T): Promise<boolean> {
+        // Valid for Redis 2.6.12+ (SET key value EX ttl NX)
+        // If ttl is 0, we don't set expiration here (or we verify logic)
+        // For usedTxHashes we DO want expiration (24h)
+        const result = this.ttlSeconds > 0
+            ? await redisClient!.set(`${this.prefix}:${key}`, JSON.stringify(value), 'EX', this.ttlSeconds, 'NX')
+            : await redisClient!.set(`${this.prefix}:${key}`, JSON.stringify(value), 'NX');
+
+        return result === 'OK';
+    }
 }
 
 // --- FACTORY ---
@@ -81,22 +97,38 @@ class RedisStore<T> implements IStore<T> {
 const EXPIRATION_SEC = 24 * 60 * 60; // 24 Hours
 
 // Exported Stores
-export const resultStore: IStore<StoredResult> = redisClient
+export const resultStore: IStore<StoredResult> = process.env.REDIS_URL
     ? new RedisStore<StoredResult>('res', EXPIRATION_SEC)
     : new MemoryStore<StoredResult>();
 
-export const usedTxHashes: IStore<number> = redisClient
+export const userHistoryStore: IStore<StoredResult[]> = process.env.REDIS_URL
+    ? new RedisStore<StoredResult[]>('history', EXPIRATION_SEC)
+    : new MemoryStore<StoredResult[]>();
+
+export const usedTxHashes: IStore<number> = process.env.REDIS_URL
     ? new RedisStore<number>('tx', EXPIRATION_SEC)
     : new MemoryStore<number>();
 
+// Global Stats Store (No Expiration)
+export const statsStore: IStore<number> = process.env.REDIS_URL
+    ? new RedisStore<number>('stats', 0) // 0 = No Expiration
+    : new MemoryStore<number>();
+
+// Share Store: UUID -> txHash mapping
+export const shareStore: IStore<string> = process.env.REDIS_URL
+    ? new RedisStore<string>('share', EXPIRATION_SEC * 7) // 7 Days expiration for links?
+    : new MemoryStore<string>();
 
 // --- CLEANUP (Only needed for Memory) ---
-if (!redisClient) {
-    const memResult = resultStore as MemoryStore<StoredResult>;
-    const memTx = usedTxHashes as MemoryStore<number>;
+if (!process.env.REDIS_URL) {
+    // Explicitly cast to MemoryStore to access the cleanup method
+    const memResult = resultStore as unknown as MemoryStore<StoredResult>;
+    const memTx = usedTxHashes as unknown as MemoryStore<number>;
+    const memShare = shareStore as unknown as MemoryStore<string>;
 
     setInterval(() => {
-        memResult.cleanup(EXPIRATION_SEC * 1000);
-        memTx.cleanup(EXPIRATION_SEC * 1000);
+        if (memResult.cleanup) memResult.cleanup(EXPIRATION_SEC * 1000);
+        if (memTx.cleanup) memTx.cleanup(EXPIRATION_SEC * 1000);
+        if (memShare.cleanup) memShare.cleanup(EXPIRATION_SEC * 7 * 1000);
     }, 60 * 60 * 1000); // Hourly
 }
