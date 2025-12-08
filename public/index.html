@@ -180,22 +180,7 @@
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
-        .input-dark {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            width: 100%;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-        }
 
-        /* Increased padding/font for mobile touch targets */
-        .input-dark:focus {
-            outline: none;
-            border-color: #6366f1;
-        }
 
         .toggle-checkbox:checked {
             right: 0;
@@ -416,15 +401,48 @@
                 </div>
 
                 <!-- Logic Hook: Input Section Wrapper -->
-                <div class="input-section max-w-xl mx-auto mb-20">
-                    <label class="block text-left text-xs font-mono text-indigo-300 mb-2">DEFINE YOUR
-                        OBSTACLE:</label>
-                    <!-- Logic Hook: problemInput ID -->
-                    <input type="text" id="problemInput" class="input-dark text-lg py-4"
-                        placeholder="e.g. 'Automate my client reporting flow' or 'Design a fintech onboarding UX'">
-                    <p class="text-[10px] text-gray-500 text-left font-mono">* This vector will be fed
-                        into the Logic
-                        Engine upon payment.</p>
+                <div class="input-section max-w-2xl mx-auto mb-20 relative group">
+                    <!-- Decorative Glow -->
+                    <div
+                        class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-xl blur opacity-50 transition duration-1000 group-hover:opacity-75 group-hover:duration-200">
+                    </div>
+
+                    <div class="relative bg-[#050508] border border-white/10 rounded-xl p-1 backdrop-blur-xl">
+                        <!-- Corner Accents -->
+                        <div class="absolute top-0 left-0 w-3 h-3 border-t border-l border-indigo-500 rounded-tl-lg">
+                        </div>
+                        <div class="absolute top-0 right-0 w-3 h-3 border-t border-r border-purple-500 rounded-tr-lg">
+                        </div>
+                        <div class="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-purple-500 rounded-bl-lg">
+                        </div>
+                        <div
+                            class="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-indigo-500 rounded-br-lg">
+                        </div>
+
+                        <div class="bg-[#0a0a0f]/80 rounded-lg p-6">
+                            <label
+                                class="flex items-center gap-2 text-xs font-mono text-indigo-400 mb-4 tracking-widest uppercase">
+                                <i class="ph-bold ph-terminal-window text-lg"></i>
+                                Define_Target_Obstacle
+                            </label>
+
+                            <!-- Logic Hook: problemInput ID -->
+                            <textarea id="problemInput" rows="5"
+                                class="w-full bg-black/40 border border-white/5 rounded-lg p-4 text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all font-mono leading-relaxed resize-none text-base"
+                                placeholder="// Enter your challenge here...&#10;> e.g. 'Automate my client reporting flow'&#10;> or 'Design a fintech onboarding UX'"></textarea>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <p class="text-[10px] text-gray-500 font-mono">
+                                    <span class="text-indigo-500">*</span> INPUT_VECTOR_READY // AWAITING_PAYMENT
+                                </p>
+                                <div class="flex gap-1.5 opacity-50">
+                                    <div class="w-1 h-1 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    <div class="w-1 h-1 bg-indigo-500 rounded-full animate-pulse delay-75"></div>
+                                    <div class="w-1 h-1 bg-indigo-500 rounded-full animate-pulse delay-150"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="relative grid md:grid-cols-[1fr,auto,1fr,auto,1fr] gap-4 items-center max-w-6xl mx-auto">
