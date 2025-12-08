@@ -62,6 +62,10 @@ const limiter = rateLimit({
     }
 });
 
+// Static files - served from 'public' directory from root (up one level from dist)
+// MOVED ABOVE RATE LIMITER to prevent assets from consuming API quota
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Disable rate limiting in test environment (Playwright runs parallel tests)
 if (config.NODE_ENV !== 'test') {
     app.use(limiter);
@@ -76,9 +80,6 @@ app.use(cors({
 
 // Body parsing
 app.use(express.json({ limit: '100kb' })); // Limit body size to prevent large payload attacks
-
-// Static files - served from 'public' directory from root (up one level from dist)
-app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== ROUTES =====
 
