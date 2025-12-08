@@ -16,36 +16,9 @@ app.set('trust proxy', 1);
 
 // Helmet: Secure HTTP headers
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'", // Needed for inline scripts in HTML
-                "'unsafe-eval'",   // Needed for Tailwind CDN to compile CSS
-                "https://cdnjs.cloudflare.com",
-                "https://cdn.tailwindcss.com",
-                "https://unpkg.com",
-                "https://cdn.jsdelivr.net"
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "https://fonts.googleapis.com",
-                "https://cdn.jsdelivr.net"
-            ],
-            imgSrc: ["'self'", "data:", "https:"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            connectSrc: [
-                "'self'",
-                "https://etherscan.io",
-                "https://api.etherscan.io",
-                "wss://mainnet.infura.io",
-                "wss://eth-mainnet.g.alchemy.com",
-                "https://api.coingecko.com"
-            ]
-        }
-    },
+    // TEMPORARILY DISABLED: CSP was blocking too many CDN resources.
+    // TODO: Re-enable with properly expanded allowlists once functionality is confirmed.
+    contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
 }));
 
