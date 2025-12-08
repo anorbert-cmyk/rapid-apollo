@@ -966,8 +966,34 @@
             </div>
 
             <!-- VIEW: ANALYTICS (Fully Functional) -->
-            <div id="view-analytics" class="hidden animate-slide-up h-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Card 1: Funnel -->
+            <div id="view-analytics" class="hidden animate-slide-up h-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- KPI Card 1: Total Solves -->
+                <div class="dash-panel p-6 flex flex-col items-center justify-center">
+                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Total Solves</div>
+                    <div id="stat-solves" class="text-4xl font-bold text-white">0</div>
+                </div>
+
+                <!-- KPI Card 2: Revenue ETH -->
+                <div class="dash-panel p-6 flex flex-col items-center justify-center">
+                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Revenue (ETH)</div>
+                    <div id="stat-revenue" class="text-4xl font-bold text-green-400">0.0000</div>
+                </div>
+
+                <!-- KPI Card 3: Top Tier -->
+                <div class="dash-panel p-6 flex flex-col items-center justify-center">
+                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Top Tier</div>
+                    <div id="stat-top-tier" class="text-4xl font-bold text-purple-400">-</div>
+                </div>
+
+                <!-- Tier Distribution Chart -->
+                <div class="dash-panel p-6 lg:col-span-2">
+                    <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">Tier Distribution</h3>
+                    <div class="h-48">
+                        <canvas id="chart-tiers"></canvas>
+                    </div>
+                </div>
+
+                <!-- Conversion Funnel -->
                 <div class="dash-panel p-6">
                     <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">Conversion Funnel</h3>
                     <div class="space-y-4">
@@ -979,15 +1005,17 @@
                             </div>
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Sign Up</span> <span
-                                    class="text-green-400">42%</span></div>
+                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Connected</span>
+                                <span class="text-green-400">42%</span>
+                            </div>
                             <div class="w-full bg-gray-800 h-2 rounded-full">
                                 <div class="bg-indigo-500 h-full w-[42%]"></div>
                             </div>
                         </div>
                         <div>
-                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Onboarding</span>
-                                <span class="text-yellow-400">18% (Drop-off)</span>
+                            <div class="flex justify-between text-xs mb-1"><span class="text-white">Payment
+                                    Started</span>
+                                <span class="text-yellow-400">18%</span>
                             </div>
                             <div class="w-full bg-gray-800 h-2 rounded-full">
                                 <div class="bg-indigo-500 h-full w-[18%]"></div>
@@ -1028,7 +1056,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-    <script src="js/app.js?v=1.9"></script>
+    <script src="js/app.js?v=2.0"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {
