@@ -106,8 +106,15 @@ function showLoading(title = 'Processing Payment') {
     loadingTitle.innerText = title;
     loadingStatus.innerText = 'Initiating...';
     loadingTxHash.innerText = '';
+
     loadingOverlay.classList.remove('hidden');
     loadingOverlay.classList.add('flex');
+
+    // Exclusive Visibility
+    if (connectModal) connectModal.classList.add('hidden');
+    if (successState) successState.classList.add('hidden');
+    const loadState = document.getElementById('loadingState');
+    if (loadState) loadState.classList.remove('hidden');
 }
 
 function updateLoading(status, txHash = null) {
@@ -140,27 +147,34 @@ function showToast(title, message) {
 // Connect Wallet Modal Logic
 const connectModal = document.getElementById('connectWalletModal');
 const btnModalConnect = document.getElementById('btn-modal-connect');
+const loadingState = document.getElementById('loadingState'); // Add reference
+const successState = document.getElementById('successState'); // Add reference
 
 function showConnectModal() {
     loadingOverlay.classList.remove('hidden');
     loadingOverlay.classList.add('flex');
-    connectModal.classList.remove('hidden');
 
-    // Wire up button (prevent duplicate listeners if possible, or just overwrite)
+    // Exclusive Visibility
+    connectModal.classList.remove('hidden');
+    if (loadingState) loadingState.classList.add('hidden');
+    if (successState) successState.classList.add('hidden');
+
+    // Wire up button
     btnModalConnect.onclick = async () => {
         const connected = await connectWallet();
         if (connected) {
             hideConnectModal();
-            // Optional: Auto-resume payment? 
-            // For now, let user click the package button again to confirm intent.
         }
     };
 }
 
-window.hideConnectModal = function () { // Global for onclick
+window.hideConnectModal = function () {
     connectModal.classList.add('hidden');
     loadingOverlay.classList.add('hidden');
     loadingOverlay.classList.remove('flex');
+
+    // Reset to default state for next 'Loading' call
+    if (loadingState) loadingState.classList.remove('hidden');
 }
 
 // Direct Pay & Solve Logic (Triggered by Card Buttons)
