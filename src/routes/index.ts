@@ -58,6 +58,11 @@ async function updateStats(tier: string) {
     }
 }
 
+// GET /health
+router.get('/health', (_req: Request, res: Response) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // POST /api/share/create
 router.post('/share/create', async (req: Request, res: Response) => {
     try {
