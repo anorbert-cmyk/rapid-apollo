@@ -330,12 +330,68 @@ window.payAndSolve = async (tier) => {
 
     } catch (error) {
         console.error('Payment/Solve Error:', error);
+
         // Reset Modal
         document.getElementById('loadingOverlay').classList.add('hidden');
         document.getElementById('loadingState').classList.remove('hidden');
         document.getElementById('successState').classList.add('hidden');
 
-        showToast('Error', error.message || 'Transaction failed');
+        // ===== GRANULAR ERROR HANDLING =====
+
+        // User rejected transaction in MetaMask
+        if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
+            showToast('Cancelled', 'Transaction rejected by user.');
+            return;
+        }
+
+        // User rejected network switch
+        if (error.code === 4902) {
+            showToast('Network Error', 'Please add Ethereum Mainnet to your wallet.');
+            return;
+        }
+
+        // Insufficient funds
+        if (error.code === 'INSUFFICIENT_FUNDS' || error.message?.includes('insufficient funds')) {
+            showToast('Insufficient Funds', 'Not enough ETH in your wallet for this transaction.');
+            return;
+        }
+
+        // Gas estimation failed (usually means TX would revert)
+        if (error.code === 'UNPREDICTABLE_GAS_LIMIT' || error.message?.includes('gas')) {
+            showToast('Gas Error', 'Unable to estimate gas. Your wallet may not have enough ETH.');
+            return;
+        }
+
+        // Transaction replaced (user sped up or cancelled in wallet)
+        if (error.code === 'TRANSACTION_REPLACED') {
+            if (error.replacement) {
+                showToast('TX Replaced', 'Transaction was replaced. Check your wallet for status.');
+            } else {
+                showToast('TX Cancelled', 'Transaction was cancelled in wallet.');
+            }
+            return;
+        }
+
+        // Network/RPC error
+        if (error.code === 'NETWORK_ERROR' || error.message?.includes('network')) {
+            showToast('Network Error', 'Connection issue. Please check your internet and try again.');
+            return;
+        }
+
+        // Server API returned an error (double-spend, invalid TX, etc.)
+        if (error.message?.includes('already processed') || error.message?.includes('insufficient amount')) {
+            showToast('Validation Failed', error.message);
+            return;
+        }
+
+        // Timeout or fetch failure
+        if (error.name === 'TypeError' && error.message?.includes('fetch')) {
+            showToast('Connection Lost', 'Unable to reach server. Please try again.');
+            return;
+        }
+
+        // Fallback for unknown errors
+        showToast('Error', error.shortMessage || error.message || 'Transaction failed. Please try again.');
     } finally {
         document.querySelectorAll('.pay-btn').forEach(b => b.disabled = false);
     }
