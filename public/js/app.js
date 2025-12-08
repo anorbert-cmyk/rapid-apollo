@@ -996,9 +996,15 @@ window.exportAdminCSV = () => {
 // ------------------------------------------
 
 window.shareResult = async () => {
+    console.log("Share button clicked", { currentTxHash: window.currentTxHash, signer: !!signer });
+
     // We need the txHash of the CURRENTLY displayed result.
-    if (!window.currentTxHash || !signer) {
-        alert("No active result to share or wallet disconnected.");
+    if (!window.currentTxHash) {
+        showToast("Cannot Share", "No active result to share. Please view a result first.");
+        return;
+    }
+    if (!signer) {
+        showToast("Cannot Share", "Wallet not connected. Please connect wallet first.");
         return;
     }
 
