@@ -48,6 +48,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== ROUTES =====
 app.use('/api', apiRoutes);
+app.use('/api/admin', adminRoutes); // Admin analytics & stats
 
 app.listen(config.PORT, () => {
     console.log(`🚀 Server running on http://localhost:${config.PORT}`);
