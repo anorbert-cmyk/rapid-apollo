@@ -74,6 +74,17 @@ async function connectWallet() {
 
             checkAdminStatus(userAddress); // Check Admin
 
+            // Update Navbar Button to show connected wallet
+            const walletBtn = document.getElementById('btn-connect-wallet');
+            const walletSpan = document.getElementById('walletAddress');
+            if (walletSpan) {
+                walletSpan.innerText = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+            }
+            if (walletBtn) {
+                walletBtn.classList.remove('bg-white/10', 'hover:bg-white/20', 'border-white/10');
+                walletBtn.classList.add('bg-green-500/20', 'hover:bg-green-500/30', 'border-green-500/30', 'text-green-300');
+            }
+
             showToast('Connected', 'Mainnet Wallet connected.');
             return true;
         } catch (err) {
