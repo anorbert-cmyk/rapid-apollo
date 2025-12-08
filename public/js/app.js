@@ -430,20 +430,6 @@ window.enterDashboard = () => {
         // Store for share context
         window.currentTxHash = currentSession.txHash;
 
-        // Add Share Button logic specific to Dashboard view (toolbar integration)
-        setTimeout(() => {
-            const toolbar = document.querySelector('#view-dashboard .group .flex.justify-between .flex.gap-2');
-            if (toolbar && !document.getElementById('btn-share')) {
-                const btn = document.createElement('button');
-                btn.id = 'btn-share';
-                btn.className = 'px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase border border-indigo-500/20 hover:bg-indigo-500/20 transition flex items-center gap-1';
-                btn.innerHTML = '<i class="ph-bold ph-share-network"></i> Share';
-                btn.onclick = window.shareResult;
-                toolbar.appendChild(btn);
-            }
-        }, 100);
-
-
         // Initialize Chart if needed (safe to call multiple times or check instance)
         if (window.initChart && !window.chartInstance) {
             window.initChart();
