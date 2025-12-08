@@ -59,7 +59,7 @@ app.use(cors({
 }));
 
 // Body parsing
-app.use(express.json({ limit: '10kb' })); // Limit body size to prevent large payload attacks
+app.use(express.json({ limit: '100kb' })); // Limit body size to prevent large payload attacks
 
 // Static files - served from 'public' directory from root (up one level from dist)
 app.use(express.static(path.join(__dirname, '../public')));
@@ -101,26 +101,34 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // ===== SERVER START =====
 
-app.listen(config.PORT, () => {
-    const redisStatus = getRedisStatus();
+// Export app for testing
+export { app };
 
-    logger.info('Server started', {
-        port: config.PORT,
-        env: config.NODE_ENV,
-        apiVersion: CONSTANTS.API_VERSION
-    });
+// ===== SERVER START =====
 
-    logger.info('Security enabled', {
-        helmet: true,
-        ipRateLimiting: true,
-        walletRateLimiting: true,
-        rateLimitStorage: redisStatus.type,
-        errorMonitoring: true
-    });
+// Only start the server if this file is run directly (not imported for tests)
+if (require.main === module) {
+    const server = app.listen(config.PORT, () => {
+        const redisStatus = getRedisStatus();
 
-    if (config.NODE_ENV !== 'production') {
-        logger.debug('Development mode', {
-            wallet: config.RECEIVER_WALLET_ADDRESS
+        logger.info('Server started', {
+            port: config.PORT,
+            env: config.NODE_ENV,
+            apiVersion: CONSTANTS.API_VERSION
         });
-    }
-});
+
+        logger.info('Security enabled', {
+            helmet: true,
+            ipRateLimiting: true,
+            walletRateLimiting: true,
+            rateLimitStorage: redisStatus.type,
+            errorMonitoring: true
+        });
+
+        if (config.NODE_ENV !== 'production') {
+            logger.debug('Development mode', {
+                wallet: config.RECEIVER_WALLET_ADDRESS
+            });
+        }
+    });
+}
