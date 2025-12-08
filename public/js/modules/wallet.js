@@ -58,13 +58,13 @@ const WalletModule = (function () {
                     provider = new ethers.BrowserProvider(window.ethereum);
                 } catch (switchError) {
                     if (switchError.code === 4902) {
-                        alert("Ethereum Mainnet not found in your wallet.");
+                        if (window.ToastModule) window.ToastModule.error('Network Error', 'Ethereum Mainnet not found.');
+                    } else if (switchError.code === 4001) {
+                        if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Network switch cancelled. Mainnet is required.');
                     } else {
-                        if (window.ToastModule) {
-                            window.ToastModule.error('Error', 'Please switch to Ethereum Mainnet.');
-                        }
-                        return false;
+                        if (window.ToastModule) window.ToastModule.error('Error', 'Failed to switch network.');
                     }
+                    return false;
                 }
             }
 
@@ -84,12 +84,10 @@ const WalletModule = (function () {
             return true;
         } catch (err) {
             console.error('Wallet connection error:', err);
-            if (err.code === 4001) {
-                if (window.ToastModule) {
-                    window.ToastModule.info('Cancelled', 'User rejected connection.');
-                }
+            if (err.code === 4001 || err.code === 'ACTION_REJECTED') {
+                if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Connection cancelled by user.');
             } else {
-                alert("Connection failed: " + err.message);
+                if (window.ToastModule) window.ToastModule.error('Connection Failed', err.message || 'Could not connect wallet.');
             }
             return false;
         }
@@ -105,6 +103,7 @@ const WalletModule = (function () {
         isConnected = false;
 
         window.dispatchEvent(new CustomEvent('wallet:disconnected'));
+        if (window.ToastModule) window.ToastModule.info('Disconnected', 'Wallet disconnected.');
     }
 
     /**
@@ -115,6 +114,7 @@ const WalletModule = (function () {
      */
     async function sendPayment(to, amountEth) {
         if (!signer) {
+            if (window.ToastModule) window.ToastModule.error('Error', 'Wallet not connected');
             return { success: false, error: 'Wallet not connected' };
         }
 
@@ -123,6 +123,8 @@ const WalletModule = (function () {
                 to,
                 value: ethers.parseEther(amountEth)
             });
+
+            if (window.ToastModule) window.ToastModule.info('Processing', 'Transaction submitted. Waiting for confirmation...');
 
             // Wait for confirmation
             const receipt = await tx.wait();
@@ -134,9 +136,23 @@ const WalletModule = (function () {
             };
         } catch (err) {
             console.error('Payment error:', err);
+
+            let errorMessage = 'Transaction failed';
+
+            if (err.code === 'ACTION_REJECTED' || err.code === 4001) {
+                if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Transaction cancelled. No funds were deducted.');
+                return { success: false, error: 'Cancelled' };
+            } else if (err.code === 'INSUFFICIENT_FUNDS') {
+                errorMessage = 'Insufficient ETH balance for this transaction.';
+                if (window.ToastModule) window.ToastModule.error('Balance Error', errorMessage);
+            } else {
+                errorMessage = err.shortMessage || err.message || 'Transaction failed on-chain.';
+                if (window.ToastModule) window.ToastModule.error('Transaction Failed', errorMessage);
+            }
+
             return {
                 success: false,
-                error: err.message || 'Transaction failed'
+                error: errorMessage
             };
         }
     }
@@ -156,6 +172,14 @@ const WalletModule = (function () {
             return { success: true, signature };
         } catch (err) {
             console.error('Signing error:', err);
+
+            if (err.code === 'ACTION_REJECTED' || err.code === 4001) {
+                if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Signature request cancelled.');
+                return { success: false, error: 'Cancelled' };
+            }
+
+            if (window.ToastModule) window.ToastModule.error('Signing Failed', 'Could not sign message.');
+
             return {
                 success: false,
                 error: err.message || 'Signing failed'

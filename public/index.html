@@ -1181,12 +1181,17 @@
     </main>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast"
-        class="fixed bottom-6 right-6 bg-white text-slate-900 px-4 py-3 rounded-lg shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-[60]">
-        <i class="ph-fill ph-check-circle text-green-600 text-xl"></i>
-        <div>
-            <div class="text-sm font-bold toast-title" id="toast-title">Notification</div>
-            <div class="text-xs text-gray-500 toast-message" id="toast-msg">Action successful</div>
+    <!-- TOAST NOTIFICATION (Modular) -->
+    <div id="toastNotification"
+        class="fixed top-24 right-6 bg-[#0f111a] border border-white/10 text-white px-5 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] transform translate-x-full transition-transform duration-300 flex items-center gap-4 z-[100] hidden max-w-sm w-full backdrop-blur-md">
+        <div class="flex-shrink-0">
+            <i id="toastIcon" class="ph-bold text-2xl"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div id="toastTitle" class="text-sm font-bold font-mono text-white mb-1 uppercase tracking-wider">
+                Notification</div>
+            <div id="toastMessage" class="text-xs text-gray-400 font-sans leading-relaxed break-words">Message body
+            </div>
         </div>
     </div>
 

@@ -62,68 +62,45 @@ setInterval(fetchConfigAndPrices, 60000);
 
 
 // Wallet Connection Logic
-async function connectWallet() {
-    if (window.ethereum) {
-        try {
-            showToast('Connecting', 'Opening MetaMask...');
-            provider = new ethers.BrowserProvider(window.ethereum);
+// Wallet Event Listeners
+window.addEventListener('wallet:connected', (event) => {
+    const { address, truncated } = event.detail;
 
-            // Network Check (Mainnet = 0x1)
-            const network = await provider.getNetwork();
-            if (network.chainId !== 1n) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x1' }],
-                    });
-                    // Re-initialize provider after switch just to be safe
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                } catch (switchError) {
-                    // This error code means the chain has not been added to MetaMask (unlikely for Mainnet, but consistent handling)
-                    if (switchError.code === 4902) {
-                        alert("Ethereum Mainnet not found in your wallet. Please add it manually.");
-                    } else {
-                        showToast('Error', 'Please switch to Ethereum Mainnet to continue.');
-                        return false;
-                    }
-                }
-            }
+    // Globals (sync with module)
+    provider = window.WalletModule.provider;
+    signer = window.WalletModule.signer;
+    userAddress = window.WalletModule.address;
 
-            signer = await provider.getSigner();
-            userAddress = await signer.getAddress();
+    checkAdminStatus(address);
 
-            checkAdminStatus(userAddress); // Check Admin
-
-            // Update Navbar Button to show connected wallet
-            const walletBtn = document.getElementById('btn-connect-wallet');
-            const walletSpan = document.getElementById('walletAddress');
-            if (walletSpan) {
-                walletSpan.innerText = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-            }
-            if (walletBtn) {
-                walletBtn.classList.remove('bg-white/10', 'hover:bg-white/20', 'border-white/10');
-                walletBtn.classList.add('bg-green-500/20', 'hover:bg-green-500/30', 'border-green-500/30', 'text-green-300');
-            }
-
-            showToast('Connected', 'Mainnet Wallet connected.');
-            return true;
-        } catch (err) {
-            console.error(err);
-            if (err.code === 4001) {
-                showToast('Cancelled', 'User rejected connection.');
-            } else {
-                alert("Connection failed: " + err.message);
-            }
-            return false;
-        }
-    } else {
-        alert("Please install MetaMask");
-        window.open('https://metamask.io/', '_blank');
-        return false;
+    // Update Navbar Button
+    const walletBtn = document.getElementById('btn-connect-wallet');
+    const walletSpan = document.getElementById('walletAddress');
+    if (walletSpan) walletSpan.innerText = truncated;
+    if (walletBtn) {
+        walletBtn.classList.remove('bg-white/10', 'hover:bg-white/20', 'border-white/10');
+        walletBtn.classList.add('bg-green-500/20', 'hover:bg-green-500/30', 'border-green-500/30', 'text-green-300');
+        // Unbind click to prevent re-connect spam, or leave it to allow switching?
+        // WalletModule handles logic check
     }
-}
+});
 
-document.getElementById('btn-connect-wallet').addEventListener('click', connectWallet);
+window.addEventListener('wallet:disconnected', () => {
+    provider = null;
+    signer = null;
+    userAddress = null;
+
+    const walletBtn = document.getElementById('btn-connect-wallet');
+    const walletSpan = document.getElementById('walletAddress');
+    if (walletSpan) walletSpan.innerText = 'CONNECT WALLET';
+    if (walletBtn) {
+        walletBtn.classList.add('bg-white/10', 'hover:bg-white/20', 'border-white/10');
+        walletBtn.classList.remove('bg-green-500/20', 'hover:bg-green-500/30', 'border-green-500/30', 'text-green-300');
+    }
+});
+
+// Bind Connect Button
+document.getElementById('btn-connect-wallet').addEventListener('click', () => window.WalletModule.connect());
 
 // Loading Modal Elements (New ID structure)
 const loadingOverlay = document.getElementById('loadingOverlay');
@@ -162,19 +139,10 @@ function hideLoading() {
 }
 
 // Toast Logic (Tailwind Transitions)
-function showToast(title, message) {
-    const toast = document.getElementById('toast');
-    toast.querySelector('.toast-title').innerText = title;
-    toast.querySelector('.toast-message').innerText = message;
+// Toast Logic Delegated to ToastModule
+// showToast() removed to prevent conflict.
+// Use window.ToastModule.show(title, message, type)
 
-    // Animate In: Remove hidden/offset state
-    toast.classList.remove('translate-y-20', 'opacity-0');
-
-    setTimeout(() => {
-        // Animate Out: Add hidden/offset state
-        toast.classList.add('translate-y-20', 'opacity-0');
-    }, APP_CONFIG.TOAST_DURATION_MS);
-}
 
 // Connect Wallet Modal Logic
 const connectModal = document.getElementById('connectWalletModal');
@@ -194,7 +162,7 @@ function showConnectModal() {
     // Wire up button
     btnModalConnect.onclick = async () => {
         console.log("Initialize Session clicked");
-        const connected = await connectWallet();
+        const connected = await window.WalletModule.connect();
         if (connected) {
             hideConnectModal();
         }
@@ -244,14 +212,14 @@ window.payAndSolve = async (tier) => {
 
     // 2. Then Validate Input
     if (!problem || problem.trim() === "") {
-        alert("Please describe your problem first!");
+        window.ToastModule.warning("Input Required", "Please describe your problem first!");
         document.getElementById('problemInput').focus();
         document.querySelector('.input-section').scrollIntoView({ behavior: 'smooth' });
         return;
     }
 
     if (!RECIPIENT_ADDRESS) {
-        alert("System configuration not loaded. Please refresh.");
+        window.ToastModule.error("Config Error", "System configuration not loaded. Please refresh.");
         return;
     }
 
@@ -276,7 +244,7 @@ window.payAndSolve = async (tier) => {
 
         if (!ethAmount) {
             hideLoading();
-            alert("Failed to get live price. Try again.");
+            window.ToastModule.error("Price Error", "Failed to get live price. Try again.");
             document.querySelectorAll('.pay-btn').forEach(b => b.disabled = false);
             return;
         }
@@ -345,7 +313,7 @@ window.payAndSolve = async (tier) => {
             btnEnterDashboard.onclick = () => window.enterDashboard();
 
         } else {
-            alert("Error: " + result.error);
+            window.ToastModule.error("Error", result.error);
         }
 
     } catch (error) {
@@ -358,60 +326,65 @@ window.payAndSolve = async (tier) => {
 
         // ===== GRANULAR ERROR HANDLING =====
 
+        if (!window.ToastModule) {
+            console.error("Critical: ToastModule missing for error reporting");
+            return;
+        }
+
         // User rejected transaction in MetaMask
         if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
-            showToast('Cancelled', 'Transaction rejected by user.');
+            window.ToastModule.warning('Cancelled', 'Transaction rejected by user.');
             return;
         }
 
         // User rejected network switch
         if (error.code === 4902) {
-            showToast('Network Error', 'Please add Ethereum Mainnet to your wallet.');
+            window.ToastModule.error('Network Error', 'Please add Ethereum Mainnet to your wallet.');
             return;
         }
 
         // Insufficient funds
         if (error.code === 'INSUFFICIENT_FUNDS' || error.message?.includes('insufficient funds')) {
-            showToast('Insufficient Funds', 'Not enough ETH in your wallet for this transaction.');
+            window.ToastModule.error('Insufficient Funds', 'Not enough ETH in your wallet for this transaction.');
             return;
         }
 
         // Gas estimation failed (usually means TX would revert)
         if (error.code === 'UNPREDICTABLE_GAS_LIMIT' || error.message?.includes('gas')) {
-            showToast('Gas Error', 'Unable to estimate gas. Your wallet may not have enough ETH.');
+            window.ToastModule.error('Gas Error', 'Unable to estimate gas. Your wallet may not have enough ETH.');
             return;
         }
 
         // Transaction replaced (user sped up or cancelled in wallet)
         if (error.code === 'TRANSACTION_REPLACED') {
             if (error.replacement) {
-                showToast('TX Replaced', 'Transaction was replaced. Check your wallet for status.');
+                window.ToastModule.info('TX Replaced', 'Transaction was replaced. Check your wallet for status.');
             } else {
-                showToast('TX Cancelled', 'Transaction was cancelled in wallet.');
+                window.ToastModule.warning('TX Cancelled', 'Transaction was cancelled in wallet.');
             }
             return;
         }
 
         // Network/RPC error
         if (error.code === 'NETWORK_ERROR' || error.message?.includes('network')) {
-            showToast('Network Error', 'Connection issue. Please check your internet and try again.');
+            window.ToastModule.error('Network Error', 'Connection issue. Please check your internet and try again.');
             return;
         }
 
         // Server API returned an error (double-spend, invalid TX, etc.)
         if (error.message?.includes('already processed') || error.message?.includes('insufficient amount')) {
-            showToast('Validation Failed', error.message);
+            window.ToastModule.error('Validation Failed', error.message);
             return;
         }
 
         // Timeout or fetch failure
         if (error.name === 'TypeError' && error.message?.includes('fetch')) {
-            showToast('Connection Lost', 'Unable to reach server. Please try again.');
+            window.ToastModule.error('Connection Lost', 'Unable to reach server. Please try again.');
             return;
         }
 
         // Fallback for unknown errors
-        showToast('Error', error.shortMessage || error.message || 'Transaction failed. Please try again.');
+        window.ToastModule.error('Error', error.shortMessage || error.message || 'Transaction failed. Please try again.');
     } finally {
         document.querySelectorAll('.pay-btn').forEach(b => b.disabled = false);
     }
@@ -549,9 +522,9 @@ const demo = "Code blocks have copy buttons!";
                 tier: 'full',
                 timestamp: Date.now()
             };
-            showToast('Admin Preview', 'Viewing dashboard as customer would see it.');
+            window.ToastModule.info('Admin Preview', 'Viewing dashboard as customer would see it.');
         } else {
-            alert("No active session found. Please complete a payment first.");
+            window.ToastModule.warning("No Session", "No active session found. Please complete a payment first.");
             return;
         }
     }
@@ -605,7 +578,7 @@ const demo = "Code blocks have copy buttons!";
 // Secure Cloud Sync
 window.syncHistory = async () => {
     if (!signer || !userAddress) {
-        alert("Please connect your wallet first.");
+        window.ToastModule.warning("Wallet Required", "Please connect your wallet first.");
         return;
     }
 
@@ -662,19 +635,19 @@ window.syncHistory = async () => {
         renderHistoryUI();
 
         if (addedCount > 0) {
-            showToast('Sync Complete', `Restored ${addedCount} sessions from cloud.`);
+            window.ToastModule.success('Sync Complete', `Restored ${addedCount} sessions from cloud.`);
             // Auto switch to latest if we had nothing
             if (!currentSession && sessionHistory.length > 0) {
                 currentSession = sessionHistory[0];
                 window.enterDashboard();
             }
         } else {
-            showToast('Sync Complete', 'History is up to date.');
+            window.ToastModule.info('Sync Complete', 'History is up to date.');
         }
 
     } catch (error) {
         console.error("Sync Error:", error);
-        alert("Sync Failed: " + error.message);
+        window.ToastModule.error("Sync Failed", error.message);
     } finally {
         const btn = document.getElementById('btn-sync');
         if (btn) {
@@ -704,7 +677,7 @@ async function checkAdminStatus(address) {
 
         if (data.isAdmin) {
             isAdmin = true;
-            showToast('Admin Mode', 'Platform Analytics Unlocked');
+            window.ToastModule.success('Admin Mode', 'Platform Analytics Unlocked');
 
             // Show Admin Button in Navbar
             const navAdminBtn = document.getElementById('nav-admin-btn');
@@ -842,7 +815,7 @@ window.refreshAdminStats = async () => {
             }
         }
 
-        showToast('Stats Updated', 'Analytics refreshed successfully.');
+        window.ToastModule.success('Stats Updated', 'Analytics refreshed successfully.');
 
         // Render Dynamic Funnel (from API response)
         if (stats.funnel) {
@@ -854,7 +827,7 @@ window.refreshAdminStats = async () => {
 
     } catch (e) {
         console.error("Admin Stats Error:", e);
-        showToast("Error", "Failed to fetch admin stats");
+        window.ToastModule.error("Error", "Failed to fetch admin stats");
     }
 };
 
@@ -988,7 +961,7 @@ function renderFunnel(funnel) {
 // Export Admin Data to CSV
 window.exportAdminCSV = () => {
     if (allTransactions.length === 0) {
-        showToast('Export Failed', 'No transaction data to export.');
+        window.ToastModule.warning('Export Failed', 'No transaction data to export.');
         return;
     }
 
@@ -1009,7 +982,7 @@ window.exportAdminCSV = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    showToast('Export Complete', `Downloaded ${allTransactions.length} transactions.`);
+    window.ToastModule.success('Export Complete', `Downloaded ${allTransactions.length} transactions.`);
 };
 // ------------------------------------------
 // SHARING & UX
@@ -1020,11 +993,11 @@ window.shareResult = async () => {
 
     // We need the txHash of the CURRENTLY displayed result.
     if (!window.currentTxHash) {
-        showToast("Cannot Share", "No active result to share. Please view a result first.");
+        window.ToastModule.warning("Cannot Share", "No active result to share. Please view a result first.");
         return;
     }
     if (!signer) {
-        showToast("Cannot Share", "Wallet not connected. Please connect wallet first.");
+        window.ToastModule.warning("Cannot Share", "Wallet not connected. Please connect wallet first.");
         return;
     }
 
@@ -1059,7 +1032,7 @@ window.shareResult = async () => {
 
     } catch (e) {
         console.error(e);
-        alert("Failed to share result.");
+        window.ToastModule.error("Share Error", "Failed to share result.");
     } finally {
         const btn = document.getElementById('btn-share');
         if (btn) btn.innerHTML = '<i class="ph-bold ph-share-network"></i> Share';
@@ -1107,14 +1080,14 @@ function renderMarkdownWithUX(content, containerId) {
 // --- GLOBAL ERROR BOUNDARY ---
 window.addEventListener('unhandledrejection', (event) => {
     console.error("Critical Failure:", event.reason);
-    showToast("Logic Engine Disrupted. Retrying...", "error");
+    if (window.ToastModule) window.ToastModule.error("System Error", "Logic Engine Disrupted. Retrying...");
 });
 
 window.addEventListener('error', (event) => {
     console.error("System Error:", event.error);
     // Don't show toast for minor asset 404s
-    if (event.target.tagName !== 'IMG') {
-        showToast("Unexpected Anomalies Detected.", "error");
+    if (event.target.tagName !== 'IMG' && window.ToastModule) {
+        window.ToastModule.error("System Error", "Unexpected Anomalies Detected.");
     }
 });
 
@@ -1124,13 +1097,13 @@ window.addEventListener('error', (event) => {
 // Dashboard View Switcher
 window.switchView = (viewName) => {
     if (viewName === 'analytics' && !isAdmin) {
-        alert("Restricted: Admin Access Only.");
+        window.ToastModule.error("Access Denied", "Restricted: Admin Access Only.");
         return;
     }
 
     if (viewName !== 'dashboard' && viewName !== 'analytics') {
         // Simple mock for other views
-        alert("This module is locked in your current tier.");
+        window.ToastModule.warning("Locked", "This module is locked in your current tier.");
         return;
     }
 

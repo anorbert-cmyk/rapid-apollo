@@ -1,30 +1,40 @@
 # Build Stage
-FROM node:20-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
+
+# Copy package files
 COPY package*.json ./
+
+# Install all dependencies (including devDependencies for build)
 RUN npm ci
 
+# Copy source code
 COPY . .
+
+# Build the application
 RUN npm run build
 
 # Production Stage
-FROM node:20-alpine
+FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Copy built artifacts and dependencies
+# Set production environment
+ENV NODE_ENV=production
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built assets from builder stage
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
 
-# Install ONLY production dependencies (lighter image)
-RUN npm ci --only=production
-
-# Install Redis client if not in package? (It is in package.json now)
-
-# Expose Port
+# Expose port (default 3000)
 EXPOSE 3000
 
-# Start Command
+# Start command
 CMD ["npm", "run", "start:prod"]

@@ -35,6 +35,9 @@ const ToastModule = (function () {
                 case 'error':
                     toastIcon.className += 'ph-warning-circle text-red-400';
                     break;
+                case 'warning':
+                    toastIcon.className += 'ph-warning text-yellow-400';
+                    break;
                 default:
                     toastIcon.className += 'ph-info text-blue-400';
             }
@@ -79,6 +82,13 @@ const ToastModule = (function () {
     }
 
     /**
+     * Show warning toast
+     */
+    function warning(title, message) {
+        show(title, message, 'warning');
+    }
+
+    /**
      * Show info toast
      */
     function info(title, message) {
@@ -91,6 +101,7 @@ const ToastModule = (function () {
         hide,
         success,
         error,
+        warning,
         info
     };
 })();
