@@ -1,16 +1,28 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { verifyMessage } from 'ethers';
 import { statsStore } from '../store';
+import { config } from '../config';
 
 const router = Router();
-const ADMIN_ADDRESS = '0xa14504ffe5E9A245c9d4079547Fa16fA0A823114';
+const ADMIN_WALLET = config.ADMIN_WALLET_ADDRESS.toLowerCase();
+
+// POST /api/admin/check-status
+// Returns true if the provided address matches the admin wallet (verified on server)
+router.post('/check-status', (req: Request, res: Response) => {
+    const { address } = req.body;
+    if (!address) return res.json({ isAdmin: false });
+
+    // Simple check: does the connected wallet match our env var?
+    const isAdmin = address.toLowerCase() === ADMIN_WALLET;
+    res.json({ isAdmin });
+});
 
 // Middleware for Admin Verification (Signature Based)
-const verifyAdmin = async (req: Request, res: Response, next: Function) => {
+const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { signature, timestamp, address } = req.body; // or headers
+        const { signature, timestamp, address } = req.body;
 
-        if (!address || address.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+        if (!address || address.toLowerCase() !== ADMIN_WALLET) {
             return res.status(403).json({ error: 'Unauthorized: Not an admin wallet' });
         }
 
@@ -23,7 +35,7 @@ const verifyAdmin = async (req: Request, res: Response, next: Function) => {
         const message = `Authenticate to Rapid Apollo Admin: ${timestamp}`;
         const recovered = verifyMessage(message, signature);
 
-        if (recovered.toLowerCase() !== ADMIN_ADDRESS.toLowerCase()) {
+        if (recovered.toLowerCase() !== ADMIN_WALLET) {
             return res.status(403).json({ error: 'Invalid admin signature' });
         }
 
@@ -34,10 +46,7 @@ const verifyAdmin = async (req: Request, res: Response, next: Function) => {
     }
 };
 
-// GET /api/admin/stats
-// Note: We use POST because we need to send the signature in the body/headers easily
-// GET with body is discouraged, so we'll use POST for this "fetch" action or pass headers.
-// Let's use POST for simplicity on the frontend `fetch` signature logic.
+// POST /api/admin/stats
 router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
     try {
         const [

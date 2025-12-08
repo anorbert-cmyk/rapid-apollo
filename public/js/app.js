@@ -526,28 +526,10 @@ window.syncHistory = async () => {
 // Secure Cloud Sync
 // ... (keep syncHistory existing code)
 
-// Admin Configuration
-const ADMIN_WALLET = '0xa14504ffe5E9A245c9d4079547Fa16fA0A823114';
-let isAdmin = false;
-
-// Check Admin Status on Connect
+// Admin Configuration// CHECKS
 async function checkAdminStatus(address) {
-    if (address.toLowerCase() === ADMIN_WALLET.toLowerCase()) {
-        isAdmin = true;
-
-        // Unlock Analytics Tab
-        const navAnalytics = document.getElementById('nav-analytics');
-        if (navAnalytics) {
-            navAnalytics.innerHTML = `
-                <i class="ph-fill ph-chart-pie-slice text-lg"></i>
-                <span class="text-xs font-bold tracking-widest uppercase">Admin Stats</span>
-            `;
-            navAnalytics.onclick = () => window.switchView('analytics');
-            navAnalytics.classList.remove('opacity-50', 'cursor-not-allowed');
-            navAnalytics.classList.add('text-indigo-400');
-        }
-        showToast('Admin Mode', 'Platform Analytics Unlocked');
-    }
+    showToast('Admin Mode', 'Platform Analytics Unlocked');
+}
 }
 
 // Modify connectWallet to call check
