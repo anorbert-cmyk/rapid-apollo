@@ -6,16 +6,28 @@ import { config } from './config';
 import { CONSTANTS } from './constants';
 import { logger } from './utils/logger';
 import { walletRateLimiter } from './utils/walletRateLimiter';
+import { redisWalletRateLimiter, getRedisStatus, closeRedis } from './utils/redisRateLimiter';
+import {
+    initErrorMonitoring,
+    errorMonitoringMiddleware,
+    requestTrackingMiddleware
+} from './utils/errorMonitoring';
 import apiRoutes from './routes';
 import path from 'path';
 import adminRoutes from './routes/admin';
+
+// Initialize error monitoring
+initErrorMonitoring();
 
 const app = express();
 
 // Security: Trust Proxy (Required for Railway/Load Balancers)
 app.set('trust proxy', 1);
 
-// ===== SECURITY MIDDLEWARE =====
+// ===== MIDDLEWARE =====
+
+// Request tracking (adds request ID)
+app.use(requestTrackingMiddleware);
 
 // Helmet: Secure HTTP headers
 // CSP temporarily disabled - was blocking CDN resources causing page to break
@@ -54,9 +66,12 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // ===== ROUTES =====
 
+// Use Redis rate limiter in production, fallback to in-memory
+const useRedisRateLimiter = config.NODE_ENV === 'production' && process.env.REDIS_URL;
+
 // Per-wallet rate limiting for payment endpoints
-app.use('/api/solve', walletRateLimiter);
-app.use('/api/v1/solve', walletRateLimiter);
+app.use('/api/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
+app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 
 // API v1 Routes (new versioned endpoints)
 app.use('/api/v1', apiRoutes);
@@ -66,9 +81,29 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/admin', adminRoutes);
 
+// Error handling middleware (must be last)
+app.use(errorMonitoringMiddleware);
+
+// ===== GRACEFUL SHUTDOWN =====
+
+async function gracefulShutdown(signal: string): Promise<void> {
+    logger.info('Shutdown signal received', { signal });
+
+    // Close Redis connection
+    await closeRedis();
+
+    logger.info('Graceful shutdown complete');
+    process.exit(0);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 // ===== SERVER START =====
 
 app.listen(config.PORT, () => {
+    const redisStatus = getRedisStatus();
+
     logger.info('Server started', {
         port: config.PORT,
         env: config.NODE_ENV,
@@ -77,8 +112,10 @@ app.listen(config.PORT, () => {
 
     logger.info('Security enabled', {
         helmet: true,
-        rateLimiting: true,
-        walletRateLimiting: true
+        ipRateLimiting: true,
+        walletRateLimiting: true,
+        rateLimitStorage: redisStatus.type,
+        errorMonitoring: true
     });
 
     if (config.NODE_ENV !== 'production') {

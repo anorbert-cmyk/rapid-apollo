@@ -1,0 +1,381 @@
+# OpenAPI 3.0 Specification for MasterPrompt API
+openapi: 3.0.3
+info:
+  title: MasterPrompt API
+  description: |
+    Crypto-gated AI problem solving service with tiered pricing.
+    
+    ## Authentication
+    Most endpoints require wallet-based authentication:
+    1. Sign a message with your wallet: `MasterPrompt Auth: {timestamp}`
+    2. Include `address`, `signature`, and `timestamp` in request body
+    
+    ## Rate Limiting
+    - IP-based: 100 requests per 15 minutes
+    - Wallet-based: 10 requests per minute
+    
+    Rate limit headers are included in responses:
+    - `X-RateLimit-Limit`: Maximum requests allowed
+    - `X-RateLimit-Remaining`: Remaining requests
+    - `X-RateLimit-Reset`: Seconds until limit resets
+  version: 1.0.0
+  contact:
+    name: MasterPrompt Support
+    url: https://masterprompt.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://masterprompt.io/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: Public
+    description: Public endpoints (no authentication required)
+  - name: Payment
+    description: Payment verification endpoints
+  - name: Session
+    description: User session management
+  - name: Admin
+    description: Admin analytics (requires admin wallet)
+
+paths:
+  /health:
+    get:
+      tags: [Public]
+      summary: Health check
+      description: Check if the API is running
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /config:
+    get:
+      tags: [Public]
+      summary: Get app configuration
+      description: Returns public configuration including receiver wallet address
+      responses:
+        '200':
+          description: Configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+
+  /pricing:
+    get:
+      tags: [Public]
+      summary: Get tier pricing
+      description: Returns current ETH prices for all tiers
+      responses:
+        '200':
+          description: Pricing data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pricing'
+
+  /verify-payment:
+    post:
+      tags: [Payment]
+      summary: Verify payment transaction
+      description: Verify an ETH payment transaction for tier access
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPaymentRequest'
+      responses:
+        '200':
+          description: Payment verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPaymentResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+
+  /solve:
+    post:
+      tags: [Session]
+      summary: Solve a problem
+      description: Submit a problem for AI solving (requires active session)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SolveRequest'
+      responses:
+        '200':
+          description: Problem solved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SolveResponse'
+        '403':
+          description: No active session or tier mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+
+  /session:
+    post:
+      tags: [Session]
+      summary: Get session data
+      description: Retrieve current session including history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Session data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+
+  /admin/stats:
+    post:
+      tags: [Admin]
+      summary: Get admin statistics
+      description: Get platform analytics (admin wallet only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Admin statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStats'
+        '403':
+          description: Not authorized (non-admin wallet)
+
+  /admin/transactions:
+    post:
+      tags: [Admin]
+      summary: Get transaction history
+      description: Get paginated transaction history (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/AuthRequest'
+                - type: object
+                  properties:
+                    page:
+                      type: integer
+                      default: 1
+                    limit:
+                      type: integer
+                      default: 50
+                    search:
+                      type: string
+      responses:
+        '200':
+          description: Transaction list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionList'
+
+components:
+  schemas:
+    Config:
+      type: object
+      properties:
+        receiverAddress:
+          type: string
+          description: Wallet address for payments
+          example: "0xa14504ffe5E9A245c9d4079547Fa16fA0A823114"
+
+    Pricing:
+      type: object
+      properties:
+        standard:
+          type: string
+          description: ETH price for Standard tier
+          example: "0.0076"
+        medium:
+          type: string
+          description: ETH price for Medium tier
+          example: "0.0195"
+        full:
+          type: string
+          description: ETH price for Full tier
+          example: "0.0795"
+        ethPrice:
+          type: number
+          description: Current ETH/USD price
+          example: 2500
+
+    AuthRequest:
+      type: object
+      required: [address, signature, timestamp]
+      properties:
+        address:
+          type: string
+          description: Wallet address
+          example: "0x1234567890abcdef1234567890abcdef12345678"
+        signature:
+          type: string
+          description: Signed message
+        timestamp:
+          type: integer
+          description: Unix timestamp (ms)
+          example: 1702070400000
+
+    VerifyPaymentRequest:
+      type: object
+      required: [txHash, tier, senderAddress]
+      properties:
+        txHash:
+          type: string
+          description: Transaction hash
+          example: "0xabc123..."
+        tier:
+          type: string
+          enum: [standard, medium, full]
+        senderAddress:
+          type: string
+          description: Sender wallet address
+
+    VerifyPaymentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        tier:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    SolveRequest:
+      allOf:
+        - $ref: '#/components/schemas/AuthRequest'
+        - type: object
+          required: [problem, tier]
+          properties:
+            problem:
+              type: string
+              minLength: 10
+              maxLength: 10000
+            tier:
+              type: string
+              enum: [standard, medium, full]
+
+    SolveResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: AI-generated solution
+
+    SessionResponse:
+      type: object
+      properties:
+        hasSession:
+          type: boolean
+        tier:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        history:
+          type: array
+          items:
+            type: object
+            properties:
+              problem:
+                type: string
+              answer:
+                type: string
+              timestamp:
+                type: string
+                format: date-time
+
+    AdminStats:
+      type: object
+      properties:
+        totalTransactions:
+          type: integer
+        totalRevenue:
+          type: string
+        uniqueUsers:
+          type: integer
+        averageOrderValue:
+          type: string
+        recentTransactions:
+          type: array
+          items:
+            type: object
+
+    TransactionList:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    RateLimitError:
+      type: object
+      properties:
+        error:
+          type: string
+        retryAfter:
+          type: integer
+          description: Seconds until rate limit resets
