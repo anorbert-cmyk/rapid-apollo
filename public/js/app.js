@@ -690,10 +690,26 @@ async function checkAdminStatus(address) {
             const navAdminBtn = document.getElementById('nav-admin-btn');
             if (navAdminBtn) {
                 navAdminBtn.classList.remove('hidden');
-                navAdminBtn.onclick = () => {
-                    // Navigate to admin analytics view
-                    window.switchView('analytics');
-                    window.refreshAdminStats();
+                navAdminBtn.onclick = async () => {
+                    // First enter the dashboard (transition from landing)
+                    const landingPage = document.getElementById('landing-page');
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    const dashboard = document.getElementById('app-dashboard');
+
+                    if (landingPage && dashboard) {
+                        landingPage.style.opacity = '0';
+                        setTimeout(() => {
+                            landingPage.style.display = 'none';
+                            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                            dashboard.classList.remove('hidden');
+
+                            // Now switch to analytics view
+                            window.switchView('analytics');
+                        }, 300);
+                    } else {
+                        // Already on dashboard, just switch view
+                        window.switchView('analytics');
+                    }
                 };
             }
 
