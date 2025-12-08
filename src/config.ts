@@ -14,8 +14,12 @@ const envSchema = z.object({
     // Admin Wallet for Analytics Access
     ADMIN_WALLET_ADDRESS: z.string().startsWith('0x').default('0xa14504ffe5E9A245c9d4079547Fa16fA0A823114'),
 
-    // CORS: Allowed origin for production (e.g., 'https://yourdomain.com')
+    // CORS: Allowed origin for production
+    // In production, this MUST be set to the actual domain
     ALLOWED_ORIGIN: z.string().default('*'),
+
+    // Railway auto-detection (Railway sets this automatically)
+    RAILWAY_PUBLIC_DOMAIN: z.string().optional(),
 
     // Pricing Service
     ETH_PRICE_API_URL: z.string().default('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'),
@@ -33,4 +37,20 @@ if (!parsedEnv.success) {
     process.exit(1);
 }
 
-export const config = parsedEnv.data;
+// Derive ALLOWED_ORIGIN for production
+let finalAllowedOrigin = parsedEnv.data.ALLOWED_ORIGIN;
+
+if (parsedEnv.data.NODE_ENV === 'production') {
+    // If ALLOWED_ORIGIN is still '*' in production, try to use Railway domain
+    if (finalAllowedOrigin === '*' && parsedEnv.data.RAILWAY_PUBLIC_DOMAIN) {
+        finalAllowedOrigin = `https://${parsedEnv.data.RAILWAY_PUBLIC_DOMAIN}`;
+        console.log(`🔒 CORS: Auto-detected Railway domain: ${finalAllowedOrigin}`);
+    } else if (finalAllowedOrigin === '*') {
+        console.warn('⚠️ WARNING: ALLOWED_ORIGIN is "*" in production! Set ALLOWED_ORIGIN env var for security.');
+    }
+}
+
+export const config = {
+    ...parsedEnv.data,
+    ALLOWED_ORIGIN: finalAllowedOrigin
+};
