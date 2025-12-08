@@ -691,19 +691,20 @@ async function checkAdminStatus(address) {
             if (navAdminBtn) {
                 navAdminBtn.classList.remove('hidden');
                 navAdminBtn.onclick = async () => {
-                    // First enter the dashboard (transition from landing)
                     const landingPage = document.getElementById('landing-page');
                     const loadingOverlay = document.getElementById('loadingOverlay');
                     const dashboard = document.getElementById('app-dashboard');
 
-                    if (landingPage && dashboard) {
+                    // Check if landing page is currently VISIBLE (not hidden)
+                    const isOnLanding = landingPage && landingPage.style.display !== 'none' && !dashboard.classList.contains('hidden') === false;
+
+                    if (landingPage && dashboard && dashboard.classList.contains('hidden')) {
+                        // Still on landing page, need to transition
                         landingPage.style.opacity = '0';
                         setTimeout(() => {
                             landingPage.style.display = 'none';
                             if (loadingOverlay) loadingOverlay.classList.add('hidden');
                             dashboard.classList.remove('hidden');
-
-                            // Now switch to analytics view
                             window.switchView('analytics');
                         }, 300);
                     } else {
