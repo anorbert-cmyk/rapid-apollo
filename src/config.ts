@@ -11,8 +11,8 @@ const envSchema = z.object({
     RPC_URL: z.string().default('https://rpc.ankr.com/eth'),
     // My receiving wallet address (hardcoded for the demo or env)
     RECEIVER_WALLET_ADDRESS: z.string().startsWith('0x'),
-    // Admin Wallet for Analytics Access
-    ADMIN_WALLET_ADDRESS: z.string().startsWith('0x').default('0xa14504ffe5E9A245c9d4079547Fa16fA0A823114'),
+    // Admin Wallet for Analytics Access (MUST be set in env, no default for security)
+    ADMIN_WALLET_ADDRESS: z.string().startsWith('0x'),
 
     // CORS: Allowed origin for production
     // In production, this MUST be set to the actual domain

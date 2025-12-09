@@ -11,5 +11,7 @@ module.exports = {
         '!src/server.ts' // Exclude entry point
     ],
     coverageDirectory: 'coverage',
-    verbose: true
+    verbose: true,
+    // Set required env vars for tests (no real secrets, just placeholders)
+    setupFiles: ['<rootDir>/jest.setup.js']
 };
