@@ -68,7 +68,14 @@ router.post('/share/create', async (req: Request, res: Response) => {
     try {
         const { txHash, address, signature, timestamp } = req.body;
         // Verify Auth (Only owner can share)
-        if (!txHash || !address || !signature) return res.status(400).json({ error: 'Missing params' });
+        if (!txHash || !address || !signature || !timestamp) return res.status(400).json({ error: 'Missing params' });
+
+        // SECURITY: Validate timestamp (max 5 minutes old)
+        const now = Date.now();
+        if (typeof timestamp !== 'number' || Math.abs(now - timestamp) > CONSTANTS.SIGNATURE_VALIDITY_MS) {
+            logger.warn('Expired or invalid timestamp on share/create', { wallet: address, timestamp });
+            return res.status(403).json({ error: 'Request expired. Please try again.' });
+        }
 
         const message = `Authorize Share for TX ${txHash} at ${timestamp}`;
         const recovered = verifyMessage(message, signature);
