@@ -176,13 +176,15 @@ router.post('/solve', async (req: Request, res: Response) => {
         await usedTxHashes.set(txHash, Date.now() as any);
 
         logger.info('Payment valid, solving problem', { txHash, tier });
-        const solution = await solveProblem(problemStatement, tier);
+        const solutionResponse = await solveProblem(problemStatement, tier, txHash);
 
         const resultData = {
             txHash,
             tier,
             problem: problemStatement,
-            solution,
+            solution: solutionResponse.rawMarkdown, // Backward compatible markdown
+            sections: solutionResponse.sections,    // NEW: Structured sections
+            meta: solutionResponse.meta,            // NEW: Response metadata
             timestamp: new Date().toISOString()
         };
 

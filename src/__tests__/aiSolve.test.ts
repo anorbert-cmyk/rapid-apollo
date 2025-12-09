@@ -3,6 +3,7 @@ import { app } from '../server';
 import { verifyTransaction } from '../services/paymentService';
 import { solveProblem } from '../services/aiService';
 import { usedTxHashes } from '../store';
+import { SolutionResponse } from '../types/solution';
 
 // Mock dependencies
 jest.mock('../services/paymentService');
@@ -12,31 +13,42 @@ jest.mock('../services/aiService');
 const mockVerifyTransaction = verifyTransaction as jest.MockedFunction<typeof verifyTransaction>;
 const mockSolveProblem = solveProblem as jest.MockedFunction<typeof solveProblem>;
 
+// Helper to create mock SolutionResponse
+function createMockResponse(solutionText: string, tier: 'standard' | 'medium' | 'full' = 'standard'): SolutionResponse {
+    return {
+        meta: {
+            originalProblem: 'Test problem',
+            tier,
+            provider: 'gemini',
+            generatedAt: Date.now()
+        },
+        sections: {
+            executiveSummary: solutionText,
+            keyInsight: 'Test insight',
+            nextStep: 'Test next step'
+        },
+        rawMarkdown: solutionText
+    };
+}
+
 describe('POST /api/solve (Integration)', () => {
 
     beforeEach(async () => {
         jest.clearAllMocks();
-        // Clear in-memory store if possible, or just mock usedTxHashes if needed
-        // For usedTxHashes validation, we might need to manually clear it if it's singleton
-        // But since we restart app? No, app is imported once.
-        // We can manually clear the map if we cast it to any
         if ((usedTxHashes as any).map) {
             (usedTxHashes as any).map.clear();
         }
     });
 
     const validPayload = {
-        // 66 chars: 0x + 64 random hex chars
         txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         problemStatement: 'Test problem',
         tier: 'standard'
     };
 
     it('should solve problem with valid payment', async () => {
-        // Mock successful payment
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        // Mock AI response
-        mockSolveProblem.mockResolvedValue('AI Solution');
+        mockSolveProblem.mockResolvedValue(createMockResponse('AI Solution'));
 
         const res = await request(app)
             .post('/api/solve')
@@ -46,10 +58,11 @@ describe('POST /api/solve (Integration)', () => {
         expect(res.body.success).toBe(true);
         expect(res.body.solution).toBe('AI Solution');
         expect(res.body.tier).toBe('standard');
+        expect(res.body.sections).toBeDefined();
+        expect(res.body.meta).toBeDefined();
 
-        // Verify mocks called
         expect(mockVerifyTransaction).toHaveBeenCalledWith(validPayload.txHash, 'standard');
-        expect(mockSolveProblem).toHaveBeenCalledWith('Test problem', 'standard');
+        expect(mockSolveProblem).toHaveBeenCalledWith('Test problem', 'standard', validPayload.txHash);
     });
 
     it('should reject invalid payment (402)', async () => {
@@ -67,7 +80,7 @@ describe('POST /api/solve (Integration)', () => {
     it('should detect double spend (409)', async () => {
         // First successful request
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        mockSolveProblem.mockResolvedValue('AI Solution');
+        mockSolveProblem.mockResolvedValue(createMockResponse('AI Solution'));
 
         await request(app).post('/api/solve').send(validPayload);
 
@@ -82,35 +95,35 @@ describe('POST /api/solve (Integration)', () => {
 
     it('should validate standard tier logic', async () => {
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        mockSolveProblem.mockResolvedValue('Standard Solution');
+        mockSolveProblem.mockResolvedValue(createMockResponse('Standard Solution'));
 
         await request(app)
             .post('/api/solve')
             .send({ ...validPayload, tier: 'standard' });
 
-        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'standard');
+        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'standard', expect.any(String));
     });
 
     it('should validate medium tier logic', async () => {
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        mockSolveProblem.mockResolvedValue('Medium Solution');
+        mockSolveProblem.mockResolvedValue(createMockResponse('Medium Solution', 'medium'));
 
         await request(app)
             .post('/api/solve')
             .send({ ...validPayload, tier: 'medium' });
 
-        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'medium');
+        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'medium', expect.any(String));
     });
 
     it('should validate full tier logic', async () => {
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        mockSolveProblem.mockResolvedValue('Full Solution');
+        mockSolveProblem.mockResolvedValue(createMockResponse('Full Solution', 'full'));
 
         await request(app)
             .post('/api/solve')
             .send({ ...validPayload, tier: 'full' });
 
-        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'full');
+        expect(mockSolveProblem).toHaveBeenCalledWith(expect.any(String), 'full', expect.any(String));
     });
 
     it('should reject invalid tier schema', async () => {
