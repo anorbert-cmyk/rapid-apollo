@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { config } from '../config';
+import { logger } from '../utils/logger';
 
 const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 
@@ -36,7 +37,7 @@ export const solveProblem = async (problemStatement: string, tier: string) => {
         const response = await result.response;
         return response.text();
     } catch (error) {
-        console.error("AI Service Error:", error);
+        logger.error('AI service error', error instanceof Error ? error : new Error(String(error)));
         throw new Error("Failed to generate solution");
     }
 };

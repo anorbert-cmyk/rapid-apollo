@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { config } from '../config';
 import { Tier, getTierPriceUSD, getEthPrice } from './priceService';
+import { logger } from '../utils/logger';
 
 const provider = new ethers.JsonRpcProvider(config.RPC_URL);
 
@@ -51,7 +52,7 @@ export async function verifyTransaction(txHash: string, tier: Tier): Promise<Tra
         return { valid: true, from: tx.from };
 
     } catch (error: any) {
-        console.error('Payment verification failed:', error);
+        logger.error('Payment verification failed', error instanceof Error ? error : new Error(String(error)));
         return { valid: false, message: error.message || 'Verification error' };
     }
 }

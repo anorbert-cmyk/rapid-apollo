@@ -49,7 +49,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
         next();
     } catch (error) {
-        console.error("Admin Auth Error:", error);
+        logger.error('Admin auth error', error instanceof Error ? error : new Error(String(error)));
         return res.status(401).json({ error: 'Authentication failed' });
     }
 };
@@ -106,7 +106,7 @@ router.post('/transactions', verifyAdmin, async (req: Request, res: Response) =>
             total: transactions.length
         });
     } catch (error) {
-        console.error('Failed to fetch transactions:', error);
+        logger.error('Failed to fetch transactions', error instanceof Error ? error : new Error(String(error)));
         res.status(500).json({ error: 'Failed to fetch transactions' });
     }
 });

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from '../config';
+import { logger } from '../utils/logger';
 
 export enum Tier {
     STANDARD = 'standard',
@@ -29,11 +30,11 @@ export const getEthPrice = async (): Promise<number> => {
 
         return price;
     } catch (error) {
-        console.error("Failed to fetch ETH price:", error);
+        logger.error('Failed to fetch ETH price', error instanceof Error ? error : new Error(String(error)));
 
         // Return stale cache if available and error occurs
         if (cachedPrice) {
-            console.warn("Returning stale cached price due to API failure");
+            logger.warn('Returning stale cached price due to API failure');
             return cachedPrice;
         }
 

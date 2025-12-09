@@ -1,4 +1,5 @@
 import Redis from 'ioredis';
+import { logger } from './utils/logger';
 
 // Database Interface
 interface IStore<T> {
@@ -17,11 +18,11 @@ interface StoredResult {
 // REDIS SETUP (Use if REDIS_URL provided)
 let redisClient: Redis | null = null;
 if (process.env.REDIS_URL) {
-    console.log('🔌 Connecting to Redis...');
+    logger.info('Connecting to Redis');
     redisClient = new Redis(process.env.REDIS_URL);
-    redisClient.on('error', (err) => console.error('Redis Client Error', err));
+    redisClient.on('error', (err) => logger.error('Redis client error', err instanceof Error ? err : new Error(String(err))));
 } else {
-    console.log('⚠️ No REDIS_URL found. Using In-Memory Storage (Data lost on restart).');
+    logger.warn('No REDIS_URL found - using in-memory storage (data lost on restart)');
 }
 
 // --- implementations ---

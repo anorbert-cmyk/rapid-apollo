@@ -54,7 +54,7 @@ async function updateStats(tier: string) {
         await statsStore.set('total_revenue_eth', currentRev + price);
 
     } catch (e) {
-        console.error("Failed to update stats:", e);
+        logger.error('Failed to update stats', e instanceof Error ? e : new Error(String(e)));
     }
 }
 
@@ -88,7 +88,7 @@ router.post('/share/create', async (req: Request, res: Response) => {
         return res.json({ success: true, link: uuid });
 
     } catch (e) {
-        console.error(e);
+        logger.error('Share creation failed', e instanceof Error ? e : new Error(String(e)));
         res.status(500).json({ error: 'Share creation failed' });
     }
 });
@@ -108,7 +108,7 @@ router.get('/pricing', async (_req: Request, res: Response) => {
             // SECURITY: receiverAddress intentionally omitted from public API
         });
     } catch (error) {
-        console.error(error);
+        logger.error('Failed to fetch prices', error instanceof Error ? error : new Error(String(error)));
         res.status(500).json({ error: 'Failed to fetch prices' });
     }
 });
@@ -150,17 +150,17 @@ router.post('/solve', async (req: Request, res: Response) => {
         const acquiredLock = await usedTxHashes.setnx(txHash, Date.now() as any);
 
         if (!acquiredLock) {
-            console.log(`⚠️ Double-spend attempt or race condition: ${txHash}`);
+            logger.warn('Double-spend attempt or race condition', { txHash });
             return res.status(409).json({ error: 'Transaction already processed or in progress' });
         }
 
-        console.log(`Verifying payment for tx: ${txHash} [Tier: ${tier}]`);
+        logger.info('Verifying payment', { txHash, tier });
 
         // Verify Payment (Cast tier to Tier enum)
         const payment = await verifyTransaction(txHash, tier as Tier);
 
         if (!payment.valid) {
-            console.log(`Payment invalid: ${payment.message}`);
+            logger.warn('Payment invalid', { txHash, message: payment.message });
             await usedTxHashes.delete(txHash);
             return res.status(402).json({ error: payment.message });
         }
@@ -168,7 +168,7 @@ router.post('/solve', async (req: Request, res: Response) => {
         // ... (Verification Success)
         await usedTxHashes.set(txHash, Date.now() as any);
 
-        console.log('Payment valid. Solving problem...');
+        logger.info('Payment valid, solving problem', { txHash, tier });
         const solution = await solveProblem(problemStatement, tier);
 
         const resultData = {
@@ -213,7 +213,7 @@ router.post('/solve', async (req: Request, res: Response) => {
         return res.json({ success: true, ...resultData });
 
     } catch (error) {
-        console.error(error);
+        logger.error('Solve endpoint error', error instanceof Error ? error : new Error(String(error)));
         if (error instanceof ZodError) {
             return res.status(400).json({ error: 'Invalid input data' });
         }
@@ -257,7 +257,7 @@ router.post('/history', async (req: Request, res: Response) => {
         return res.json({ success: true, history });
 
     } catch (error) {
-        console.error("History Sync Error:", error);
+        logger.error('History sync error', error instanceof Error ? error : new Error(String(error)));
         return res.status(500).json({ error: 'Failed to sync history' });
     }
 });
