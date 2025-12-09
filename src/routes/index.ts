@@ -10,6 +10,8 @@ import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
 import { verifyMessage } from 'ethers';
 import { checkAndMarkSignature } from '../utils/signatureStore';
+import * as solutionRepo from '../db/solutionRepository';
+import { isDatabaseAvailable } from '../db';
 
 // Simple UUID Helper
 function generateUUID() {
@@ -182,24 +184,44 @@ router.post('/solve', async (req: Request, res: Response) => {
             txHash,
             tier,
             problem: problemStatement,
-            solution: solutionResponse.rawMarkdown, // Backward compatible markdown
-            sections: solutionResponse.sections,    // NEW: Structured sections
-            meta: solutionResponse.meta,            // NEW: Response metadata
+            solution: solutionResponse.rawMarkdown,
+            sections: solutionResponse.sections,
+            meta: solutionResponse.meta,
             timestamp: new Date().toISOString()
         };
 
-        // 1. Save individual result (legacy/backup)
+        // ===== PERSISTENCE =====
+
+        // 1. PostgreSQL (Primary - persistent storage)
+        if (isDatabaseAvailable() && payment.from) {
+            await solutionRepo.saveSolution(
+                txHash,
+                payment.from,
+                tier,
+                problemStatement,
+                solutionResponse
+            );
+            await solutionRepo.markTxHashUsed(txHash);
+            await solutionRepo.logTransaction(txHash, payment.from, tier);
+
+            // Get ETH price for stats
+            const ethPrice = parseFloat(await getTierPriceETH(tier as Tier));
+            await solutionRepo.updateStats(tier, ethPrice);
+
+            logger.info('Solution persisted to PostgreSQL', { txHash });
+        }
+
+        // 2. Redis/In-Memory (Backup - for cache and non-DB deployments)
         await resultStore.set(txHash, {
             data: resultData,
             timestamp: Date.now()
         });
 
-        // 2. Save to User History (NEW)
         if (payment.from) {
             await addToUserHistory(payment.from.toLowerCase(), resultData);
         }
 
-        // 3. Log Transaction for Admin Table
+        // 3. Legacy transaction log (Redis)
         if (payment.from) {
             const txLog = (await transactionLogStore.get('all')) || [];
             txLog.unshift({
@@ -208,15 +230,13 @@ router.post('/solve', async (req: Request, res: Response) => {
                 timestamp: new Date().toISOString(),
                 txHash: txHash
             });
-            // Keep last N transactions (configurable)
             if (txLog.length > CONSTANTS.MAX_TRANSACTIONS_LOG) {
                 txLog.length = CONSTANTS.MAX_TRANSACTIONS_LOG;
             }
             await transactionLogStore.set('all', txLog);
         }
 
-        // 4. Update Admin Stats
-        // Fire and forget (don't block response)
+        // 4. Update Redis stats (backup)
         updateStats(tier);
 
         return res.json({ success: true, ...resultData });
@@ -260,8 +280,30 @@ router.post('/history', async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }
 
-        // 3. Fetch History
-        const history = (await userHistoryStore.get(walletAddress.toLowerCase())) || [];
+        // 3. Fetch History (PostgreSQL first, then Redis fallback)
+        let history: any[] = [];
+
+        if (isDatabaseAvailable()) {
+            const dbSolutions = await solutionRepo.getSolutionsByWallet(walletAddress);
+            history = dbSolutions.map(s => ({
+                txHash: s.txHash,
+                tier: s.tier,
+                problem: s.problemStatement,
+                solution: s.rawMarkdown,
+                sections: s.sections,
+                meta: {
+                    originalProblem: s.problemStatement,
+                    tier: s.tier,
+                    provider: s.provider,
+                    generatedAt: s.createdAt.getTime()
+                },
+                timestamp: s.createdAt.toISOString()
+            }));
+            logger.debug('History fetched from PostgreSQL', { wallet: walletAddress, count: history.length });
+        } else {
+            // Fallback to Redis/in-memory
+            history = (await userHistoryStore.get(walletAddress.toLowerCase())) || [];
+        }
 
         return res.json({ success: true, history });
 

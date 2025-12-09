@@ -1,0 +1,275 @@
+// ===========================================
+// SOLUTION REPOSITORY - Database operations for solutions
+// ===========================================
+
+import { query, queryOne, isDatabaseAvailable } from './index';
+import { SolutionResponse, SolutionSections } from '../types/solution';
+import { logger } from '../utils/logger';
+
+export interface StoredSolution {
+    id: number;
+    txHash: string;
+    walletAddress: string;
+    tier: 'standard' | 'medium' | 'full';
+    problemStatement: string;
+    sections: SolutionSections;
+    rawMarkdown: string | null;
+    provider: string;
+    createdAt: Date;
+}
+
+/**
+ * Save a solution to the database
+ */
+export async function saveSolution(
+    txHash: string,
+    walletAddress: string,
+    tier: string,
+    problemStatement: string,
+    response: SolutionResponse
+): Promise<StoredSolution | null> {
+    if (!isDatabaseAvailable()) {
+        logger.debug('Database not available, skipping saveSolution');
+        return null;
+    }
+
+    try {
+        const result = await queryOne<any>(
+            `INSERT INTO solutions (tx_hash, wallet_address, tier, problem_statement, sections, raw_markdown, provider)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (tx_hash) DO NOTHING
+             RETURNING *`,
+            [
+                txHash,
+                walletAddress.toLowerCase(),
+                tier,
+                problemStatement,
+                JSON.stringify(response.sections),
+                response.rawMarkdown,
+                response.meta.provider
+            ]
+        );
+
+        if (result) {
+            logger.info('Solution saved to database', { txHash });
+            return mapToStoredSolution(result);
+        }
+
+        return null;
+
+    } catch (error) {
+        logger.error('Failed to save solution', error as Error);
+        return null;
+    }
+}
+
+/**
+ * Get all solutions for a wallet address
+ */
+export async function getSolutionsByWallet(
+    walletAddress: string,
+    limit: number = 50
+): Promise<StoredSolution[]> {
+    if (!isDatabaseAvailable()) {
+        return [];
+    }
+
+    try {
+        const rows = await query<any>(
+            `SELECT * FROM solutions 
+             WHERE wallet_address = $1 
+             ORDER BY created_at DESC 
+             LIMIT $2`,
+            [walletAddress.toLowerCase(), limit]
+        );
+
+        return rows.map(mapToStoredSolution);
+
+    } catch (error) {
+        logger.error('Failed to get solutions by wallet', error as Error);
+        return [];
+    }
+}
+
+/**
+ * Get a single solution by txHash
+ */
+export async function getSolutionByTxHash(
+    txHash: string
+): Promise<StoredSolution | null> {
+    if (!isDatabaseAvailable()) {
+        return null;
+    }
+
+    try {
+        const result = await queryOne<any>(
+            `SELECT * FROM solutions WHERE tx_hash = $1`,
+            [txHash]
+        );
+
+        return result ? mapToStoredSolution(result) : null;
+
+    } catch (error) {
+        logger.error('Failed to get solution by txHash', error as Error);
+        return null;
+    }
+}
+
+/**
+ * Check if txHash exists (for double-spend prevention)
+ */
+export async function isTxHashUsed(txHash: string): Promise<boolean> {
+    if (!isDatabaseAvailable()) {
+        return false; // Fall back to in-memory check
+    }
+
+    try {
+        const result = await queryOne<any>(
+            `SELECT 1 FROM used_tx_hashes WHERE tx_hash = $1`,
+            [txHash]
+        );
+
+        return result !== null;
+
+    } catch (error) {
+        logger.error('Failed to check txHash', error as Error);
+        return false;
+    }
+}
+
+/**
+ * Mark txHash as used
+ */
+export async function markTxHashUsed(txHash: string): Promise<boolean> {
+    if (!isDatabaseAvailable()) {
+        return false;
+    }
+
+    try {
+        await query(
+            `INSERT INTO used_tx_hashes (tx_hash) VALUES ($1) ON CONFLICT DO NOTHING`,
+            [txHash]
+        );
+        return true;
+
+    } catch (error) {
+        logger.error('Failed to mark txHash as used', error as Error);
+        return false;
+    }
+}
+
+/**
+ * Log transaction for admin
+ */
+export async function logTransaction(
+    txHash: string,
+    walletAddress: string,
+    tier: string
+): Promise<void> {
+    if (!isDatabaseAvailable()) {
+        return;
+    }
+
+    try {
+        await query(
+            `INSERT INTO transaction_log (tx_hash, wallet_address, tier) VALUES ($1, $2, $3)`,
+            [txHash, walletAddress.toLowerCase(), tier]
+        );
+    } catch (error) {
+        logger.error('Failed to log transaction', error as Error);
+    }
+}
+
+/**
+ * Update stats
+ */
+export async function updateStats(tier: string, ethAmount: number): Promise<void> {
+    if (!isDatabaseAvailable()) {
+        return;
+    }
+
+    try {
+        // Increment total solves
+        await query(
+            `UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = 'total_solves'`
+        );
+
+        // Increment tier count
+        await query(
+            `UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = $1`,
+            [`count_${tier}`]
+        );
+
+        // Add revenue
+        await query(
+            `UPDATE stats SET value = value + $1, updated_at = NOW() WHERE key = 'total_revenue_eth'`,
+            [ethAmount]
+        );
+
+    } catch (error) {
+        logger.error('Failed to update stats', error as Error);
+    }
+}
+
+/**
+ * Get stats for admin
+ */
+export async function getStats(): Promise<Record<string, number>> {
+    if (!isDatabaseAvailable()) {
+        return {};
+    }
+
+    try {
+        const rows = await query<{ key: string; value: string }>(
+            `SELECT key, value FROM stats`
+        );
+
+        return rows.reduce((acc, row) => {
+            acc[row.key] = parseFloat(row.value);
+            return acc;
+        }, {} as Record<string, number>);
+
+    } catch (error) {
+        logger.error('Failed to get stats', error as Error);
+        return {};
+    }
+}
+
+/**
+ * Get transaction log for admin
+ */
+export async function getTransactionLog(
+    limit: number = 100
+): Promise<any[]> {
+    if (!isDatabaseAvailable()) {
+        return [];
+    }
+
+    try {
+        return await query(
+            `SELECT tx_hash, wallet_address, tier, created_at 
+             FROM transaction_log 
+             ORDER BY created_at DESC 
+             LIMIT $1`,
+            [limit]
+        );
+    } catch (error) {
+        logger.error('Failed to get transaction log', error as Error);
+        return [];
+    }
+}
+
+// Helper to map DB rows to StoredSolution
+function mapToStoredSolution(row: any): StoredSolution {
+    return {
+        id: row.id,
+        txHash: row.tx_hash,
+        walletAddress: row.wallet_address,
+        tier: row.tier,
+        problemStatement: row.problem_statement,
+        sections: typeof row.sections === 'string' ? JSON.parse(row.sections) : row.sections,
+        rawMarkdown: row.raw_markdown,
+        provider: row.provider,
+        createdAt: new Date(row.created_at)
+    };
+}
