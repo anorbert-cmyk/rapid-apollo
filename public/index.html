@@ -763,41 +763,123 @@
         <div class="flex h-full w-full relative z-10">
             <!-- Sidebar: Premium Glass Rail -->
             <aside
-                class="w-20 lg:w-24 flex-shrink-0 flex flex-col items-center py-8 z-50 border-r border-white/5 bg-[#030014]/50 backdrop-blur-xl">
-                <a href="javascript:location.reload()"
-                    class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-12 shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:bg-indigo-500 transition cursor-pointer group">
-                    <i class="ph-bold ph-strategy text-white text-2xl group-hover:scale-110 transition-transform"></i>
-                </a>
+                class="w-20 lg:w-72 flex-shrink-0 flex flex-col py-6 z-50 border-r border-white/5 bg-gradient-to-b from-[#0a0a1a]/90 to-[#030014]/95 backdrop-blur-2xl transition-all duration-300">
 
-                <nav class="flex-1 flex flex-col gap-8 w-full px-4 items-center">
+                <!-- Logo Section -->
+                <div class="px-4 lg:px-6 mb-8">
+                    <a href="javascript:location.reload()" class="flex items-center gap-3 group">
+                        <div
+                            class="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:scale-105">
+                            <i class="ph-bold ph-strategy text-white text-xl"></i>
+                        </div>
+                        <div class="hidden lg:block">
+                            <h2 class="text-white font-bold text-lg tracking-tight">Aether</h2>
+                            <p class="text-[10px] text-indigo-400 font-mono -mt-0.5">INTELLIGENCE</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="flex-1 px-3 lg:px-4 space-y-2">
+                    <p class="hidden lg:block text-[10px] font-mono text-gray-500 uppercase tracking-wider px-3 mb-4">
+                        Main Menu</p>
+
                     <button onclick="switchView('dashboard')" id="nav-dashboard"
-                        class="sidebar-item-active w-12 h-12 rounded-xl flex items-center justify-center transition group relative">
-                        <i class="ph-fill ph-squares-four text-xl"></i>
-                        <span
-                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Dashboard</span>
+                        class="sidebar-item-active w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/10 opacity-0 group-[.sidebar-item-active]:opacity-100 transition-opacity">
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-[.sidebar-item-active]:bg-indigo-500/20 transition-all">
+                            <i
+                                class="ph-fill ph-squares-four text-xl text-gray-400 group-[.sidebar-item-active]:text-indigo-400"></i>
+                        </div>
+                        <div class="hidden lg:block relative z-10">
+                            <span
+                                class="text-sm font-medium text-gray-300 group-[.sidebar-item-active]:text-white">Dashboard</span>
+                            <p class="text-[10px] text-gray-500 group-[.sidebar-item-active]:text-indigo-300/70">
+                                Overview & Results</p>
+                        </div>
+                        <div class="hidden lg:block ml-auto relative z-10">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        </div>
                     </button>
+
                     <button onclick="switchView('analytics')" id="nav-analytics"
-                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                        <i class="ph-bold ph-chart-line-up text-xl"></i>
-                        <span
-                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Growth</span>
+                        class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all duration-200 group relative">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                            <i class="ph-bold ph-chart-line-up text-xl"></i>
+                        </div>
+                        <div class="hidden lg:block">
+                            <span class="text-sm font-medium">Analytics</span>
+                            <p class="text-[10px] text-gray-600">Growth & Stats</p>
+                        </div>
+                        <span id="admin-badge"
+                            class="hidden lg:flex ml-auto text-[9px] font-mono bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30">ADMIN</span>
                     </button>
+
                     <button onclick="switchView('team')" id="nav-team"
-                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                        <i class="ph-bold ph-users text-xl"></i>
-                        <span
-                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Team</span>
+                        class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all duration-200 group relative">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                            <i class="ph-bold ph-clock-counter-clockwise text-xl"></i>
+                        </div>
+                        <div class="hidden lg:block">
+                            <span class="text-sm font-medium">History</span>
+                            <p class="text-[10px] text-gray-600">Past Sessions</p>
+                        </div>
                     </button>
+
                     <button onclick="switchView('settings')" id="nav-settings"
-                        class="w-12 h-12 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition flex items-center justify-center group relative">
-                        <i class="ph-bold ph-gear text-xl"></i>
-                        <span
-                            class="absolute left-16 bg-gray-900 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap border border-white/10 z-50 pointer-events-none">Config</span>
+                        class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/5 transition-all duration-200 group relative">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                            <i class="ph-bold ph-gear text-xl"></i>
+                        </div>
+                        <div class="hidden lg:block">
+                            <span class="text-sm font-medium">Settings</span>
+                            <p class="text-[10px] text-gray-600">Preferences</p>
+                        </div>
                     </button>
                 </nav>
 
-                <div
-                    class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 opacity-80 cursor-pointer hover:ring-2 ring-indigo-500/50 transition border border-white/20">
+                <!-- Bottom Section -->
+                <div class="mt-auto px-3 lg:px-4 space-y-3">
+                    <!-- Tier Badge -->
+                    <div
+                        class="hidden lg:block p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-500/20">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                                <i class="ph-bold ph-crown text-white text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-white" id="sidebar-tier">Pro Tier</p>
+                                <p class="text-[10px] text-indigo-400">Active Session</p>
+                            </div>
+                        </div>
+                        <div class="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div class="h-full w-3/4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <!-- User Avatar -->
+                    <div
+                        class="flex items-center justify-center lg:justify-start gap-3 p-3 rounded-xl hover:bg-white/5 transition cursor-pointer group">
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 p-0.5">
+                            <div class="w-full h-full rounded-full bg-[#030014] flex items-center justify-center">
+                                <i class="ph-bold ph-wallet text-white text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="hidden lg:block flex-1 overflow-hidden">
+                            <p class="text-xs font-medium text-white truncate" id="sidebar-wallet">Not Connected</p>
+                            <p class="text-[10px] text-gray-500">Click to view</p>
+                        </div>
+                        <i
+                            class="hidden lg:block ph-bold ph-caret-right text-gray-600 group-hover:text-white transition text-sm"></i>
+                    </div>
                 </div>
             </aside>
 
