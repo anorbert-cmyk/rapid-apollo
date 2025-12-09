@@ -4,6 +4,8 @@ import { statsStore, transactionLogStore } from '../store';
 import { config } from '../config';
 import { checkAndMarkSignature } from '../utils/signatureStore';
 import { logger } from '../utils/logger';
+import { isDatabaseAvailable } from '../db';
+import * as solutionRepo from '../db/solutionRepository';
 
 const router = Router();
 const ADMIN_WALLET = config.ADMIN_WALLET_ADDRESS.toLowerCase();
@@ -57,19 +59,36 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 // POST /api/admin/stats
 router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
     try {
-        const [
-            totalSolves,
-            totalRevEth,
-            countStandard,
-            countMedium,
-            countFull
-        ] = await Promise.all([
-            statsStore.get('total_solves'),
-            statsStore.get('total_revenue_eth'),
-            statsStore.get('count_standard'),
-            statsStore.get('count_medium'),
-            statsStore.get('count_full')
-        ]);
+        let totalSolves = 0;
+        let totalRevEth = 0;
+        let countStandard = 0;
+        let countMedium = 0;
+        let countFull = 0;
+
+        // Try PostgreSQL first (persistent data)
+        if (isDatabaseAvailable()) {
+            const dbStats = await solutionRepo.getStats();
+            totalSolves = dbStats.total_solves || 0;
+            totalRevEth = dbStats.total_revenue_eth || 0;
+            countStandard = dbStats.count_standard || 0;
+            countMedium = dbStats.count_medium || 0;
+            countFull = dbStats.count_full || 0;
+            logger.debug('Stats fetched from PostgreSQL');
+        } else {
+            // Fallback to Redis
+            const results = await Promise.all([
+                statsStore.get('total_solves'),
+                statsStore.get('total_revenue_eth'),
+                statsStore.get('count_standard'),
+                statsStore.get('count_medium'),
+                statsStore.get('count_full')
+            ]);
+            totalSolves = results[0] || 0;
+            totalRevEth = results[1] || 0;
+            countStandard = results[2] || 0;
+            countMedium = results[3] || 0;
+            countFull = results[4] || 0;
+        }
 
         res.json({
             stats: {
@@ -80,13 +99,11 @@ router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
                     medium: countMedium || 0,
                     full: countFull || 0
                 },
-                // Funnel estimates (until real event tracking is added)
-                // Based on industry averages: ~2% conversion rate
                 funnel: {
-                    landing: Math.max((totalSolves || 0) * 50, 100), // Estimated visits
-                    connected: Math.max((totalSolves || 0) * 10, 20), // Est. wallet connects
-                    paymentStarted: Math.max((totalSolves || 0) * 2, 5), // Est. payment attempts
-                    paid: totalSolves || 0 // Actual successful payments
+                    landing: Math.max((totalSolves || 0) * 50, 100),
+                    connected: Math.max((totalSolves || 0) * 10, 20),
+                    paymentStarted: Math.max((totalSolves || 0) * 2, 5),
+                    paid: totalSolves || 0
                 }
             }
         });
@@ -98,9 +115,17 @@ router.post('/stats', verifyAdmin, async (req: Request, res: Response) => {
 // POST /api/admin/transactions - Get all transaction history
 router.post('/transactions', verifyAdmin, async (req: Request, res: Response) => {
     try {
-        const transactions = (await transactionLogStore.get('all')) || [];
+        let transactions: any[] = [];
 
-        // Return all transactions (filtering handled client-side for simplicity)
+        // Try PostgreSQL first (persistent data)
+        if (isDatabaseAvailable()) {
+            transactions = await solutionRepo.getTransactionLog();
+            logger.debug('Transactions fetched from PostgreSQL', { count: transactions.length });
+        } else {
+            // Fallback to Redis
+            transactions = (await transactionLogStore.get('all')) || [];
+        }
+
         res.json({
             transactions: transactions,
             total: transactions.length
