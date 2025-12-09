@@ -36,11 +36,28 @@ const DashboardModule = (function () {
             _updateElement('problem-display', currentSession.problem);
             _updateElement('tx-display', `TX: ${currentSession.txHash.substring(0, 10)}...`);
 
-            // Render Result - use structured sections if available, fallback to markdown
-            if (currentSession.sections) {
-                _renderStructuredSections(currentSession, 'result-content');
+            // Render Result - EXPLICITLY clear loading state first
+            const resultContainer = document.getElementById('result-content');
+            if (resultContainer) {
+                // Clear any existing content (including loading spinner)
+                resultContainer.innerHTML = '';
+
+                // Render content based on available data
+                if (currentSession.sections) {
+                    _renderStructuredSections(currentSession, 'result-content');
+                } else if (currentSession.solution) {
+                    _renderMarkdown(currentSession.solution, 'result-content');
+                } else {
+                    // Fallback if no content available
+                    resultContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full text-gray-500 font-mono space-y-4">
+                            <i class="ph-bold ph-warning text-4xl text-yellow-500"></i>
+                            <span class="text-sm">No solution data available</span>
+                        </div>
+                    `;
+                }
             } else {
-                _renderMarkdown(currentSession.solution, 'result-content');
+                console.error('result-content container not found');
             }
 
             // Store for share context

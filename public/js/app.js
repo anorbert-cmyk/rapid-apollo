@@ -315,6 +315,11 @@ window.hideConnectModal = () => {
 // BUTTON EVENT BINDINGS
 // ===========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Sidebar Module
+    if (window.SidebarModule) {
+        window.SidebarModule.init();
+    }
+
     // Payment Tier Buttons
     const btnStandard = document.getElementById('btn-pay-standard');
     const btnMedium = document.getElementById('btn-pay-medium');

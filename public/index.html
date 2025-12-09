@@ -180,7 +180,47 @@
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
+        /* ===================================== */
+        /* SIDEBAR COLLAPSED STATE */
+        /* ===================================== */
+        #app-sidebar[data-collapsed="true"] .sidebar-text {
+            display: none !important;
+        }
 
+        #app-sidebar[data-collapsed="true"] .hidden.lg\\:block {
+            display: none !important;
+        }
+
+        #app-sidebar[data-collapsed="true"] {
+            width: 5rem !important;
+            /* 80px */
+        }
+
+        /* ===================================== */
+        /* THEME TOGGLE ICONS */
+        /* ===================================== */
+        [data-theme="dark"] .theme-icon-light {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-icon-dark {
+            display: none;
+        }
+
+        [data-theme="light"] .theme-icon-light {
+            display: none;
+        }
+
+        [data-theme="light"] .theme-icon-dark {
+            display: block;
+        }
+
+        /* ===================================== */
+        /* THEME TRANSITION */
+        /* ===================================== */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
 
         .toggle-checkbox:checked {
             right: 0;
@@ -762,8 +802,15 @@
 
         <div class="flex h-full w-full relative z-10">
             <!-- Sidebar: Premium Glass Rail -->
-            <aside
+            <aside id="app-sidebar" data-collapsed="false"
                 class="w-20 lg:w-72 flex-shrink-0 flex flex-col py-6 z-50 border-r border-white/5 bg-gradient-to-b from-[#0a0a1a]/90 to-[#030014]/95 backdrop-blur-2xl transition-all duration-300">
+
+                <!-- Sidebar Toggle Button -->
+                <button id="sidebar-toggle"
+                    class="absolute -right-3 top-6 w-6 h-6 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 rounded-full flex items-center justify-center transition-all duration-300 group z-50"
+                    aria-label="Toggle sidebar">
+                    <i class="ph-bold ph-caret-left text-xs text-indigo-400 group-hover:text-indigo-300 transition"></i>
+                </button>
 
                 <!-- Logo Section -->
                 <div class="px-4 lg:px-6 mb-8">
@@ -772,7 +819,7 @@
                             class="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:scale-105">
                             <i class="ph-bold ph-strategy text-white text-xl"></i>
                         </div>
-                        <div class="hidden lg:block">
+                        <div class="hidden lg:block sidebar-text">
                             <h2 class="text-white font-bold text-lg tracking-tight">Aether</h2>
                             <p class="text-[10px] text-indigo-400 font-mono -mt-0.5">INTELLIGENCE</p>
                         </div>
@@ -899,7 +946,18 @@
                             <span id="tx-display">TX: INITIALIZING...</span>
                         </p>
                     </div>
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 items-center">
+                        <!-- Theme Toggle -->
+                        <button id="theme-toggle"
+                            class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all duration-300 group"
+                            aria-label="Toggle theme">
+                            <i
+                                class="ph-bold ph-sun text-lg text-gray-400 group-hover:text-yellow-400 transition theme-icon-light"></i>
+                            <i
+                                class="ph-bold ph-moon text-lg text-gray-400 group-hover:text-indigo-400 transition theme-icon-dark hidden"></i>
+                        </button>
+
+                        <!-- System Status -->
                         <div
                             class="hud-card px-4 py-2 rounded-lg flex items-center gap-3 border border-white/5 bg-black/40">
                             <div class="flex gap-1 h-3 items-end">
@@ -1461,13 +1519,15 @@
     <!-- Modular JS Architecture -->
     <script src="js/modules/toast.js?v=1.0"></script>
     <script src="js/modules/wallet.js?v=1.0"></script>
-    <script src="js/modules/api.js?v=1.0"></script>
-    <script src="js/modules/markdown.js?v=1.0"></script>
     <script src="js/modules/session.js?v=1.0"></script>
     <script src="js/modules/payment.js?v=1.0"></script>
     <script src="js/modules/admin.js?v=1.0"></script>
     <script src="js/modules/dashboard.js?v=1.0"></script>
     <script src="js/modules/share.js?v=1.0"></script>
+    <script src="js/modules/theme.js?v=1.0"></script>
+    <script src="js/modules/sidebar.js?v=1.0"></script>
+
+    <!-- Main App (v5.0 - Modular) -->
     <script src="js/app.js?v=5.0"></script>
     <script>
         // UI Helpers
