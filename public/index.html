@@ -183,32 +183,57 @@
         /* ===================================== */
         /* SIDEBAR COLLAPSED STATE */
         /* ===================================== */
-        /* Hide all text when collapsed */
-        #app-sidebar[data-collapsed="true"] .sidebar-text,
-        #app-sidebar[data-collapsed="true"] .lg\:block,
-        #app-sidebar[data-collapsed="true"] span,
-        #app-sidebar[data-collapsed="true"] p,
-        #app-sidebar[data-collapsed="true"] h2,
-        #app-sidebar[data-collapsed="true"] h3,
-        #app-sidebar[data-collapsed="true"] h4 {
-            display: none !important;
-        }
-
-        /* Keep icons visible */
-        #app-sidebar[data-collapsed="true"] i {
-            display: block !important;
-        }
-
         /* Collapsed width */
         #app-sidebar[data-collapsed="true"] {
             width: 5rem !important;
             /* 80px */
         }
 
-        /* Center icons when collapsed */
+        /* Hide ALL text elements - ultra specific */
+        #app-sidebar[data-collapsed="true"] .sidebar-text,
+        #app-sidebar[data-collapsed="true"] span:not(.w-2):not(.bg-green-400):not(.bg-indigo-500),
+        #app-sidebar[data-collapsed="true"] p,
+        #app-sidebar[data-collapsed="true"] h2,
+        #app-sidebar[data-collapsed="true"] h3,
+        #app-sidebar[data-collapsed="true"] h4,
+        #app-sidebar[data-collapsed="true"] div.hidden,
+        #app-sidebar[data-collapsed="true"] .lg\:block:not(i) {
+            display: none !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Specifically hide navigation text */
+        #app-sidebar[data-collapsed="true"] button span,
+        #app-sidebar[data-collapsed="true"] button p,
+        #app-sidebar[data-collapsed="true"] button div:not(.w-10):not(.flex) {
+            display: none !important;
+        }
+
+        /* Keep ONLY icons visible */
+        #app-sidebar[data-collapsed="true"] i {
+            display: block !important;
+        }
+
+        /* Keep indicator dots visible */
+        #app-sidebar[data-collapsed="true"] .w-2.h-2,
+        #app-sidebar[data-collapsed="true"] .bg-green-400,
+        #app-sidebar[data-collapsed="true"] .bg-indigo-500 {
+            display: block !important;
+        }
+
+        /* Center all content when collapsed */
         #app-sidebar[data-collapsed="true"] button,
+        #app-sidebar[data-collapsed="true"] a,
         #app-sidebar[data-collapsed="true"] .flex {
             justify-content: center !important;
+        }
+
+        /* Hide the logo text container */
+        #app-sidebar[data-collapsed="true"] a .flex.items-center.gap-3>div:not(.w-12) {
+            display: none !important;
         }
 
         /* ===================================== */
