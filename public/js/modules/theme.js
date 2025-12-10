@@ -145,13 +145,22 @@ const ThemeModule = (function () {
      * Initialize theme system
      */
     function init() {
+        console.log('ThemeModule: Initializing...');
         const theme = loadTheme();
+        console.log('ThemeModule: Loaded theme:', theme);
         applyTheme(theme);
 
         // Set up toggle button listener
         const toggleButton = document.getElementById('theme-toggle');
+        console.log('ThemeModule: Toggle button found:', !!toggleButton);
         if (toggleButton) {
-            toggleButton.addEventListener('click', toggleTheme);
+            toggleButton.addEventListener('click', () => {
+                console.log('ThemeModule: Toggle clicked');
+                toggleTheme();
+            });
+            console.log('ThemeModule: Event listener attached');
+        } else {
+            console.warn('ThemeModule: theme-toggle button not found in DOM');
         }
     }
 

@@ -183,36 +183,53 @@
         /* ===================================== */
         /* SIDEBAR COLLAPSED STATE */
         /* ===================================== */
-        #app-sidebar[data-collapsed="true"] .sidebar-text {
+        /* Hide all text when collapsed */
+        #app-sidebar[data-collapsed="true"] .sidebar-text,
+        #app-sidebar[data-collapsed="true"] .lg\:block,
+        #app-sidebar[data-collapsed="true"] span,
+        #app-sidebar[data-collapsed="true"] p,
+        #app-sidebar[data-collapsed="true"] h2,
+        #app-sidebar[data-collapsed="true"] h3,
+        #app-sidebar[data-collapsed="true"] h4 {
             display: none !important;
         }
 
-        #app-sidebar[data-collapsed="true"] .hidden.lg\\:block {
-            display: none !important;
+        /* Keep icons visible */
+        #app-sidebar[data-collapsed="true"] i {
+            display: block !important;
         }
 
+        /* Collapsed width */
         #app-sidebar[data-collapsed="true"] {
             width: 5rem !important;
             /* 80px */
         }
 
+        /* Center icons when collapsed */
+        #app-sidebar[data-collapsed="true"] button,
+        #app-sidebar[data-collapsed="true"] .flex {
+            justify-content: center !important;
+        }
+
         /* ===================================== */
         /* THEME TOGGLE ICONS */
         /* ===================================== */
-        [data-theme="dark"] .theme-icon-light {
+        /* Default: show light icon (sun) in dark mode */
+        .theme-icon-light {
             display: block;
         }
 
-        [data-theme="dark"] .theme-icon-dark {
+        .theme-icon-dark {
             display: none;
         }
 
+        /* When light theme is active, show dark icon (moon) */
         [data-theme="light"] .theme-icon-light {
-            display: none;
+            display: none !important;
         }
 
         [data-theme="light"] .theme-icon-dark {
-            display: block;
+            display: block !important;
         }
 
         /* ===================================== */
