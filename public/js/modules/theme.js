@@ -5,71 +5,61 @@
 const ThemeModule = (function () {
     'use strict';
 
-    // Theme color palettes with AA contrast compliance
+    // Semantic Theme System
     const themes = {
         dark: {
-            // Backgrounds
-            '--bg-primary': '#030014',
-            '--bg-secondary': '#0a0a1a',
-            '--bg-tertiary': '#131524',
-            '--bg-hover': 'rgba(255,255,255,0.05)',
-            '--bg-card': 'rgba(19,21,36,0.8)',
+            // Base Backgrounds
+            '--bg-body': '#030014',
+            '--bg-panel': '#0a0a1a',
+            '--bg-card': 'rgba(13, 14, 28, 0.7)', // Glassy card
+            '--bg-input': 'rgba(255, 255, 255, 0.05)',
+            '--bg-hover': 'rgba(255, 255, 255, 0.05)',
 
-            // Text (AA compliant on dark backgrounds)
-            '--text-primary': '#ffffff',
-            '--text-secondary': '#d1d5db',
-            '--text-tertiary': '#9ca3af',
-            '--text-muted': '#6b7280',
+            // Typography
+            '--text-main': '#ffffff',
+            '--text-secondary': '#9ca3af', // gray-400
+            '--text-muted': '#6b7280',     // gray-500
 
             // Borders
-            '--border-color': 'rgba(255,255,255,0.05)',
-            '--border-hover': 'rgba(255,255,255,0.1)',
+            '--border-subtle': 'rgba(255, 255, 255, 0.08)',
+            '--border-focus': 'rgba(99, 102, 241, 0.5)',
 
             // Accents
-            '--accent-primary': '#6366f1',
-            '--accent-primary-hover': '#818cf8',
-            '--accent-success': '#10b981',
-            '--accent-warning': '#f59e0b',
-            '--accent-error': '#ef4444',
+            '--accent-primary': '#6366f1', // Indigo-500
+            '--accent-glow': 'rgba(99, 102, 241, 0.5)',
+            '--accent-text': '#818cf8',    // Indigo-400
 
-            // Sidebar
-            '--sidebar-bg': 'rgba(10,10,26,0.9)',
-            '--sidebar-border': 'rgba(255,255,255,0.05)',
-            '--sidebar-item-hover': 'rgba(255,255,255,0.05)',
-            '--sidebar-item-active-bg': 'rgba(99,102,241,0.2)',
-            '--sidebar-item-active-text': '#ffffff',
+            // Sidebar specifics
+            '--sidebar-bg': 'rgba(10, 10, 26, 0.95)',
+            '--sidebar-border': 'rgba(255, 255, 255, 0.05)',
+            '--sidebar-item-active-bg': 'rgba(255, 255, 255, 0.05)',
         },
         light: {
-            // Backgrounds
-            '--bg-primary': '#ffffff',
-            '--bg-secondary': '#f8f9fa',
-            '--bg-tertiary': '#e9ecef',
-            '--bg-hover': '#dee2e6',
-            '--bg-card': '#ffffff',
+            // Base Backgrounds
+            '--bg-body': '#f3f4f6',        // gray-100
+            '--bg-panel': '#ffffff',
+            '--bg-card': '#ffffffff',       // Solid white for contrast
+            '--bg-input': '#f9fafb',        // gray-50
+            '--bg-hover': '#f3f4f6',        // gray-100
 
-            // Text (AA compliant - 4.5:1 minimum)
-            '--text-primary': '#212529',      // 16.5:1 contrast
-            '--text-secondary': '#495057',    // 9.7:1 contrast
-            '--text-tertiary': '#6c757d',     // 4.6:1 contrast (AA ✓)
-            '--text-muted': '#868e96',        // 3.8:1 (large text only)
+            // Typography
+            '--text-main': '#111827',      // gray-900 (High Contrast)
+            '--text-secondary': '#4b5563', // gray-600
+            '--text-muted': '#9ca3af',     // gray-400
 
             // Borders
-            '--border-color': '#dee2e6',
-            '--border-hover': '#adb5bd',
+            '--border-subtle': '#e5e7eb',  // gray-200
+            '--border-focus': '#4f46e5',   // Indigo-600
 
-            // Accents (adjusted for AA on white)
-            '--accent-primary': '#4338ca',    // Darker indigo for AA
-            '--accent-primary-hover': '#3730a3',
-            '--accent-success': '#059669',    // Darker green for AA
-            '--accent-warning': '#d97706',    // Darker orange for AA
-            '--accent-error': '#dc2626',      // Darker red for AA
+            // Accents
+            '--accent-primary': '#4f46e5', // Indigo-600 (Darker for AA on light)
+            '--accent-glow': 'rgba(79, 70, 229, 0.3)',
+            '--accent-text': '#4338ca',    // Indigo-700
 
-            // Sidebar
-            '--sidebar-bg': '#f8f9fa',
-            '--sidebar-border': '#dee2e6',
-            '--sidebar-item-hover': '#e9ecef',
-            '--sidebar-item-active-bg': '#e0e7ff',
-            '--sidebar-item-active-text': '#312e81',
+            // Sidebar specifics
+            '--sidebar-bg': '#ffffff',
+            '--sidebar-border': '#e5e7eb',
+            '--sidebar-item-active-bg': '#f3f4f6',
         }
     };
 

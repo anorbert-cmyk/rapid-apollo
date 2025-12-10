@@ -72,22 +72,41 @@
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
                     },
+                    colors: {
+                        app: {
+                            body: 'var(--bg-body)',
+                            panel: 'var(--bg-panel)',
+                            card: 'var(--bg-card)',
+                            input: 'var(--bg-input)',
+                            hover: 'var(--bg-hover)',
+                            border: 'var(--border-subtle)',
+                        },
+                        txt: {
+                            main: 'var(--text-main)',
+                            secondary: 'var(--text-secondary)',
+                            muted: 'var(--text-muted)',
+                        },
+                        brand: {
+                            primary: 'var(--accent-primary)',
+                            glow: 'var(--accent-glow)',
+                            text: 'var(--accent-text)',
+                        },
+                        sidebar: {
+                            bg: 'var(--sidebar-bg)',
+                            border: 'var(--sidebar-border)',
+                            active: 'var(--sidebar-item-active-bg)',
+                        }
+                    },
                     screens: {
-                        'xs': '375px', // Targeted mobile optimization
+                        'xs': '375px',
                     },
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'shimmer': 'shimmer 2s linear infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                        'beam': 'beam 2s linear infinite',
-                        'typewriter': 'blink 1s step-end infinite',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
                     },
                     keyframes: {
                         shimmer: { from: { backgroundPosition: '0 0' }, to: { backgroundPosition: '-200% 0' } },
-                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-                        beam: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
-                        blink: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0' } },
                         slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
                     }
                 }
@@ -136,9 +155,9 @@
         }
 
         .hud-card {
-            background: rgba(13, 14, 28, 0.7);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-subtle);
             box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
             transition: all 0.3s ease;
         }
@@ -174,66 +193,82 @@
         }
 
         .sidebar-item-active {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: var(--sidebar-item-active-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
         /* ===================================== */
-        /* SIDEBAR COLLAPSED STATE */
+        /* SIDEBAR COLLAPSED STATE (REFINED)     */
         /* ===================================== */
-        /* Collapsed width */
+
+        #app-sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+        }
+
+        /* Width Transition */
+        #app-sidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            /* Critical for clean collapse */
+            justify-content: flex-start;
+        }
+
         #app-sidebar[data-collapsed="true"] {
             width: 5rem !important;
             /* 80px */
         }
 
-        /* Hide ALL text elements - ultra specific */
-        #app-sidebar[data-collapsed="true"] .sidebar-text,
-        #app-sidebar[data-collapsed="true"] span:not(.w-2):not(.bg-green-400):not(.bg-indigo-500),
-        #app-sidebar[data-collapsed="true"] p,
-        #app-sidebar[data-collapsed="true"] h2,
-        #app-sidebar[data-collapsed="true"] h3,
-        #app-sidebar[data-collapsed="true"] h4,
-        #app-sidebar[data-collapsed="true"] div.hidden,
-        #app-sidebar[data-collapsed="true"] .lg\:block:not(i) {
-            display: none !important;
-            opacity: 0 !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
+        /* 
+           Technique: Grid/Flex Manipulation instead of display:none
+           This keeps structure but hides text 
+        */
+
+        .sidebar-item-content {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+            opacity: 1;
+            transform: translateX(0);
         }
 
-        /* Specifically hide navigation text */
-        #app-sidebar[data-collapsed="true"] button span,
-        #app-sidebar[data-collapsed="true"] button p,
-        #app-sidebar[data-collapsed="true"] button div:not(.w-10):not(.flex) {
-            display: none !important;
+        #app-sidebar[data-collapsed="true"] .sidebar-item-content {
+            opacity: 0;
+            transform: translateX(10px);
+            pointer-events: none;
+            width: 0;
+            display: none;
+            /* Fallback for layout */
         }
 
-        /* Keep ONLY icons visible */
-        #app-sidebar[data-collapsed="true"] i {
-            display: block !important;
+        /* Center icons */
+        #app-sidebar[data-collapsed="true"] .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
         }
 
-        /* Keep indicator dots visible */
-        #app-sidebar[data-collapsed="true"] .w-2.h-2,
-        #app-sidebar[data-collapsed="true"] .bg-green-400,
-        #app-sidebar[data-collapsed="true"] .bg-indigo-500 {
-            display: block !important;
+        /* Hide specific Headers */
+        #app-sidebar[data-collapsed="true"] .nav-section-title {
+            display: none;
         }
 
-        /* Center all content when collapsed */
-        #app-sidebar[data-collapsed="true"] button,
-        #app-sidebar[data-collapsed="true"] a,
-        #app-sidebar[data-collapsed="true"] .flex {
-            justify-content: center !important;
+        /* Logo Adjustment */
+        #app-sidebar[data-collapsed="true"] .logo-text {
+            display: none;
         }
 
-        /* Hide the logo text container */
-        #app-sidebar[data-collapsed="true"] a .flex.items-center.gap-3>div:not(.w-12) {
-            display: none !important;
+        #app-sidebar[data-collapsed="true"] .logo-container {
+            justify-content: center;
+            padding: 0;
+        }
+
+        /* Active Item Styling Fix for icons */
+        .sidebar-item-active {
+            background-color: var(--sidebar-item-active-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
         }
 
         /* ===================================== */
@@ -830,7 +865,7 @@
     <!-- DASHBOARD APP (HIDDEN BY DEFAULT)          -->
     <!-- ========================================== -->
     <main id="app-dashboard"
-        class="hidden h-screen w-full bg-[#030014] fixed inset-0 overflow-hidden transition-all duration-500 z-[60]">
+        class="hidden h-screen w-full bg-app-body fixed inset-0 overflow-hidden transition-all duration-500 z-[60]">
 
         <!-- Ambient Background for Dashboard -->
         <div class="fixed inset-0 pointer-events-none">
@@ -845,25 +880,26 @@
         <div class="flex h-full w-full relative z-10">
             <!-- Sidebar: Premium Glass Rail -->
             <aside id="app-sidebar" data-collapsed="false"
-                class="w-20 lg:w-72 flex-shrink-0 flex flex-col py-6 z-50 border-r border-white/5 bg-gradient-to-b from-[#0a0a1a]/90 to-[#030014]/95 backdrop-blur-2xl transition-all duration-300">
+                class="w-20 lg:w-72 flex-shrink-0 flex flex-col py-6 z-50 transition-all duration-300">
 
                 <!-- Sidebar Toggle Button -->
                 <button id="sidebar-toggle"
-                    class="absolute -right-3 top-6 w-6 h-6 bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 rounded-full flex items-center justify-center transition-all duration-300 group z-50"
+                    class="absolute -right-3 top-6 w-6 h-6 bg-app-card border border-app-border rounded-full flex items-center justify-center transition-all duration-300 group z-50 hover:border-brand-primary"
                     aria-label="Toggle sidebar">
-                    <i class="ph-bold ph-caret-left text-xs text-indigo-400 group-hover:text-indigo-300 transition"></i>
+                    <i
+                        class="ph-bold ph-caret-left text-xs text-txt-secondary group-hover:text-brand-primary transition"></i>
                 </button>
 
                 <!-- Logo Section -->
-                <div class="px-4 lg:px-6 mb-8">
-                    <a href="javascript:location.reload()" class="flex items-center gap-3 group">
+                <div class="px-4 lg:px-6 mb-8 logo-container flex items-center gap-3">
+                    <a href="javascript:location.reload()" class="flex items-center gap-3 group w-full">
                         <div
-                            class="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:scale-105">
+                            class="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:scale-105 flex-shrink-0">
                             <i class="ph-bold ph-strategy text-white text-xl"></i>
                         </div>
-                        <div class="hidden lg:block sidebar-text">
-                            <h2 class="text-white font-bold text-lg tracking-tight">Aether</h2>
-                            <p class="text-[10px] text-indigo-400 font-mono -mt-0.5">INTELLIGENCE</p>
+                        <div class="hidden lg:block logo-text">
+                            <h2 class="text-txt-main font-bold text-lg tracking-tight">Aether</h2>
+                            <p class="text-[10px] text-brand-text font-mono -mt-0.5">INTELLIGENCE</p>
                         </div>
                     </a>
                 </div>
@@ -977,39 +1013,39 @@
 
                 <!-- Top Bar: Floating Glass -->
                 <header
-                    class="h-20 flex-shrink-0 flex justify-between items-center px-8 border-b border-white/5 bg-[#030014]/20 backdrop-blur-sm">
+                    class="h-20 flex-shrink-0 flex justify-between items-center px-8 border-b border-app-border bg-app-card backdrop-blur-sm transition-colors duration-300">
                     <div>
-                        <h1 class="text-xl font-bold text-white flex items-center gap-3 tracking-tight">
+                        <h1 class="text-xl font-bold text-txt-main flex items-center gap-3 tracking-tight">
                             Strategic Dashboard
                             <span
                                 class="text-[9px] font-mono bg-green-500/10 text-green-400 px-2 py-0.5 rounded border border-green-500/20 tracking-wider">LIVE_SESSION</span>
                         </h1>
-                        <p class="text-[10px] text-gray-500 font-mono mt-0.5 flex gap-2">
+                        <p class="text-[10px] text-txt-muted font-mono mt-0.5 flex gap-2">
                             <span id="tx-display">TX: INITIALIZING...</span>
                         </p>
                     </div>
                     <div class="flex gap-4 items-center">
                         <!-- Theme Toggle -->
                         <button id="theme-toggle"
-                            class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all duration-300 group"
+                            class="w-10 h-10 rounded-lg bg-app-card hover:bg-app-hover border border-app-border flex items-center justify-center transition-all duration-300 group"
                             aria-label="Toggle theme">
                             <i
-                                class="ph-bold ph-sun text-lg text-gray-400 group-hover:text-yellow-400 transition theme-icon-light"></i>
+                                class="ph-bold ph-sun text-lg text-txt-muted group-hover:text-yellow-400 transition theme-icon-light"></i>
                             <i
-                                class="ph-bold ph-moon text-lg text-gray-400 group-hover:text-indigo-400 transition theme-icon-dark hidden"></i>
+                                class="ph-bold ph-moon text-lg text-txt-muted group-hover:text-brand-primary transition theme-icon-dark hidden"></i>
                         </button>
 
                         <!-- System Status -->
                         <div
-                            class="hud-card px-4 py-2 rounded-lg flex items-center gap-3 border border-white/5 bg-black/40">
+                            class="hud-card px-4 py-2 rounded-lg flex items-center gap-3 border border-app-border bg-app-card">
                             <div class="flex gap-1 h-3 items-end">
-                                <div class="w-1 h-2 bg-indigo-500/50 rounded-sm animate-pulse"></div>
-                                <div class="w-1 h-3 bg-indigo-500 rounded-sm animate-pulse"
+                                <div class="w-1 h-2 bg-brand-primary/50 rounded-sm animate-pulse"></div>
+                                <div class="w-1 h-3 bg-brand-primary rounded-sm animate-pulse"
                                     style="animation-delay: 0.1s"></div>
-                                <div class="w-1 h-1.5 bg-indigo-500/50 rounded-sm animate-pulse"
+                                <div class="w-1 h-1.5 bg-brand-primary/50 rounded-sm animate-pulse"
                                     style="animation-delay: 0.2s"></div>
                             </div>
-                            <span class="text-[10px] font-mono text-gray-400" id="status-text">SYSTEM_OPTIMAL</span>
+                            <span class="text-[10px] font-mono text-txt-muted" id="status-text">SYSTEM_OPTIMAL</span>
                         </div>
                     </div>
                 </header>
@@ -1044,7 +1080,7 @@
 
                             <!-- INPUT CONTENT -->
                             <div id="input-panel" class="flex-1 flex flex-col relative z-10">
-                                <div class="flex-1 bg-black/20 rounded border border-white/5 p-3 text-xs text-gray-300 font-mono leading-relaxed overflow-y-auto"
+                                <div class="flex-1 bg-app-input rounded border border-app-border p-3 text-xs text-txt-secondary font-mono leading-relaxed overflow-y-auto"
                                     id="problem-display">
                                     Loading input vector...
                                 </div>
@@ -1446,17 +1482,17 @@
                                         <!-- Step 2 -->
                                         <div class="relative">
                                             <div class="flex justify-between text-xs mb-2">
-                                                <span class="text-white font-bold">Wallet Connect</span>
+                                                <span class="text-txt-main font-bold">Wallet Connect</span>
                                                 <span id="funnel-connected-pct"
-                                                    class="text-indigo-400 font-mono">--%</span>
+                                                    class="text-brand-text font-mono">--%</span>
                                             </div>
                                             <div
-                                                class="h-14 bg-white/5 rounded-lg border border-white/5 relative overflow-hidden">
+                                                class="h-14 bg-app-input rounded-lg border border-app-border relative overflow-hidden">
                                                 <div id="funnel-connected-bar"
-                                                    class="absolute inset-y-0 left-0 bg-indigo-700/40 border-r border-indigo-400/50 transition-all duration-1000"
+                                                    class="absolute inset-y-0 left-0 bg-brand-primary/40 border-r border-brand-primary/50 transition-all duration-1000"
                                                     style="width: 0%"></div>
                                                 <div
-                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-gray-400 font-mono">
+                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-txt-muted font-mono">
                                                     <i class="ph-bold ph-plug mr-2"></i> Handshake
                                                 </div>
                                             </div>
@@ -1465,16 +1501,16 @@
                                         <!-- Step 3 -->
                                         <div class="relative">
                                             <div class="flex justify-between text-xs mb-2">
-                                                <span class="text-white font-bold">Conversion</span>
+                                                <span class="text-txt-main font-bold">Conversion</span>
                                                 <span id="funnel-paid-pct" class="text-green-400 font-mono">--%</span>
                                             </div>
                                             <div
-                                                class="h-14 bg-white/5 rounded-lg border border-white/5 relative overflow-hidden">
+                                                class="h-14 bg-app-input rounded-lg border border-app-border relative overflow-hidden">
                                                 <div id="funnel-paid-bar"
                                                     class="absolute inset-y-0 left-0 bg-green-500/20 border-r border-green-500/50 transition-all duration-1000"
                                                     style="width: 0%"></div>
                                                 <div
-                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-gray-400 font-mono">
+                                                    class="absolute inset-0 flex items-center px-4 text-[10px] text-txt-muted font-mono">
                                                     <i class="ph-bold ph-coins mr-2"></i> Minted
                                                 </div>
                                             </div>
@@ -1511,12 +1547,13 @@
                     <div id="view-team"
                         class="hidden animate-slide-up h-full flex flex-col items-center justify-center p-8">
                         <div class="dash-panel p-12 text-center max-w-lg mx-auto">
-                            <i class="ph-duotone ph-users-three text-6xl text-gray-600 mb-6"></i>
-                            <h2 class="text-2xl text-white font-bold mb-2">Team Management</h2>
-                            <p class="text-gray-400 mb-6">Collaborate with your organization. This feature is coming in
+                            <i class="ph-duotone ph-users-three text-6xl text-txt-muted mb-6"></i>
+                            <h2 class="text-2xl text-txt-main font-bold mb-2">Team Management</h2>
+                            <p class="text-txt-secondary mb-6">Collaborate with your organization. This feature is
+                                coming in
                                 v2.1.</p>
                             <button
-                                class="px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 cursor-not-allowed">
+                                class="px-6 py-2 bg-app-card border border-app-border rounded-lg text-txt-muted cursor-not-allowed">
                                 Feature Locked
                             </button>
                         </div>
@@ -1526,11 +1563,12 @@
                     <div id="view-settings"
                         class="hidden animate-slide-up h-full flex flex-col items-center justify-center p-8">
                         <div class="dash-panel p-12 text-center max-w-lg mx-auto">
-                            <i class="ph-duotone ph-gear text-6xl text-gray-600 mb-6"></i>
-                            <h2 class="text-2xl text-white font-bold mb-2">System Settings</h2>
-                            <p class="text-gray-400 mb-6">Configure API keys, webhooks, and security preferences.</p>
+                            <i class="ph-duotone ph-gear text-6xl text-txt-muted mb-6"></i>
+                            <h2 class="text-2xl text-txt-main font-bold mb-2">System Settings</h2>
+                            <p class="text-txt-secondary mb-6">Configure API keys, webhooks, and security preferences.
+                            </p>
                             <button
-                                class="px-6 py-2 bg-indigo-500/20 border border-indigo-500/40 rounded-lg text-indigo-300 hover:bg-indigo-500/30 transition">
+                                class="px-6 py-2 bg-brand-primary/20 border border-brand-primary/40 rounded-lg text-brand-text hover:bg-brand-primary/30 transition">
                                 Open Config Panel
                             </button>
                         </div>
@@ -1545,14 +1583,14 @@
     <!-- TOAST NOTIFICATION -->
     <!-- TOAST NOTIFICATION (Modular) -->
     <div id="toastNotification"
-        class="fixed top-24 right-6 bg-[#0f111a] border border-white/10 text-white px-5 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] transform translate-x-full transition-transform duration-300 flex items-center gap-4 z-[100] hidden max-w-sm w-full backdrop-blur-md">
+        class="fixed top-24 right-6 bg-app-panel border border-app-border text-txt-main px-5 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] transform translate-x-full transition-transform duration-300 flex items-center gap-4 z-[100] hidden max-w-sm w-full backdrop-blur-md">
         <div class="flex-shrink-0">
             <i id="toastIcon" class="ph-bold text-2xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-            <div id="toastTitle" class="text-sm font-bold font-mono text-white mb-1 uppercase tracking-wider">
+            <div id="toastTitle" class="text-sm font-bold font-mono text-txt-main mb-1 uppercase tracking-wider">
                 Notification</div>
-            <div id="toastMessage" class="text-xs text-gray-400 font-sans leading-relaxed break-words">Message body
+            <div id="toastMessage" class="text-xs text-txt-secondary font-sans leading-relaxed break-words">Message body
             </div>
         </div>
     </div>
