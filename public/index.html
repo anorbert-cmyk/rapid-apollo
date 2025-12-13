@@ -155,54 +155,66 @@
             --blob-3: rgba(6, 182, 212, 0.1);
         }
 
-        /* Light Theme */
+        /* Light Theme - Precise Gemini MD3 Implementation */
         :root[data-theme="light"] {
-            /* Backgrounds */
+            /* Backgrounds - Material 3 Tokens */
             --bg-primary: #FFFFFF;
-            --bg-secondary: #FAFAFA;
-            --bg-tertiary: #F5F5F7;
+            /* surface-lowest */
+            --bg-secondary: #F0F4F9;
+            /* surface-container */
+            --bg-tertiary: #F7F9FC;
+            /* surface-container-low */
 
             /* Glass & Panels */
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-hover: rgba(255, 255, 255, 0.85);
-            --panel-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --glass-border-hover: rgba(0, 0, 0, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-hover: rgba(255, 255, 255, 0.9);
+            --panel-bg: rgba(240, 244, 249, 0.6);
+            /* Matches bg-secondary */
+            --glass-border: rgba(116, 119, 127, 0.2);
+            /* outline-variant */
+            --glass-border-hover: rgba(11, 87, 208, 0.3);
+            /* primary accent hover */
 
             /* Text Colors */
-            --text-primary: #1A1A1A;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --text-dim: rgba(0, 0, 0, 0.5);
+            --text-primary: #1F1F1F;
+            /* on-surface */
+            --text-secondary: #44474F;
+            /* on-surface-variant */
+            --text-muted: #74777F;
+            /* outline */
+            --text-dim: rgba(31, 31, 31, 0.38);
 
             /* Accents */
-            --accent-indigo: #2563EB;
-            --accent-purple: #9f7aea;
-            --accent-cyan: #0891b2;
+            --accent-indigo: #0B57D0;
+            /* primary */
+            --accent-purple: #9C27B0;
+            /* secondary-ish/custom */
+            --accent-cyan: #006D4E;
+            /* tertiary */
 
-            /* Shadows */
-            --shadow-soft: 0 4px 30px rgba(0, 0, 0, 0.03);
-            --shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.06);
+            /* Shadows - Softer, more diffuse */
+            --shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1), 0 12px 32px rgba(0, 0, 0, 0.1);
 
             /* Blur */
-            --blur-amount: 24px;
-            --blur-heavy: 80px;
+            --blur-amount: 20px;
+            --blur-heavy: 60px;
 
             /* Scrollbar */
-            --scrollbar-track: #f5f5f5;
-            --scrollbar-thumb: #d4d4d4;
-            --scrollbar-thumb-hover: #2563EB;
+            --scrollbar-track: #F0F4F9;
+            --scrollbar-thumb: #C4C7C5;
+            --scrollbar-thumb-hover: #0B57D0;
 
-            /* Noise Overlay */
-            --noise-opacity: 0.4;
+            /* Noise Overlay - Reduced for cleaner look */
+            --noise-opacity: 0.15;
 
-            /* Fractal Blobs - Light (iridescent) */
-            --blob-1: #E0E7FF;
-            /* Soft Blue */
-            --blob-2: #F3E8FF;
-            /* Soft Purple */
-            --blob-3: #FFE4E6;
-            /* Soft Pink */
+            /* Fractal Blobs - Gem-like iridescence */
+            --blob-1: #D3E3FD;
+            /* primary-container */
+            --blob-2: #C2E7FF;
+            /* secondary-container */
+            --blob-3: #E1E2E6;
+            /* surface-variant */
         }
 
         /* ========================================
