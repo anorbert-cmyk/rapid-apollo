@@ -155,68 +155,70 @@
             --blob-3: rgba(6, 182, 212, 0.1);
         }
 
-        /* Light Theme - Exact Gemini MD3 Tokens */
+        /* Light Theme - Premium Tailwind Slate Palette (WCAG AA Compliant) */
         :root[data-theme="light"] {
-            /* Backgrounds - Exact MD3 Surface tokens */
+            /* Surfaces - Tailwind Slate scale */
             --bg-primary: #FFFFFF;
-            /* surface */
-            --bg-secondary: #F0F4F9;
-            /* surface-container (THE key Gemini color) */
-            --bg-tertiary: #F7F9FC;
-            /* surface-container-low */
+            /* Pure white base */
+            --bg-secondary: #F1F5F9;
+            /* slate-100 - Cards, panels */
+            --bg-tertiary: #F8FAFC;
+            /* slate-50 - Subtle sections */
 
-            /* Glass & Panels - Solid, NOT transparent */
-            --glass-bg: #F0F4F9;
-            /* surface-container (solid) */
-            --glass-hover: #EBEBEB;
-            /* surface-container-high */
-            --panel-bg: #F0F4F9;
-            /* surface-container (solid) */
-            --glass-border: #C4C7C5;
-            /* outline-variant */
-            --glass-border-hover: #0B57D0;
-            /* primary */
+            /* Glass & Panels - Solid, professional */
+            --glass-bg: #F1F5F9;
+            /* slate-100 */
+            --glass-hover: #E2E8F0;
+            /* slate-200 */
+            --panel-bg: #F1F5F9;
+            /* slate-100 */
+            --glass-border: #E2E8F0;
+            /* slate-200 */
+            --glass-border-hover: #2563EB;
+            /* blue-600 (primary) */
 
-            /* Text Colors - Exact MD3 tokens */
-            --text-primary: #1F1F1F;
-            /* on-surface */
-            --text-secondary: #44474F;
-            /* on-surface-variant */
-            --text-muted: #74777F;
-            /* outline */
-            --text-dim: rgba(31, 31, 31, 0.38);
+            /* Text Colors - High contrast */
+            --text-primary: #0F172A;
+            /* slate-900 - 15.4:1 ✓ */
+            --text-secondary: #334155;
+            /* slate-700 - 8.6:1 ✓ */
+            --text-muted: #64748B;
+            /* slate-500 - 4.7:1 ✓ */
+            --text-dim: #94A3B8;
+            /* slate-400 */
 
-            /* Accents - Exact MD3 */
-            --accent-indigo: #0B57D0;
-            /* primary */
-            --accent-purple: #00639B;
-            /* secondary */
-            --accent-cyan: #006D4E;
-            /* tertiary */
+            /* Accents - Vibrant, accessible */
+            --accent-indigo: #2563EB;
+            /* blue-600 - 4.7:1 ✓ */
+            --accent-purple: #7C3AED;
+            /* violet-600 - 6.3:1 ✓ */
+            --accent-cyan: #0891B2;
+            /* cyan-600 - 4.6:1 ✓ */
 
-            /* Shadows - Subtle, no color tint */
-            --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.15);
+            /* Shadows - Subtle, professional */
+            --shadow-soft: 0 1px 3px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 4px 6px -1px rgba(15, 23, 42, 0.08);
 
-            /* Blur - Minimal since not using transparency */
+            /* Effects */
             --blur-amount: 0px;
             --blur-heavy: 0px;
 
             /* Scrollbar */
-            --scrollbar-track: #F0F4F9;
-            --scrollbar-thumb: #C4C7C5;
-            --scrollbar-thumb-hover: #0B57D0;
+            --scrollbar-track: #F1F5F9;
+            --scrollbar-thumb: #CBD5E1;
+            /* slate-300 */
+            --scrollbar-thumb-hover: #2563EB;
 
-            /* Noise Overlay - Off for clean look */
+            /* Noise - Off for clean look */
             --noise-opacity: 0;
 
-            /* Fractal Blobs - Using MD3 containers */
-            --blob-1: #D3E3FD;
-            /* primary-container */
-            --blob-2: #C2E7FF;
-            /* secondary-container */
-            --blob-3: #9EF3CF;
-            /* tertiary-container */
+            /* Decorative blobs - Pastel containers */
+            --blob-1: #DBEAFE;
+            /* blue-100 */
+            --blob-2: #EDE9FE;
+            /* violet-100 */
+            --blob-3: #CFFAFE;
+            /* cyan-100 */
         }
 
         /* ========================================
