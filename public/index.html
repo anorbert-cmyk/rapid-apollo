@@ -1373,6 +1373,7 @@
                         class="hidden animate-slide-up h-full overflow-y-auto custom-scrollbar pb-12">
 
                         <div class="max-w-[1600px] mx-auto">
+                            <!-- Simulation Logic v2.0 -->
                             <!-- Section Title -->
                             <div class="mb-6 flex items-end justify-between border-b border-white/5 pb-4">
                                 <div>
@@ -1694,17 +1695,17 @@
                                     </div>
                                     <!-- Tab Navigation -->
                                     <div class="flex items-center gap-2">
-                                        <button onclick="switchOutputTab('vp')" id="output-tab-vp"
+                                        <button onclick="switchOutputTab('strategy')" id="output-tab-strategy"
                                             class="output-tab-active px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-chart-pie-slice"></i> VP Summary
+                                            <i class="ph-bold ph-strategy"></i> Strategy & ROI
                                         </button>
-                                        <button onclick="switchOutputTab('build')" id="output-tab-build"
-                                            class="px-4 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-package"></i> Build Pack
+                                        <button onclick="switchOutputTab('design')" id="output-tab-design"
+                                            class="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white rounded-lg transition-all flex items-center gap-2">
+                                            <i class="ph-bold ph-paint-brush"></i> Design & UX
                                         </button>
-                                        <button onclick="switchOutputTab('evidence')" id="output-tab-evidence"
-                                            class="px-4 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-paperclip"></i> Evidence
+                                        <button onclick="switchOutputTab('engineering')" id="output-tab-engineering"
+                                            class="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white rounded-lg transition-all flex items-center gap-2">
+                                            <i class="ph-bold ph-code"></i> Engineering & Build
                                         </button>
                                         <div class="h-6 w-px bg-white/10 mx-2"></div>
                                         <button onclick="exportAllOutput()"
@@ -2008,6 +2009,124 @@
                                     </div>
                                 </div>
 
+                            </div>
+
+                            <!-- TAB 2: DESIGN & UX -->
+                            <div id="output-content-design" class="output-tab-content hidden space-y-6">
+                                <!-- Row 1: Figma Assets (Top Priority for Designers) -->
+                                <div
+                                    class="dash-panel p-6 bg-gradient-to-r from-pink-500/10 to-transparent border-pink-500/20">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-bold ph-figma-logo text-pink-400 text-xl"></i>
+                                            <div>
+                                                <h3 class="text-sm text-white font-bold">Figma AI Asset Library</h3>
+                                                <p class="text-[10px] text-pink-300">Copy-paste ready prompts for UI
+                                                    generation</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="design-figma-container"
+                                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <!-- Populated -->
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: Screen Specifications -->
+                                <div class="dash-panel p-6">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3
+                                            class="text-xs font-mono text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="ph-bold ph-devices text-cyan-400"></i> Interface Specifications
+                                        </h3>
+                                        <div class="flex gap-2 text-[10px] text-gray-500">
+                                            <span class="flex items-center gap-1">
+                                                <div class="w-2 h-2 rounded-full bg-indigo-500"></div> Core
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <div class="w-2 h-2 rounded-full bg-purple-500"></div> Flow
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div id="design-screens-container"
+                                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        <!-- Populated -->
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: UX Blueprint -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="dash-panel p-6">
+                                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">UX
+                                            Philosophy</h3>
+                                        <div id="design-ux-philosophy" class="text-sm text-gray-300 italic mb-4"></div>
+                                        <div id="design-ux-principles" class="space-y-2"></div>
+                                    </div>
+                                    <div class="dash-panel p-6">
+                                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-3">
+                                            Accessibility Standards</h3>
+                                        <div id="design-ux-accessibility" class="text-xs text-gray-300"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- TAB 3: ENGINEERING & BUILD -->
+                            <div id="output-content-engineering" class="output-tab-content hidden space-y-6">
+                                <!-- Row 1: Scope Lock & Stack -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="md:col-span-2 dash-panel p-6">
+                                        <h3
+                                            class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="ph-bold ph-crosshair text-green-400"></i> Scope Lock
+                                        </h3>
+                                        <div id="engineering-scope-container">
+                                            <!-- Populated -->
+                                        </div>
+                                    </div>
+                                    <div class="dash-panel p-6">
+                                        <h3
+                                            class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="ph-bold ph-stack text-blue-400"></i> Tech Stack
+                                        </h3>
+                                        <div id="engineering-stack-container" class="text-xs text-gray-300">
+                                            <!-- Populated -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: Assumptions -->
+                                <div class="dash-panel p-6">
+                                    <h3
+                                        class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="ph-bold ph-list-checks text-yellow-400"></i> Assumption Ledger
+                                    </h3>
+                                    <div id="engineering-assumptions-container"
+                                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <!-- Populated -->
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Validation & Errors -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="dash-panel p-6">
+                                        <h3
+                                            class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="ph-bold ph-shield-warning text-orange-400"></i> Validation Rules
+                                        </h3>
+                                        <div id="engineering-validation-container" class="overflow-x-auto">
+                                            <!-- Populated -->
+                                        </div>
+                                    </div>
+                                    <div class="dash-panel p-6">
+                                        <h3
+                                            class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="ph-bold ph-siren text-red-400"></i> Resilience & Error Handling
+                                        </h3>
+                                        <div id="engineering-errors-container" class="space-y-3">
+                                            <!-- Populated -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- TAB: BUILD PACK -->
@@ -2538,7 +2657,7 @@
             }
         }
 
-        // Output Tab Switching for Product Output View
+        // Output Tab Switcher (Strategy / Design / Engineering)
         function switchOutputTab(tabName) {
             const tabs = ['vp', 'build', 'evidence'];
             tabs.forEach(t => {
@@ -2635,307 +2754,261 @@
         // MASTER PROMPT SIMULATION LOGIC
         // ============================================
         function runMasterPromptSimulation() {
-            if (!window.SIMULATION_RESULT) {
-                console.error("Simulation data not loaded");
-                return;
-            }
-
-            console.log("Running Gemini 3 Master Prompt Simulation...");
             const data = window.SIMULATION_RESULT;
+            if (!data) return;
 
-            // 1. UPDATE VP SUMMARY
-            // Hero Metric
-            const heroMetric = document.querySelector('.hero-metric');
-            if (heroMetric) heroMetric.innerText = data.vp.heroMetric.value;
-            // Supporting KPIs (using approximate selectors or IDs if added)
-            // For demo, we might need to select by index or add IDs. Assuming IDs exist or adding them:
-            const kpiValues = document.querySelectorAll('.kpi-supporting .value');
-            if (kpiValues.length >= 4) {
-                kpiValues[0].innerText = data.vp.kpis[0].value; // Conversion -> Throughput
-                kpiValues[1].innerText = data.vp.kpis[1].value; // Latency -> Gas
-                kpiValues[2].innerText = data.vp.kpis[2].value; // NPS -> Latency
-                kpiValues[3].innerText = data.vp.kpis[3].value; // Support -> Uptime
+            // ==========================================
+            // TAB 1: STRATEGY & ROI
+            // ==========================================
+
+            // 1. Hero & Meta
+            const domainEl = document.getElementById('strategy-meta-domain');
+            if (domainEl) domainEl.innerText = data.meta.domain;
+
+            const summaryEl = document.getElementById('strategy-hero-summary');
+            if (summaryEl) summaryEl.innerHTML = data.vp.execSummary;
+
+            const mVal = document.getElementById('strategy-hero-metric-value');
+            if (mVal) mVal.innerText = data.vp.heroMetric.value;
+
+            const mLabel = document.getElementById('strategy-hero-metric-label');
+            if (mLabel) mLabel.innerText = data.vp.heroMetric.label;
+
+            const mTrend = document.getElementById('strategy-hero-metric-trend');
+            if (mTrend) mTrend.innerText = data.vp.heroMetric.trend;
+
+            // 2. KPIs
+            if (data.vp.kpis) {
+                data.vp.kpis.forEach((kpi, i) => {
+                    const el = document.getElementById(`kpi-${i + 1}-val`);
+                    if (el) el.innerText = kpi.value;
+                });
             }
 
-            // Labels update for context (since we changed the metric types in simulation)
-            const kpiLabels = document.querySelectorAll('.kpi-supporting .label');
-            if (kpiLabels.length >= 4) {
-                kpiLabels[0].innerText = data.vp.kpis[0].label;
-                kpiLabels[1].innerText = data.vp.kpis[1].label;
-                kpiLabels[2].innerText = data.vp.kpis[2].label;
-                kpiLabels[3].innerText = data.vp.kpis[3].label;
-            }
-
-            // Exec Summary
-            const execContent = document.getElementById('exec-summary-content');
-            if (execContent) execContent.innerHTML = data.vp.execSummary;
-
-            // Risk Matrix
-            const riskContainer = document.getElementById('risk-matrix');
-            if (riskContainer) {
-                riskContainer.innerHTML = data.vp.riskMatrix.map((r, i) => `
-                    <div class="flex items-center gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-xl hover:bg-red-500/10 transition group">
-                        <div class="w-8 h-8 flex items-center justify-center bg-red-500/20 rounded-lg text-red-400 text-xs font-bold group-hover:scale-110 transition">${i + 1}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="text-xs text-white font-medium">${r.name}</div>
-                            <div class="text-[10px] text-gray-400 truncate">${r.desc}</div>
+            // 3. ROI Analysis
+            const roiContainer = document.getElementById('strategy-roi-content');
+            if (roiContainer) {
+                roiContainer.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="p-4 bg-white/5 rounded-xl border border-white/5 text-center">
+                            <div class="text-[10px] text-gray-400 uppercase mb-1">Est. Cost</div>
+                            <div class="text-xl font-bold text-white">${data.evidence.roi.cost}</div>
                         </div>
-                        <span class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold rounded-lg">${r.severity}</span>
+                        <div class="p-4 bg-green-500/10 rounded-xl border border-green-500/20 text-center">
+                            <div class="text-[10px] text-green-400 uppercase mb-1">Est. Revenue</div>
+                            <div class="text-xl font-bold text-green-400">${data.evidence.roi.revenue}</div>
+                        </div>
                     </div>
-                `).join('');
-            }
-
-            // Cost Model (VP Tab)
-            const costRange = document.getElementById('cost-range');
-            if (costRange) costRange.innerText = data.vp.cost.range;
-
-
-            // 2. UPDATE BUILD PACK (Assumptions) - EXPANDED
-            const assumptionsContainer = document.getElementById('build-assumptions');
-            if (assumptionsContainer && data.build.assumptions) {
-                assumptionsContainer.innerHTML = data.build.assumptions.map(a => {
-                    let colorClass = 'gray';
-                    let badgeColor = 'gray';
-                    if (a.type === 'assumed') { colorClass = 'yellow'; badgeColor = 'yellow'; }
-                    else if (a.type === 'in-scope') { colorClass = 'green'; badgeColor = 'green'; }
-                    else if (a.type === 'validated') { colorClass = 'cyan'; badgeColor = 'cyan'; }
-                    else { colorClass = 'red'; badgeColor = 'red'; }
-
-                    return `
-                    <div class="p-4 bg-${colorClass}-500/5 border border-${colorClass}-500/10 rounded-xl hover:bg-${colorClass}-500/10 transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="px-2 py-0.5 bg-${badgeColor}-500/20 text-${badgeColor}-400 text-[9px] font-bold rounded uppercase">${a.type.replace('-', ' ')}</span>
-                            <span class="text-[10px] text-gray-500 font-mono">Conf: ${a.confidence}</span>
-                        </div>
-                        <h4 class="text-sm text-white font-bold mb-1">${a.label}</h4>
-                        <p class="text-xs text-gray-400 mb-3">${a.desc}</p>
-                        ${a.validation ? `<div class="text-[10px] text-gray-500 mb-1"><span class="text-${colorClass}-400">Validation:</span> ${a.validation}</div>` : ''}
-                        ${a.riskIfWrong ? `<div class="text-[10px] text-red-400/70"><span class="text-gray-500">Risk if wrong:</span> ${a.riskIfWrong}</div>` : ''}
-                    </div>`;
-                }).join('');
-            }
-
-            // 2.5 UPDATE BUILD PACK (Scope Lock) - if scopeLock exists
-            const scopeLockContainer = document.getElementById('build-scope-container');
-            if (scopeLockContainer && data.build.scopeLock) {
-                const sl = data.build.scopeLock;
-                scopeLockContainer.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-4 bg-green-500/5 border border-green-500/20 rounded-xl">
-                            <h4 class="text-[10px] text-green-400 font-mono uppercase mb-2">✓ In Scope</h4>
-                            <ul class="space-y-1 text-xs text-gray-300">
-                                ${sl.inScope.map(item => `<li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">•</span>${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
-                            <h4 class="text-[10px] text-red-400 font-mono uppercase mb-2">✗ Out of Scope</h4>
-                            <ul class="space-y-1 text-xs text-gray-300">
-                                ${sl.outOfScope.map(item => `<li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">•</span>${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl">
-                            <h4 class="text-[10px] text-purple-400 font-mono uppercase mb-2">◐ Phase 2</h4>
-                            <ul class="space-y-1 text-xs text-gray-300">
-                                ${sl.phase2.map(item => `<li class="flex items-start gap-2"><span class="text-purple-400 mt-0.5">•</span>${item}</li>`).join('')}
-                            </ul>
-                        </div>
+                    <div class="flex justify-between text-xs text-gray-400 px-2">
+                        <span>Breakeven: <span class="text-white">${data.evidence.roi.breakEven}</span></span>
+                        <span>Uplift: <span class="text-green-400">${data.evidence.roi.uplift}</span></span>
                     </div>
                 `;
             }
 
-            // 3. UPDATE BUILD PACK (Screens) - EXPANDABLE
-            const screensContainer = document.getElementById('build-screens-container');
-            if (screensContainer && data.build.screens) {
-                screensContainer.innerHTML = data.build.screens.map((screen, index) => `
-                    <div class="screen-card bg-gradient-to-br from-${screen.color || 'indigo'}-500/10 to-${screen.color || 'indigo'}-500/5 border border-${screen.color || 'indigo'}-500/20 rounded-xl overflow-hidden">
-                        <div class="p-4 cursor-pointer" onclick="toggleScreenDetail(${index})">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-white font-bold text-sm">${screen.title}</h4>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[10px] bg-${screen.color || 'indigo'}-500/20 text-${screen.color || 'indigo'}-400 px-2 py-0.5 rounded font-mono">${screen.id}</span>
-                                    <i class="ph-bold ph-caret-down text-gray-400 transition-transform screen-caret-${index}"></i>
-                                </div>
+            // 4. Risk Matrix
+            const riskContainer = document.getElementById('strategy-risk-content');
+            if (riskContainer) {
+                riskContainer.innerHTML = data.vp.riskMatrix.map(risk => `
+                    <div class="flex items-start gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                        <div class="mt-1 w-1.5 h-1.5 rounded-full ${risk.severity === 'HIGH' ? 'bg-red-500' : 'bg-orange-400'}"></div>
+                        <div class="w-full">
+                            <div class="text-xs text-white font-bold flex justify-between w-full">
+                                <span>${risk.name}</span>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-white/5 rounded text-gray-400">${risk.severity}</span>
                             </div>
-                            <p class="text-xs text-gray-400 mb-3">${screen.desc}</p>
-                            <div class="flex flex-wrap gap-2 text-[10px]">
-                                <span class="px-2 py-0.5 bg-white/5 rounded text-gray-400">${screen.components.split(',').length} Components</span>
-                                <span class="px-2 py-0.5 bg-white/5 rounded text-gray-400">${screen.states.split(',').length} States</span>
-                            </div>
-                        </div>
-                        <div id="screen-detail-${index}" class="hidden border-t border-white/10 p-4 bg-black/20 space-y-3">
-                            <div>
-                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Wireframe</div>
-                                <p class="text-xs text-gray-300">${screen.wireframe || 'N/A'}</p>
-                            </div>
-                            <div>
-                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Interactions</div>
-                                <p class="text-xs text-gray-300">${screen.interactions || 'N/A'}</p>
-                            </div>
-                            ${screen.copy ? `
-                            <div>
-                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Copy</div>
-                                <div class="space-y-1 text-xs">
-                                    ${Object.entries(screen.copy).map(([key, val]) => `<div><span class="text-gray-500">${key}:</span> <span class="text-yellow-300">"${val}"</span></div>`).join('')}
-                                </div>
-                            </div>` : ''}
-                            ${screen.microCopy ? `<div class="text-[10px] text-gray-500 italic">"${screen.microCopy}"</div>` : ''}
+                            <div class="text-[10px] text-gray-400 mt-1 leading-tight">${risk.desc}</div>
                         </div>
                     </div>
                 `).join('');
             }
 
-            // 4. UPDATE BUILD PACK (Validation)
-            const validationContainer = document.getElementById('build-validation-container');
-            if (validationContainer && data.build.validation) {
-                // Generate table rows
-                const rows = data.build.validation.map(v => `
-                    <tr class="hover:bg-white/5 transition border-b border-white/5 last:border-0">
-                        <td class="py-2 px-3 text-gray-300">${v.field}</td>
-                        <td class="py-2 px-3 text-gray-400 font-mono text-[10px]">${v.rule}</td>
-                        <td class="py-2 px-3 text-gray-400 text-[10px]">${v.timing}</td>
+            // 5. Decisions Table
+            const decisionBody = document.querySelector('#strategy-decisions-table tbody');
+            if (decisionBody && data.evidence.decisions) {
+                decisionBody.innerHTML = data.evidence.decisions.map(d => `
+                    <tr class="hover:bg-white/5 transition">
+                        <td class="py-2 pr-2 text-white font-medium">${d.item}</td>
+                        <td class="py-2 pr-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${d.verdict.includes('BLOCK') ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">${d.verdict}</span></td>
+                        <td class="py-2 text-gray-400 italic text-[11px]">${d.rationale}</td>
                     </tr>
                 `).join('');
-
-                // Generate Deep Dives
-                let deepDivesHtml = '';
-                if (data.build.deepDives) {
-                    deepDivesHtml = `
-                        <div class="mt-4 space-y-3 pt-3 border-t border-white/5">
-                            <h4 class="text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Error Scenarios</h4>
-                            ${data.build.deepDives.map(d => `
-                                <div class="p-3 bg-${d.tagColor}-500/5 border border-${d.tagColor}-500/10 rounded-lg">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="px-2 py-0.5 bg-${d.tagColor}-500/30 text-${d.tagColor}-400 text-[9px] font-bold rounded">${d.tag}</span>
-                                        <span class="text-[10px] text-gray-400">${d.label}</span>
-                                    </div>
-                                    <h4 class="text-white font-bold mb-2">${d.title}</h4>
-                                    <div class="space-y-2 text-xs">
-                                        <div class="flex gap-2"><span class="text-gray-400">Cause:</span><span class="text-gray-300">${d.cause}</span></div>
-                                        <div class="flex gap-2"><span class="text-gray-400">Copy:</span><span class="text-yellow-300 font-mono text-[10px] tracking-wide">${d.copy}</span></div>
-                                        <div class="flex gap-2"><span class="text-gray-400">Recovery:</span><span class="text-green-400">${d.recovery}</span></div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                     `;
-                }
-
-                // Set innerHTML with table structure and deep dives
-                validationContainer.innerHTML = `
-                <table class="w-full text-xs">
-                    <thead>
-                        <tr class="text-gray-400 border-b border-white/10">
-                            <th class="text-left py-2 px-3 font-mono">Field</th>
-                            <th class="text-left py-2 px-3 font-mono">Rule</th>
-                            <th class="text-left py-2 px-3 font-mono">Timing</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        ${rows}
-                    </tbody>
-                </table>
-                ${deepDivesHtml}
-                `;
             }
 
-            // 8. UPDATE BUILD PACK (Tech Specs)
-            const techSpecsContainer = document.getElementById('build-techspecs-container');
-            if (techSpecsContainer && data.build.techSpecs) {
-                // Preserve header but replace content
-                techSpecsContainer.innerHTML = `
-                    <div class="flex items-center gap-2 mb-4">
-                        <i class="ph-bold ph-code text-purple-400"></i>
-                        <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Technical Implementation</h3>
+            // ==========================================
+            // TAB 2: DESIGN & UX
+            // ==========================================
+
+            // 6. Figma Assets
+            const figmaContainer = document.getElementById('design-figma-container');
+            if (figmaContainer && data.figmaPrompts) {
+                figmaContainer.innerHTML = data.figmaPrompts.prompts.map((fp, index) => `
+                    <div class="p-4 bg-black/20 border border-white/5 rounded-xl group hover:border-pink-500/30 transition shadow-lg relative h-full flex flex-col justify-between">
+                        <div class="mb-3">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-xs text-white font-bold">${fp.title}</h4>
+                                <i class="ph-bold ph-image text-pink-500/50"></i>
+                            </div>
+                            <div class="flex flex-wrap gap-1 mb-2">
+                                ${fp.tags.map(t => `<span class="px-1.5 py-0.5 bg-white/5 text-[9px] text-gray-500 rounded">${t}</span>`).join('')}
+                            </div>
+                            <p class="text-[10px] text-gray-400 line-clamp-3 leading-relaxed">${fp.prompt}</p>
+                        </div>
+                        <button onclick="copyFigmaPrompt(${index})" 
+                            class="w-full py-2 bg-pink-500/5 hover:bg-pink-500/20 text-pink-400 text-[10px] font-bold rounded flex items-center justify-center gap-1 transition border border-pink-500/10 hover:border-pink-500/30">
+                            <i class="ph-bold ph-copy"></i> Copy Prompt
+                        </button>
+                        <textarea id="figma-prompt-${index}" class="hidden">${fp.prompt}</textarea>
                     </div>
-                    ${data.build.techSpecs}
+                `).join('');
+            }
+
+            // 7. Screen Specs (Expandable Cards)
+            const screensContainer = document.getElementById('design-screens-container');
+            if (screensContainer && data.build.screens) {
+                screensContainer.innerHTML = data.build.screens.map((screen, index) => `
+                    <div class="bg-gradient-to-br from-gray-900 to-black border border-white/10 rounded-xl overflow-hidden group hover:border-${screen.color}-500/30 transition">
+                        <div class="p-4 cursor-pointer" onclick="toggleScreenDetail(${index})">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-lg bg-${screen.color}-500/10 flex items-center justify-center text-${screen.color}-400">
+                                        <i class="ph-bold ph-desktop"></i>
+                                    </span>
+                                    <div>
+                                        <h4 class="text-sm text-white font-bold">${screen.title}</h4>
+                                        <span class="text-[10px] text-gray-500 font-mono">${screen.id}</span>
+                                    </div>
+                                </div>
+                                <i class="ph-bold ph-caret-down text-gray-500 transition-transform screen-caret-${index}"></i>
+                            </div>
+                            <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed">${screen.desc}</p>
+                        </div>
+                        
+                        <!-- Details -->
+                        <div id="screen-detail-${index}" class="hidden bg-black/40 border-t border-white/5 p-4 space-y-3">
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="bg-white/5 p-2 rounded">
+                                    <div class="text-gray-500 uppercase mb-1 text-[9px]">State</div>
+                                    <div class="text-gray-300">Wireframe Ready</div>
+                                </div>
+                                <div class="bg-white/5 p-2 rounded">
+                                    <div class="text-gray-500 uppercase mb-1 text-[9px]">Interactions</div>
+                                    <div class="text-gray-300">${screen.interactions ? 'Defined' : 'None'}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] text-${screen.color}-400 uppercase mb-1">Wireframe</div>
+                                <p class="text-[10px] text-gray-300 italic leading-relaxed">"${screen.wireframe}"</p>
+                            </div>
+                             ${screen.copy ? `
+                            <div>
+                                <div class="text-[9px] text-gray-500 uppercase mb-1">Key Copy</div>
+                                <div class="text-[10px] text-white bg-white/5 p-2 rounded border-l-2 border-${screen.color}-500 italic">
+                                    "${Object.values(screen.copy)[0]}"
+                                </div>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                // Exec Summary
+                const execContent = document.getElementById('exec-summary-content');
+                if (execContent) execContent.innerHTML = data.vp.execSummary;
+
+                // Risk Matrix
+                <div class="bg-white/5 p-2 rounded border-l-2 border-${screen.color}-500 italic text-[10px] text-white space-y-1">
+                    ${Object.entries(screen.copy).map(([k, v]) => `<div><span class="text-gray-500">${k}:</span> ${v}</div>`).join('')}
+                </div>
+                            </div > ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 8. UX Blueprint
+            if (data.build.uxBlueprint) {
+                const phEl = document.getElementById('design-ux-philosophy');
+                if (phEl) phEl.innerText = `"${data.build.uxBlueprint.philosophy}"`;
+
+                const prEl = document.getElementById('design-ux-principles');
+                if (prEl) prEl.innerHTML = data.build.uxBlueprint.principles.map(p =>
+                    `<div class="flex items-center gap-2 text-xs text-gray-400"><i class="ph-bold ph-check text-green-400"></i> ${p}</div>`
+                ).join('');
+
+                const accEl = document.getElementById('design-ux-accessibility');
+                if (accEl) accEl.innerText = data.build.uxBlueprint.accessibility;
+            }
+
+            // ==========================================
+            // TAB 3: ENGINEERING & BUILD
+            // ==========================================
+
+            // 9. Scope Lock
+            const scopeContainer = document.getElementById('engineering-scope-container');
+            if (scopeContainer && data.build.scopeLock) {
+                const sl = data.build.scopeLock;
+                scopeContainer.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div class="space-y-1 bg-green-500/5 p-3 rounded-lg border border-green-500/10">
+                            <div class="text-[10px] text-green-400 uppercase font-bold mb-2">In Scope</div>
+                            ${sl.inScope.map(i => `<div class="flex gap-2 text-gray-300"><span class="text-green-500">•</span> ${i}</div>`).join('')}
+                        </div>
+                        <div class="space-y-1 bg-red-500/5 p-3 rounded-lg border border-red-500/10">
+                            <div class="text-[10px] text-red-400 uppercase font-bold mb-2">Out of Scope</div>
+                            ${sl.outOfScope.map(i => `<div class="flex gap-2 text-gray-400 opacity-70"><span class="text-red-500">✕</span> ${i}</div>`).join('')}
+                        </div>
+                         <div class="space-y-1 bg-purple-500/5 p-3 rounded-lg border border-purple-500/10">
+                            <div class="text-[10px] text-purple-400 uppercase font-bold mb-2">Phase 2</div>
+                            ${sl.phase2.map(i => `<div class="flex gap-2 text-gray-400"><span class="text-purple-500">➜</span> ${i}</div>`).join('')}
+                        </div>
+                    </div>
                  `;
             }
 
-            // 5. UPDATE EVIDENCE (Decisions)
-            const decisionsBody = document.getElementById('evidence-decisions-body');
-            if (decisionsBody && data.evidence.decisions) {
-                decisionsBody.innerHTML = data.evidence.decisions.map(d => `
-                    <tr class="hover:bg-white/5">
-                        <td class="py-2 px-3 text-white font-medium">${d.item}</td>
-                        <td class="py-2 px-3 text-gray-400">${d.desc}</td>
-                        <td class="py-2 px-3 text-gray-400">${d.impact}</td>
-                        <td class="py-2 px-3"><span class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px] font-bold uppercase">${d.verdict}</span></td>
-                    </tr>
-                 `).join('');
+            // 10. Tech Stack
+            const stackContainer = document.getElementById('engineering-stack-container');
+            if (stackContainer && data.build.techSpecs) {
+                stackContainer.innerHTML = data.build.techSpecs;
             }
 
-            // 6. UPDATE EVIDENCE (Research)
-            const researchContainer = document.getElementById('evidence-research-container');
-            if (researchContainer && data.evidence.research) {
-                // Using the string data to create a summary card
-                researchContainer.innerHTML = `
-                    <div class="p-3 bg-white/5 rounded-lg border border-white/5">
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-xs shrink-0"><i class="ph-bold ph-lightbulb"></i></div>
-                            <div>
-                                <p class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">Market Analysis</p>
-                                <p class="text-xs text-white leading-relaxed">${data.evidence.research}</p>
-                            </div>
+            // 11. Assumptions
+            const assumptionContainer = document.getElementById('engineering-assumptions-container');
+            if (assumptionContainer && data.build.assumptions) {
+                assumptionContainer.innerHTML = data.build.assumptions.map(a => `
+                    <div class="p-3 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 transition">
+                        <div class="flex justify-between items-start mb-2">
+                             <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${a.type === 'validated' ? 'bg-cyan-500/20 text-cyan-400' : (a.type === 'in-scope' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400')}">${a.type}</span>
+                             <span class="text-[9px] text-gray-500">Conf: ${a.confidence}</span>
                         </div>
+                        <div class="text-xs font-bold text-white mb-1 leading-tight">${a.label}</div>
+                        <div class="text-[10px] text-gray-400 leading-tight">${a.desc}</div>
                     </div>
-                `;
+                `).join('');
             }
 
-            // 7. UPDATE EVIDENCE (ROI)
-            const roiContainer = document.getElementById('evidence-roi-container');
-            if (roiContainer && data.evidence.roi) {
-                roiContainer.innerHTML = `
-                    <div class="flex flex-col justify-between h-full space-y-4">
-                        <div>
-                            <div class="flex items-baseline gap-2 mb-1">
-                                <span class="text-3xl font-bold text-white">${data.evidence.roi.uplift}</span>
-                                <span class="text-green-400 text-xs">Efficiency Uplift</span>
-                            </div>
-                            <p class="text-xs text-gray-400">Projected Break-even: <span class="text-white">${data.evidence.roi.breakEven}</span></p>
-                            <p class="text-xs text-gray-400">Total Revenue: <span class="text-green-300 font-mono">${data.evidence.roi.revenue}</span></p>
-                        </div>
-                        <div class="w-full bg-white/10 rounded-full h-2 mb-4">
-                            <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-2 rounded-full" style="width: 85%"></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                             <div class="text-center p-2 bg-white/5 rounded border border-white/5">
-                                 <div class="text-[9px] text-gray-400 uppercase">Est. Cost</div>
-                                 <div class="text-xs font-bold text-white font-mono">${data.evidence.roi.cost}</div>
-                             </div>
-                             <div class="text-center p-2 bg-green-500/10 rounded border border-green-500/20">
-                                 <div class="text-[9px] text-gray-400 uppercase">Est. Rev</div>
-                                 <div class="text-xs font-bold text-green-400 font-mono">${data.evidence.roi.revenue}</div>
-                             </div>
-                        </div>
-                    </div>
+            // 12. Validation & Errors
+            const valContainer = document.getElementById('engineering-validation-container');
+            if (valContainer && data.build.validation) {
+                valContainer.innerHTML = `
+                    <table class="w-full text-[10px] text-left">
+                        <thead><tr class="text-gray-500 border-b border-white/10"><th class="pb-2 pl-2">Field</th><th class="pb-2">Rule</th></tr></thead>
+                        <tbody class="divide-y divide-white/5">
+                            ${data.build.validation.slice(0, 5).map(v => `<tr><td class="py-2 pl-2 text-gray-300 font-medium">${v.field}</td><td class="py-2 text-gray-500 font-mono">${v.rule}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
                 `;
+            }
+            const errContainer = document.getElementById('engineering-errors-container');
+            if (errContainer && data.build.deepDives) {
+                errContainer.innerHTML = data.build.deepDives.map(d => `
+                    <div class="p-2 border border-${d.tagColor}-500/20 bg-${d.tagColor}-500/5 rounded transition hover:bg-${d.tagColor}-500/10">
+                        <div class="text-[10px] font-bold text-${d.tagColor}-400 mb-0.5">${d.title}</div>
+                        <div class="text-[9px] text-gray-400 leading-tight">${d.cause}</div>
+                    </div>
+                `).join('');
             }
 
             if (window.ToastModule) {
-                window.ToastModule.success('Gemini 3 Finished', 'Master Prompt simulation complete. Full report generated.');
-            }
-
-            // 9. RENDER FIGMA PROMPTS
-            const figmaContainer = document.getElementById('build-figma-container');
-            if (figmaContainer && data.figmaPrompts) {
-                figmaContainer.innerHTML = data.figmaPrompts.prompts.map((fp, index) => `
-                    <div class="p-4 bg-pink-500/5 border border-pink-500/20 rounded-xl group hover:bg-pink-500/10 transition">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-sm text-white font-bold">${fp.title}</h4>
-                            <span class="text-[10px] text-pink-400 font-mono">${fp.id}</span>
-                        </div>
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            ${fp.tags.map(t => `<span class="px-1.5 py-0.5 bg-white/5 text-[9px] text-gray-400 rounded">${t}</span>`).join('')}
-                        </div>
-                        <div class="relative">
-                            <pre id="figma-prompt-${index}" class="text-[10px] text-gray-300 bg-black/40 p-3 rounded-lg overflow-x-auto leading-relaxed whitespace-pre-wrap max-h-32 overflow-y-auto">${fp.prompt}</pre>
-                            <button onclick="copyFigmaPrompt(${index})" 
-                                class="absolute top-2 right-2 px-2 py-1 bg-pink-500/20 hover:bg-pink-500/40 text-pink-300 text-[9px] rounded transition opacity-0 group-hover:opacity-100">
-                                <i class="ph-bold ph-copy"></i> Copy
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                window.ToastModule.success('Dashboard Updated', 'OrbitAI v2.0 Bento Grid Loaded');
             }
         }
 
@@ -2950,17 +3023,18 @@
                 if (typeof switchView === 'function') {
                     switchView('output');
                 }
+                // Default to Strategy tab
                 if (typeof switchOutputTab === 'function') {
-                    switchOutputTab('vp');
+                    switchOutputTab('strategy');
                 }
-            }, 1500);
+            }, 1000);
         });
 
         // Copy individual Figma prompt
         function copyFigmaPrompt(index) {
             const promptEl = document.getElementById(`figma-prompt-${index}`);
             if (promptEl) {
-                navigator.clipboard.writeText(promptEl.innerText);
+                navigator.clipboard.writeText(promptEl.value || promptEl.innerText);
                 if (window.ToastModule) {
                     window.ToastModule.success('Copied!', 'Figma prompt copied to clipboard.');
                 }
