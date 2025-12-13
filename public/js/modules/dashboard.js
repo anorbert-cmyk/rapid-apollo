@@ -90,12 +90,18 @@ const DashboardModule = (function () {
             return;
         }
 
-        if (viewName !== 'dashboard' && viewName !== 'analytics') {
+        // Allow all views except analytics (which requires admin)
+        const allowedViews = ['dashboard', 'output', 'team', 'settings'];
+        if (viewName === 'analytics' && isAdmin) {
+            allowedViews.push('analytics');
+        }
+
+        if (!allowedViews.includes(viewName) && viewName !== 'analytics') {
             window.ToastModule?.warning("Locked", "This module is locked in your current tier.");
             return;
         }
 
-        const views = ['dashboard', 'analytics', 'team', 'settings'];
+        const views = ['dashboard', 'analytics', 'team', 'settings', 'output'];
 
         // Hide all views
         views.forEach(v => {

@@ -180,6 +180,14 @@
             box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
         }
 
+        /* Output Tab Active Styles */
+        .output-tab-active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+            color: white;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
 
 
         .toggle-checkbox:checked {
@@ -830,6 +838,20 @@
                         </div>
                     </button>
 
+                    <button onclick="switchView('output')" id="nav-output"
+                        class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200 group relative">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-all">
+                            <i class="ph-bold ph-file-doc text-xl"></i>
+                        </div>
+                        <div class="hidden lg:block">
+                            <span class="text-sm font-medium">Output</span>
+                            <p class="text-[10px] text-gray-400">Product Strategy</p>
+                        </div>
+                        <span
+                            class="hidden lg:flex ml-auto text-[9px] font-mono bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-500/30">NEW</span>
+                    </button>
+
                     <button onclick="switchView('settings')" id="nav-settings"
                         class="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200 group relative">
                         <div
@@ -1435,9 +1457,286 @@
                         </div>
                     </div>
 
+                    <!-- VIEW: PRODUCT OUTPUT -->
+                    <div id="view-output" class="hidden animate-slide-up h-full overflow-y-auto custom-scrollbar pb-12">
+                        <div class="max-w-[1600px] mx-auto">
+
+                            <!-- Section Header with Tabs -->
+                            <div
+                                class="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/5 pb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white tracking-tight">Product Strategy Output
+                                    </h2>
+                                    <p class="text-xs text-gray-400 font-mono mt-1">GEMINI_3_ENGINE // v14.1 HYBRID FULL
+                                        PACKAGE</p>
+                                </div>
+                                <!-- Tab Navigation -->
+                                <div class="flex gap-2">
+                                    <button onclick="switchOutputTab('vp')" id="output-tab-vp"
+                                        class="output-tab-active px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2">
+                                        <i class="ph-bold ph-chart-pie-slice"></i> VP Summary
+                                    </button>
+                                    <button onclick="switchOutputTab('build')" id="output-tab-build"
+                                        class="px-4 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
+                                        <i class="ph-bold ph-package"></i> Build Pack
+                                    </button>
+                                    <button onclick="switchOutputTab('evidence')" id="output-tab-evidence"
+                                        class="px-4 py-2 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all flex items-center gap-2">
+                                        <i class="ph-bold ph-paperclip"></i> Evidence
+                                    </button>
+                                    <div class="h-6 w-px bg-white/10 mx-2"></div>
+                                    <button onclick="exportAllOutput()"
+                                        class="px-3 py-2 bg-indigo-500/10 text-indigo-400 text-xs font-bold rounded-lg border border-indigo-500/20 hover:bg-indigo-500/20 transition flex items-center gap-2">
+                                        <i class="ph-bold ph-download-simple"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- TAB: VP SUMMARY -->
+                            <div id="output-content-vp" class="output-tab-content space-y-6">
+
+                                <!-- KPI Row -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                    <div
+                                        class="dash-panel p-4 text-center border-t-2 border-indigo-500 relative overflow-hidden group">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                        </div>
+                                        <div class="text-[10px] text-gray-400 uppercase font-mono tracking-wider mb-1">
+                                            North Star</div>
+                                        <div id="kpi-northstar" class="text-2xl font-bold text-white">+15%</div>
+                                        <div class="text-[9px] text-indigo-400 font-mono">Revenue Impact</div>
+                                    </div>
+                                    <div
+                                        class="dash-panel p-4 text-center border-t-2 border-green-500 relative overflow-hidden group">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                        </div>
+                                        <div class="text-[10px] text-gray-400 uppercase font-mono tracking-wider mb-1">
+                                            Conversion</div>
+                                        <div id="kpi-conversion" class="text-2xl font-bold text-green-400">+8%</div>
+                                        <div class="text-[9px] text-green-400/70 font-mono">Uplift</div>
+                                    </div>
+                                    <div
+                                        class="dash-panel p-4 text-center border-t-2 border-cyan-500 relative overflow-hidden group">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                        </div>
+                                        <div class="text-[10px] text-gray-400 uppercase font-mono tracking-wider mb-1">
+                                            Latency</div>
+                                        <div id="kpi-latency" class="text-2xl font-bold text-cyan-400">
+                                            <200ms< /div>
+                                                <div class="text-[9px] text-cyan-400/70 font-mono">Budget</div>
+                                        </div>
+                                        <div
+                                            class="dash-panel p-4 text-center border-t-2 border-yellow-500 relative overflow-hidden group">
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-b from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                            </div>
+                                            <div
+                                                class="text-[10px] text-gray-400 uppercase font-mono tracking-wider mb-1">
+                                                NPS</div>
+                                            <div id="kpi-nps" class="text-2xl font-bold text-yellow-400">>50</div>
+                                            <div class="text-[9px] text-yellow-400/70 font-mono">Target</div>
+                                        </div>
+                                        <div
+                                            class="dash-panel p-4 text-center border-t-2 border-purple-500 relative overflow-hidden group">
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition">
+                                            </div>
+                                            <div
+                                                class="text-[10px] text-gray-400 uppercase font-mono tracking-wider mb-1">
+                                                Support</div>
+                                            <div id="kpi-support" class="text-2xl font-bold text-purple-400">-20%</div>
+                                            <div class="text-[9px] text-purple-400/70 font-mono">Tickets</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Executive Summary + Risk Matrix Row -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <!-- Executive Summary -->
+                                        <div class="col-span-12 md:col-span-7 dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-brain text-indigo-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Executive Summary</h3>
+                                            </div>
+                                            <div id="exec-summary-content"
+                                                class="prose prose-invert prose-sm max-w-none">
+                                                <p class="text-gray-300 leading-relaxed">Loading executive summary...
+                                                </p>
+                                            </div>
+                                            <div class="mt-4 flex flex-wrap gap-2">
+                                                <span
+                                                    class="px-2 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px] text-indigo-300 font-mono">DOMAIN:
+                                                    Fintech</span>
+                                                <span
+                                                    class="px-2 py-1 bg-red-500/10 border border-red-500/20 rounded text-[10px] text-red-300 font-mono">RISK:
+                                                    High</span>
+                                                <span
+                                                    class="px-2 py-1 bg-green-500/10 border border-green-500/20 rounded text-[10px] text-green-300 font-mono">FRAMEWORK:
+                                                    A</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Risk Matrix -->
+                                        <div class="col-span-12 md:col-span-5 dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-warning text-red-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Top 5 Breakers</h3>
+                                            </div>
+                                            <div id="risk-matrix" class="space-y-3">
+                                                <div
+                                                    class="flex items-center gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                                                    <div
+                                                        class="w-8 h-8 flex items-center justify-center bg-red-500/20 rounded text-red-400 text-xs font-bold">
+                                                        1</div>
+                                                    <div class="flex-1">
+                                                        <div class="text-xs text-white font-medium">Trust Decay Risk
+                                                        </div>
+                                                        <div class="text-[10px] text-gray-400">Payment verification UX
+                                                            unclear</div>
+                                                    </div>
+                                                    <span
+                                                        class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold rounded">CRITICAL</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-3 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-lg">
+                                                    <div
+                                                        class="w-8 h-8 flex items-center justify-center bg-yellow-500/20 rounded text-yellow-400 text-xs font-bold">
+                                                        2</div>
+                                                    <div class="flex-1">
+                                                        <div class="text-xs text-white font-medium">Cognitive Overload
+                                                        </div>
+                                                        <div class="text-[10px] text-gray-400">Too many steps in
+                                                            checkout</div>
+                                                    </div>
+                                                    <span
+                                                        class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-[9px] font-bold rounded">HIGH</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-3 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-lg">
+                                                    <div
+                                                        class="w-8 h-8 flex items-center justify-center bg-yellow-500/20 rounded text-yellow-400 text-xs font-bold">
+                                                        3</div>
+                                                    <div class="flex-1">
+                                                        <div class="text-xs text-white font-medium">Latency Budget</div>
+                                                        <div class="text-[10px] text-gray-400">API response >300ms</div>
+                                                    </div>
+                                                    <span
+                                                        class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-[9px] font-bold rounded">HIGH</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Solution Bullets + Cost Row -->
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                        <!-- Solution Summary -->
+                                        <div class="col-span-12 md:col-span-8 dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-check-circle text-green-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Solution Summary</h3>
+                                            </div>
+                                            <div id="solution-bullets" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                <div
+                                                    class="flex items-start gap-2 p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                                                    <i class="ph-bold ph-check text-green-400 mt-0.5"></i>
+                                                    <span class="text-xs text-gray-300">Wizard-based checkout reduces
+                                                        cognitive load by 40%</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-start gap-2 p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                                                    <i class="ph-bold ph-check text-green-400 mt-0.5"></i>
+                                                    <span class="text-xs text-gray-300">Real-time validation prevents
+                                                        85% of errors</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-start gap-2 p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                                                    <i class="ph-bold ph-check text-green-400 mt-0.5"></i>
+                                                    <span class="text-xs text-gray-300">Trust indicators increase
+                                                        conversion +12%</span>
+                                                </div>
+                                                <div
+                                                    class="flex items-start gap-2 p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                                                    <i class="ph-bold ph-check text-green-400 mt-0.5"></i>
+                                                    <span class="text-xs text-gray-300">Progressive disclosure reduces
+                                                        abandonment</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cost & Timeline -->
+                                        <div class="col-span-12 md:col-span-4 dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-currency-dollar text-green-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Cost & Timeline</h3>
+                                            </div>
+                                            <div class="text-center">
+                                                <div id="cost-range" class="text-3xl font-bold text-white mb-1">$45-65k
+                                                </div>
+                                                <div class="text-[10px] text-gray-400 font-mono mb-4">Build Cost Range
+                                                </div>
+                                                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-4">
+                                                    <div
+                                                        class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-3/4 rounded-full">
+                                                    </div>
+                                                </div>
+                                                <div class="flex justify-between text-[10px] text-gray-400 font-mono">
+                                                    <span>Discovery</span>
+                                                    <span>Design</span>
+                                                    <span>Build</span>
+                                                    <span>QA</span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 pt-4 border-t border-white/5">
+                                                <div class="flex justify-between text-xs">
+                                                    <span class="text-gray-400">Timeline:</span>
+                                                    <span class="text-white font-bold">8-10 weeks</span>
+                                                </div>
+                                                <div class="flex justify-between text-xs mt-2">
+                                                    <span class="text-gray-400">Team Size:</span>
+                                                    <span class="text-white font-bold">5-7 people</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- TAB: BUILD PACK -->
+                                <div id="output-content-build" class="output-tab-content hidden space-y-6">
+                                    <div class="dash-panel p-8 text-center">
+                                        <i class="ph-duotone ph-package text-6xl text-indigo-500/50 mb-4"></i>
+                                        <h3 class="text-xl text-white font-bold mb-2">Build Pack</h3>
+                                        <p class="text-gray-400 text-sm mb-4">Screen specs, validation rules, error
+                                            recovery, tech specs</p>
+                                        <p class="text-[10px] text-gray-500 font-mono">Content will be populated from
+                                            Gemini 3 output</p>
+                                    </div>
+                                </div>
+
+                                <!-- TAB: EVIDENCE -->
+                                <div id="output-content-evidence" class="output-tab-content hidden space-y-6">
+                                    <div class="dash-panel p-8 text-center">
+                                        <i class="ph-duotone ph-paperclip text-6xl text-purple-500/50 mb-4"></i>
+                                        <h3 class="text-xl text-white font-bold mb-2">Evidence & Appendix</h3>
+                                        <p class="text-gray-400 text-sm mb-4">Decision table, research plan, cost model,
+                                            ROI analysis</p>
+                                        <p class="text-[10px] text-gray-500 font-mono">Content will be populated from
+                                            Gemini 3 output</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-        </div>
 
     </main>
 
@@ -1534,6 +1833,56 @@
             if (activeTab) {
                 activeTab.classList.add('border-b-2', 'border-indigo-500', 'text-white');
                 activeTab.classList.remove('text-gray-500');
+            }
+        }
+
+        // Output Tab Switching for Product Output View
+        function switchOutputTab(tabName) {
+            const tabs = ['vp', 'build', 'evidence'];
+            tabs.forEach(t => {
+                const content = document.getElementById('output-content-' + t);
+                const tab = document.getElementById('output-tab-' + t);
+                if (content) {
+                    content.classList.add('hidden');
+                }
+                if (tab) {
+                    tab.classList.remove('output-tab-active');
+                    tab.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+                }
+            });
+            const activeContent = document.getElementById('output-content-' + tabName);
+            const activeTab = document.getElementById('output-tab-' + tabName);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+            if (activeTab) {
+                activeTab.classList.add('output-tab-active');
+                activeTab.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+            }
+        }
+
+        // Export All Output Function
+        function exportAllOutput() {
+            const data = {
+                vpSummary: {
+                    northStar: document.getElementById('kpi-northstar')?.innerText || '',
+                    conversion: document.getElementById('kpi-conversion')?.innerText || '',
+                    execSummary: document.getElementById('exec-summary-content')?.innerText || '',
+                    costRange: document.getElementById('cost-range')?.innerText || ''
+                },
+                exportedAt: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `product-output-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            if (window.ToastModule) {
+                window.ToastModule.success('Exported', 'Product output exported to JSON');
+            } else if (typeof showToast === 'function') {
+                showToast('Exported', 'Product output exported to JSON');
             }
         }
 
