@@ -82,13 +82,20 @@
                         'beam': 'beam 2s linear infinite',
                         'typewriter': 'blink 1s step-end infinite',
                         'slide-up': 'slideUp 0.5s ease-out forwards',
+                        'blob-spin': 'blobSpin 20s linear infinite',
                     },
                     keyframes: {
                         shimmer: { from: { backgroundPosition: '0 0' }, to: { backgroundPosition: '-200% 0' } },
                         float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
                         beam: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
                         blink: { '0%, 100%': { opacity: '1' }, '50%': { opacity: '0' } },
-                        slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } }
+                        slideUp: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+                        blobSpin: {
+                            '0%': { transform: 'rotate(0deg) translate(0, 0) scale(1)' },
+                            '33%': { transform: 'rotate(120deg) translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'rotate(240deg) translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'rotate(360deg) translate(0, 0) scale(1)' },
+                        }
                     }
                 }
             }
@@ -631,14 +638,14 @@
     <!-- Noise Texture -->
     <div class="bg-noise"></div>
 
-    <!-- Background Orbs (Global) -->
-    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div
-            class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-indigo-900/30 rounded-full blur-[120px] mix-blend-screen animate-pulse-slow">
-        </div>
-        <div
-            class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] mix-blend-screen">
-        </div>
+    <!-- Fractal Blob Background (Theme-Aware) -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none" id="fractal-container">
+        <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[80px] opacity-60 mix-blend-multiply fractal-blob blob-1"
+            style="background: var(--blob-1); animation: blob-spin 20s infinite; animation-delay: 0s;"></div>
+        <div class="absolute top-[20%] right-[-20%] w-[60vw] h-[60vw] rounded-full blur-[80px] opacity-60 mix-blend-multiply fractal-blob blob-2"
+            style="background: var(--blob-2); animation: blob-spin 20s infinite; animation-delay: -5s;"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[50vw] h-[50vw] rounded-full blur-[80px] opacity-60 mix-blend-multiply fractal-blob blob-3"
+            style="background: var(--blob-3); animation: blob-spin 20s infinite; animation-delay: -10s;"></div>
     </div>
 
     <!-- ========================================== -->
@@ -681,6 +688,19 @@
                         class="hidden text-xs font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg border border-indigo-500/20">
                         <i class="ph-fill ph-circles-four"></i> Dashboard
                     </button>
+
+                    <!-- Theme Toggle Switch -->
+                    <div class="flex items-center gap-2 bg-white/5 px-2 py-2 rounded-full border border-white/10">
+                        <i class="ph-bold ph-sun text-yellow-400 text-sm"></i>
+                        <button id="theme-toggle"
+                            class="relative w-14 h-7 bg-gray-700 rounded-full transition-colors duration-300 hover:bg-gray-600"
+                            aria-label="Toggle theme">
+                            <div id="theme-toggle-dot"
+                                class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-lg">
+                            </div>
+                        </button>
+                        <i class="ph-bold ph-moon text-indigo-400 text-sm"></i>
+                    </div>
                 </div>
 
                 <!-- Connect Wallet Button -->
@@ -3943,6 +3963,42 @@
             if (window.ToastModule) window.ToastModule.success('Copied', 'Figma prompt copied to clipboard.');
         }
         function exportPDF() { showToast("Exporting...", "Generating PDF Report v8.0"); }
+
+        // ========================================
+        // THEME TOGGLE SYSTEM
+        // ========================================
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const toggleDot = document.getElementById('theme-toggle-dot');
+            const root = document.documentElement;
+
+            // Load saved theme or default to dark
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(savedTheme);
+
+            // Toggle button click handler
+            toggle.addEventListener('click', () => {
+                const currentTheme = root.getAttribute('data-theme') || 'dark';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            function setTheme(theme) {
+                root.setAttribute('data-theme', theme);
+
+                // Animate toggle dot and button background
+                if (theme === 'light') {
+                    toggleDot.style.transform = 'translateX(28px)';
+                    toggle.classList.add('bg-indigo-500');
+                    toggle.classList.remove('bg-gray-700');
+                } else {
+                    toggleDot.style.transform = 'translateX(0)';
+                    toggle.classList.add('bg-gray-700');
+                    toggle.classList.remove('bg-indigo-500');
+                }
+            }
+        })();
     </script>
 </body>
 
