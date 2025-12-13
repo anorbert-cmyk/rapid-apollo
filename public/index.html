@@ -2031,6 +2031,24 @@
                                     </div>
                                 </div>
 
+                                <!-- Scope Lock -->
+                                <div class="dash-panel p-6">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div class="flex items-center gap-2">
+                                            <i class="ph-bold ph-target text-purple-400"></i>
+                                            <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                Scope Lock</h3>
+                                        </div>
+                                        <button onclick="toggleBuildSection('scope')"
+                                            class="text-[10px] text-gray-400 hover:text-white transition">
+                                            <i class="ph-bold ph-caret-down"></i>
+                                        </button>
+                                    </div>
+                                    <div id="build-scope-container">
+                                        <!-- Populated by JS -->
+                                    </div>
+                                </div>
+
                                 <!-- Screen Specs Carousel -->
                                 <div class="dash-panel p-6">
                                     <div class="flex items-center justify-between mb-4">
@@ -2191,6 +2209,26 @@
   "retry": boolean
 }</code></pre>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Figma AI Prompt Pack -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <i class="ph-bold ph-figma-logo text-pink-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Figma AI Prompt Pack</h3>
+                                            </div>
+                                            <button onclick="toggleBuildSection('figma')"
+                                                class="text-[10px] text-gray-400 hover:text-white transition">
+                                                <i class="ph-bold ph-caret-down"></i>
+                                            </button>
+                                        </div>
+                                        <p class="text-xs text-gray-400 mb-4">Copy-paste ready prompts for Figma AI or
+                                            MidJourney to generate design assets.</p>
+                                        <div id="build-figma-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <!-- Populated by JS -->
                                         </div>
                                     </div>
 
@@ -2420,17 +2458,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <!-- Modular JS Architecture -->
-    <script src="js/modules/toast.js?v=1.5"></script>
-    <script src="js/modules/wallet.js?v=1.5"></script>
-    <script src="js/modules/simulationResult.js?v=1.5"></script>
-    <script src="js/modules/api.js?v=1.5"></script>
-    <script src="js/modules/markdown.js?v=1.5"></script>
-    <script src="js/modules/session.js?v=1.5"></script>
-    <script src="js/modules/payment.js?v=1.5"></script>
-    <script src="js/modules/admin.js?v=1.5"></script>
-    <script src="js/modules/dashboard.js?v=1.5"></script>
-    <script src="js/modules/share.js?v=1.5"></script>
-    <script src="js/app.js?v=5.5"></script>
+    <script src="js/modules/toast.js?v=1.6"></script>
+    <script src="js/modules/wallet.js?v=1.6"></script>
+    <script src="js/modules/simulationResult.js?v=1.6"></script>
+    <script src="js/modules/api.js?v=1.6"></script>
+    <script src="js/modules/markdown.js?v=1.6"></script>
+    <script src="js/modules/session.js?v=1.6"></script>
+    <script src="js/modules/payment.js?v=1.6"></script>
+    <script src="js/modules/admin.js?v=1.6"></script>
+    <script src="js/modules/dashboard.js?v=1.6"></script>
+    <script src="js/modules/share.js?v=1.6"></script>
+    <script src="js/app.js?v=5.6"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {
@@ -2557,7 +2595,18 @@
             });
         }
 
-        // Export All Output Function
+        // Toggle individual screen detail (for expandable cards)
+        function toggleScreenDetail(index) {
+            const detail = document.getElementById(`screen-detail-${index}`);
+            const caret = document.querySelector(`.screen-caret-${index}`);
+            if (detail) {
+                detail.classList.toggle('hidden');
+                if (caret) {
+                    caret.classList.toggle('rotate-180');
+                }
+            }
+        }
+
         function exportAllOutput() {
             const data = {
                 vpSummary: {
@@ -2641,7 +2690,7 @@
             if (costRange) costRange.innerText = data.vp.cost.range;
 
 
-            // 2. UPDATE BUILD PACK (Assumptions)
+            // 2. UPDATE BUILD PACK (Assumptions) - EXPANDED
             const assumptionsContainer = document.getElementById('build-assumptions');
             if (assumptionsContainer && data.build.assumptions) {
                 assumptionsContainer.innerHTML = data.build.assumptions.map(a => {
@@ -2649,38 +2698,87 @@
                     let badgeColor = 'gray';
                     if (a.type === 'assumed') { colorClass = 'yellow'; badgeColor = 'yellow'; }
                     else if (a.type === 'in-scope') { colorClass = 'green'; badgeColor = 'green'; }
+                    else if (a.type === 'validated') { colorClass = 'cyan'; badgeColor = 'cyan'; }
                     else { colorClass = 'red'; badgeColor = 'red'; }
 
                     return `
-                    <div class="flex items-center gap-3 p-3 bg-${colorClass}-500/5 border border-${colorClass}-500/10 rounded-lg">
-                        <span class="px-2 py-0.5 bg-${badgeColor}-500/20 text-${badgeColor}-400 text-[9px] font-bold rounded uppercase">${a.type.replace('-', ' ')}</span>
-                        <div class="flex-1 min-w-0">
-                             <div class="text-xs text-white font-medium">${a.label}</div>
-                             <div class="text-[10px] text-gray-400 truncate">${a.desc}</div>
+                    <div class="p-4 bg-${colorClass}-500/5 border border-${colorClass}-500/10 rounded-xl hover:bg-${colorClass}-500/10 transition">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2 py-0.5 bg-${badgeColor}-500/20 text-${badgeColor}-400 text-[9px] font-bold rounded uppercase">${a.type.replace('-', ' ')}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">Conf: ${a.confidence}</span>
                         </div>
-                        <span class="ml-auto text-[10px] text-gray-500">Conf: ${a.confidence}</span>
+                        <h4 class="text-sm text-white font-bold mb-1">${a.label}</h4>
+                        <p class="text-xs text-gray-400 mb-3">${a.desc}</p>
+                        ${a.validation ? `<div class="text-[10px] text-gray-500 mb-1"><span class="text-${colorClass}-400">Validation:</span> ${a.validation}</div>` : ''}
+                        ${a.riskIfWrong ? `<div class="text-[10px] text-red-400/70"><span class="text-gray-500">Risk if wrong:</span> ${a.riskIfWrong}</div>` : ''}
                     </div>`;
                 }).join('');
             }
 
-            // 3. TECH SPECS (Build Pack) - if container exists
-            // Assuming tech specs container might need ID or just skipping for now as explicit request was satisfied broadly.
-            // But let's verify if we have tech specs container.
+            // 2.5 UPDATE BUILD PACK (Scope Lock) - if scopeLock exists
+            const scopeLockContainer = document.getElementById('build-scope-container');
+            if (scopeLockContainer && data.build.scopeLock) {
+                const sl = data.build.scopeLock;
+                scopeLockContainer.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-green-500/5 border border-green-500/20 rounded-xl">
+                            <h4 class="text-[10px] text-green-400 font-mono uppercase mb-2">✓ In Scope</h4>
+                            <ul class="space-y-1 text-xs text-gray-300">
+                                ${sl.inScope.map(item => `<li class="flex items-start gap-2"><span class="text-green-400 mt-0.5">•</span>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
+                            <h4 class="text-[10px] text-red-400 font-mono uppercase mb-2">✗ Out of Scope</h4>
+                            <ul class="space-y-1 text-xs text-gray-300">
+                                ${sl.outOfScope.map(item => `<li class="flex items-start gap-2"><span class="text-red-400 mt-0.5">•</span>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl">
+                            <h4 class="text-[10px] text-purple-400 font-mono uppercase mb-2">◐ Phase 2</h4>
+                            <ul class="space-y-1 text-xs text-gray-300">
+                                ${sl.phase2.map(item => `<li class="flex items-start gap-2"><span class="text-purple-400 mt-0.5">•</span>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
 
-            // 3. UPDATE BUILD PACK (Screens)
+            // 3. UPDATE BUILD PACK (Screens) - EXPANDABLE
             const screensContainer = document.getElementById('build-screens-container');
             if (screensContainer && data.build.screens) {
                 screensContainer.innerHTML = data.build.screens.map((screen, index) => `
-                    <div class="p-4 bg-white/5 border border-white/5 rounded-lg group hover:bg-white/10 transition">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="text-white font-medium text-sm">${screen.title}</h4>
-                            <span class="text-[10px] bg-${screen.color || 'indigo'}-500/20 text-${screen.color || 'indigo'}-400 px-2 py-0.5 rounded font-mono">${screen.id}</span>
+                    <div class="screen-card bg-gradient-to-br from-${screen.color || 'indigo'}-500/10 to-${screen.color || 'indigo'}-500/5 border border-${screen.color || 'indigo'}-500/20 rounded-xl overflow-hidden">
+                        <div class="p-4 cursor-pointer" onclick="toggleScreenDetail(${index})">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-white font-bold text-sm">${screen.title}</h4>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] bg-${screen.color || 'indigo'}-500/20 text-${screen.color || 'indigo'}-400 px-2 py-0.5 rounded font-mono">${screen.id}</span>
+                                    <i class="ph-bold ph-caret-down text-gray-400 transition-transform screen-caret-${index}"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mb-3">${screen.desc}</p>
+                            <div class="flex flex-wrap gap-2 text-[10px]">
+                                <span class="px-2 py-0.5 bg-white/5 rounded text-gray-400">${screen.components.split(',').length} Components</span>
+                                <span class="px-2 py-0.5 bg-white/5 rounded text-gray-400">${screen.states.split(',').length} States</span>
+                            </div>
                         </div>
-                        <p class="text-xs text-gray-400 mb-3">${screen.desc}</p>
-                        <div class="space-y-1 text-[10px]">
-                            <div class="flex justify-between"><span class="text-gray-400">Components:</span><span class="text-gray-300 text-right truncate ml-2">${screen.components}</span></div>
-                            <div class="flex justify-between"><span class="text-gray-400">States:</span><span class="text-gray-300 text-right truncate ml-2">${screen.states}</span></div>
-                            <div class="flex justify-between"><span class="text-gray-400">Index:</span><span class="text-green-400">${index + 1} / ${data.build.screens.length}</span></div>
+                        <div id="screen-detail-${index}" class="hidden border-t border-white/10 p-4 bg-black/20 space-y-3">
+                            <div>
+                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Wireframe</div>
+                                <p class="text-xs text-gray-300">${screen.wireframe || 'N/A'}</p>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Interactions</div>
+                                <p class="text-xs text-gray-300">${screen.interactions || 'N/A'}</p>
+                            </div>
+                            ${screen.copy ? `
+                            <div>
+                                <div class="text-[10px] text-${screen.color || 'indigo'}-400 uppercase mb-1">Copy</div>
+                                <div class="space-y-1 text-xs">
+                                    ${Object.entries(screen.copy).map(([key, val]) => `<div><span class="text-gray-500">${key}:</span> <span class="text-yellow-300">"${val}"</span></div>`).join('')}
+                                </div>
+                            </div>` : ''}
+                            ${screen.microCopy ? `<div class="text-[10px] text-gray-500 italic">"${screen.microCopy}"</div>` : ''}
                         </div>
                     </div>
                 `).join('');
@@ -2816,6 +2914,29 @@
             if (window.ToastModule) {
                 window.ToastModule.success('Gemini 3 Finished', 'Master Prompt simulation complete. Full report generated.');
             }
+
+            // 9. RENDER FIGMA PROMPTS
+            const figmaContainer = document.getElementById('build-figma-container');
+            if (figmaContainer && data.figmaPrompts) {
+                figmaContainer.innerHTML = data.figmaPrompts.prompts.map((fp, index) => `
+                    <div class="p-4 bg-pink-500/5 border border-pink-500/20 rounded-xl group hover:bg-pink-500/10 transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-sm text-white font-bold">${fp.title}</h4>
+                            <span class="text-[10px] text-pink-400 font-mono">${fp.id}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${fp.tags.map(t => `<span class="px-1.5 py-0.5 bg-white/5 text-[9px] text-gray-400 rounded">${t}</span>`).join('')}
+                        </div>
+                        <div class="relative">
+                            <pre id="figma-prompt-${index}" class="text-[10px] text-gray-300 bg-black/40 p-3 rounded-lg overflow-x-auto leading-relaxed whitespace-pre-wrap max-h-32 overflow-y-auto">${fp.prompt}</pre>
+                            <button onclick="copyFigmaPrompt(${index})" 
+                                class="absolute top-2 right-2 px-2 py-1 bg-pink-500/20 hover:bg-pink-500/40 text-pink-300 text-[9px] rounded transition opacity-0 group-hover:opacity-100">
+                                <i class="ph-bold ph-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         // Auto-run simulation on load specific for this demo
@@ -2835,10 +2956,21 @@
             }, 1500);
         });
 
+        // Copy individual Figma prompt
+        function copyFigmaPrompt(index) {
+            const promptEl = document.getElementById(`figma-prompt-${index}`);
+            if (promptEl) {
+                navigator.clipboard.writeText(promptEl.innerText);
+                if (window.ToastModule) {
+                    window.ToastModule.success('Copied!', 'Figma prompt copied to clipboard.');
+                }
+            }
+        }
+
         function copyFigmaCode() {
-            const code = document.getElementById('figma-code').innerText;
-            navigator.clipboard.writeText(code);
-            showToast('Copied', 'Figma prompt copied to clipboard.');
+            const code = document.getElementById('figma-code')?.innerText;
+            if (code) navigator.clipboard.writeText(code);
+            if (window.ToastModule) window.ToastModule.success('Copied', 'Figma prompt copied to clipboard.');
         }
         function exportPDF() { showToast("Exporting...", "Generating PDF Report v8.0"); }
     </script>
