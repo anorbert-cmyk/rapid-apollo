@@ -143,18 +143,18 @@ const SIMULATION_RESULT = {
             }
         ],
         techSpecs: `
-            <div class="space-y-2">
-                <div class="p-2 bg-black/30 rounded border border-white/10">
-                    <div class="text-[10px] text-gray-500 mb-1">CORE APP</div>
-                    <div class="text-xs text-white font-mono">Next.js 14 (App Router), React Hook Form, Tailwind CSS</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="p-3 bg-black/30 rounded-lg border border-white/10 h-full">
+                    <div class="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">CORE APP</div>
+                    <div class="text-xs text-white font-mono leading-relaxed">Next.js 14 (App Router), React Hook Form, Tailwind CSS</div>
                 </div>
-                <div class="p-2 bg-black/30 rounded border border-white/10">
-                    <div class="text-[10px] text-gray-500 mb-1">DATA & INFRA</div>
-                    <div class="text-xs text-white font-mono">Supabase (Postgres), Redis (Rate Limits), S3 (Assets)</div>
+                <div class="p-3 bg-black/30 rounded-lg border border-white/10 h-full">
+                    <div class="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">DATA & INFRA</div>
+                    <div class="text-xs text-white font-mono leading-relaxed">Supabase (Postgres), Redis (Rate Limits), S3 (Assets)</div>
                 </div>
-                <div class="p-2 bg-black/30 rounded border border-white/10">
-                    <div class="text-[10px] text-gray-500 mb-1">INTEGRATIONS</div>
-                    <div class="text-xs text-white font-mono">HubSpot CRM, SendGrid, OpenAI API (Drafts)</div>
+                <div class="p-3 bg-black/30 rounded-lg border border-white/10 h-full">
+                    <div class="text-[10px] text-gray-500 mb-2 uppercase tracking-wide">INTEGRATIONS</div>
+                    <div class="text-xs text-white font-mono leading-relaxed">HubSpot CRM, SendGrid, OpenAI API (Drafts)</div>
                 </div>
             </div>
         `

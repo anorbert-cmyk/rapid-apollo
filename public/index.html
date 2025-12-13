@@ -2026,29 +2026,8 @@
                                             <i class="ph-bold ph-caret-down"></i>
                                         </button>
                                     </div>
-                                    <div id="build-assumptions" class="space-y-2">
-                                        <div
-                                            class="flex items-center gap-3 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-lg">
-                                            <span
-                                                class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-[9px] font-bold rounded">ASSUMED</span>
-                                            <span class="text-xs text-gray-300">User has existing wallet
-                                                connected</span>
-                                            <span class="ml-auto text-[10px] text-gray-400">Confidence: 85%</span>
-                                        </div>
-                                        <div
-                                            class="flex items-center gap-3 p-3 bg-green-500/5 border border-green-500/10 rounded-lg">
-                                            <span
-                                                class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-bold rounded">IN
-                                                SCOPE</span>
-                                            <span class="text-xs text-gray-300">Payment flow (3 tiers)</span>
-                                        </div>
-                                        <div
-                                            class="flex items-center gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
-                                            <span
-                                                class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold rounded">OUT
-                                                OF SCOPE</span>
-                                            <span class="text-xs text-gray-300">Multi-chain support (Phase 2)</span>
-                                        </div>
+                                    <div id="build-assumptions" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <!-- Populated -->
                                     </div>
                                 </div>
 
@@ -2092,7 +2071,7 @@
                                                 <i class="ph-bold ph-caret-down"></i>
                                             </button>
                                         </div>
-                                        <div id="build-screens-container" class="space-y-4">
+                                        <div id="build-screens-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <!-- Content populated by JS -->
                                         </div>
                                     </div>
@@ -2441,17 +2420,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <!-- Modular JS Architecture -->
-    <script src="js/modules/toast.js?v=1.4"></script>
-    <script src="js/modules/wallet.js?v=1.4"></script>
-    <script src="js/modules/simulationResult.js?v=1.4"></script>
-    <script src="js/modules/api.js?v=1.4"></script>
-    <script src="js/modules/markdown.js?v=1.4"></script>
-    <script src="js/modules/session.js?v=1.4"></script>
-    <script src="js/modules/payment.js?v=1.4"></script>
-    <script src="js/modules/admin.js?v=1.4"></script>
-    <script src="js/modules/dashboard.js?v=1.4"></script>
-    <script src="js/modules/share.js?v=1.4"></script>
-    <script src="js/app.js?v=5.4"></script>
+    <script src="js/modules/toast.js?v=1.5"></script>
+    <script src="js/modules/wallet.js?v=1.5"></script>
+    <script src="js/modules/simulationResult.js?v=1.5"></script>
+    <script src="js/modules/api.js?v=1.5"></script>
+    <script src="js/modules/markdown.js?v=1.5"></script>
+    <script src="js/modules/session.js?v=1.5"></script>
+    <script src="js/modules/payment.js?v=1.5"></script>
+    <script src="js/modules/admin.js?v=1.5"></script>
+    <script src="js/modules/dashboard.js?v=1.5"></script>
+    <script src="js/modules/share.js?v=1.5"></script>
+    <script src="js/app.js?v=5.5"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {
