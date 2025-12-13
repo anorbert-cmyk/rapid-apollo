@@ -99,6 +99,26 @@ const SIMULATION_RESULT = {
             { field: "Liquidity Depth", rule: "Amount < Pool Reserve * 0.1", timing: "Execution", error: "High Slippage Warning" },
             { field: "Compliance Proof", rule: "Valid ZK-SNARK", timing: "On-chain", error: "Revert: Not Authorized" }
         ],
+        deepDives: [
+            {
+                tag: "DEEP DIVE #1",
+                tagColor: "red",
+                label: "Most Likely Failure",
+                title: "Transaction Rejected",
+                cause: "User rejected MetaMask prompt",
+                copy: "\"Transaction cancelled. Ready when you are.\"",
+                recovery: "Show retry CTA, preserve input"
+            },
+            {
+                tag: "DEEP DIVE #2",
+                tagColor: "orange",
+                label: "Highest Risk",
+                title: "Payment Timeout",
+                cause: "Network congestion, tx pending >5min",
+                copy: "\"Still processing. Check Etherscan: [link]\"",
+                recovery: "Poll status, email receipt, support link"
+            }
+        ],
         techSpecs: `
             <div class="space-y-2">
                 <div class="p-2 bg-black/30 rounded border border-white/10">
