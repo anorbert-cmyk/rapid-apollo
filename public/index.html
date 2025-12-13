@@ -155,66 +155,61 @@
             --blob-3: rgba(6, 182, 212, 0.1);
         }
 
-        /* Light Theme - Precise Gemini MD3 Implementation */
+        /* Light Theme - Vibrant 'Aurora' Gemini Style */
         :root[data-theme="light"] {
-            /* Backgrounds - Material 3 Tokens */
+            /* Backgrounds */
             --bg-primary: #FFFFFF;
-            /* surface-lowest */
-            --bg-secondary: #F0F4F9;
-            /* surface-container */
-            --bg-tertiary: #F7F9FC;
-            /* surface-container-low */
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-tertiary: #F8F9FA;
 
-            /* Glass & Panels */
-            --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-hover: rgba(255, 255, 255, 0.9);
-            --panel-bg: rgba(240, 244, 249, 0.6);
-            /* Matches bg-secondary */
-            --glass-border: rgba(116, 119, 127, 0.2);
-            /* outline-variant */
-            --glass-border-hover: rgba(11, 87, 208, 0.3);
-            /* primary accent hover */
+            /* Glass & Panels - Crystal Clear */
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            /* More transparent to show aurora */
+            --glass-hover: rgba(255, 255, 255, 0.6);
+            --panel-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-border-hover: rgba(11, 87, 208, 0.2);
 
-            /* Text Colors */
+            /* Text Colors - Sharp & High Contrast */
             --text-primary: #1F1F1F;
-            /* on-surface */
-            --text-secondary: #44474F;
-            /* on-surface-variant */
-            --text-muted: #74777F;
-            /* outline */
-            --text-dim: rgba(31, 31, 31, 0.38);
+            --text-secondary: #444746;
+            --text-muted: #747775;
+            --text-dim: rgba(31, 31, 31, 0.4);
 
-            /* Accents */
-            --accent-indigo: #0B57D0;
-            /* primary */
+            /* Accents - Gemini Brand Colors */
+            --accent-indigo: #1A73E8;
+            /* Google Blue */
             --accent-purple: #9C27B0;
-            /* secondary-ish/custom */
-            --accent-cyan: #006D4E;
-            /* tertiary */
+            /* Bard/Gemini Purple */
+            --accent-cyan: #00796B;
+            /* Teal accent */
 
-            /* Shadows - Softer, more diffuse */
-            --shadow-soft: 0 2px 6px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1), 0 12px 32px rgba(0, 0, 0, 0.1);
+            /* Shadows - Soft & Colored */
+            --shadow-soft: 0 4px 20px rgba(26, 115, 232, 0.08);
+            /* Blueish tint */
+            --shadow-hover: 0 8px 30px rgba(156, 39, 176, 0.12);
+            /* Purpleish tint */
 
             /* Blur */
-            --blur-amount: 20px;
-            --blur-heavy: 60px;
+            --blur-amount: 24px;
+            --blur-heavy: 80px;
 
             /* Scrollbar */
-            --scrollbar-track: #F0F4F9;
-            --scrollbar-thumb: #C4C7C5;
-            --scrollbar-thumb-hover: #0B57D0;
+            --scrollbar-track: transparent;
+            --scrollbar-thumb: #DADCE0;
+            --scrollbar-thumb-hover: #1A73E8;
 
-            /* Noise Overlay - Reduced for cleaner look */
-            --noise-opacity: 0.15;
+            /* Noise Overlay - Minimal */
+            --noise-opacity: 0.1;
 
-            /* Fractal Blobs - Gem-like iridescence */
-            --blob-1: #D3E3FD;
-            /* primary-container */
-            --blob-2: #C2E7FF;
-            /* secondary-container */
-            --blob-3: #E1E2E6;
-            /* surface-variant */
+            /* Fractal Blobs - The "Aurora" Effect */
+            /* These need to be VIBRANT to show up on white */
+            --blob-1: #D9E7FF;
+            /* Vivid Light Blue (Top Left) */
+            --blob-2: #F2E3FF;
+            /* Vivid Light Purple (Right) */
+            --blob-3: #FFE8E8;
+            /* Soft Peach/Pink (Bottom) */
         }
 
         /* ========================================
