@@ -1,11 +1,11 @@
 // SIMULATION DATA - Gemini 3 Master Prompt Result
-// Topic: Webservice for Web2/Web3 Industries (Hybrid Gateway)
+// Topic: OrbitAI Growth (Agency Platform)
 
 const SIMULATION_RESULT = {
     meta: {
-        domain: "Enterprise Web3",
-        risk: "Severe",
-        confidence: 92,
+        domain: "B2B Agency Platform",
+        risk: "Medium-High",
+        confidence: 88,
         progress: 100,
         completedSectionCount: 17
     },
@@ -15,47 +15,46 @@ const SIMULATION_RESULT = {
     // ============================================
     vp: {
         heroMetric: {
-            value: "$12.5M",
-            label: "Projected TVL (Total Value Locked)",
-            trend: "+45% vs Competitors",
+            value: "28%",
+            label: "Qualified Kickoff Rate",
+            trend: "+120% vs Email Leads",
             trendUp: true
         },
         kpis: [
-            { label: "Throughput", value: "50k", trend: "TPS / sec", trendUp: true, color: "green" },
-            { label: "Gas Saved", value: "-40%", trend: "Per Tx", trendUp: true, color: "green" },
-            { label: "Latency", value: "<150ms", trend: "E2E Finality", trendUp: true, color: "cyan" },
-            { label: "Uptime", value: "99.99%", trend: "SLA Guaranteed", trendUp: true, color: "purple" }
+            { label: "Brief Completion", value: "65%", trend: "Wizard Format", trendUp: true, color: "green" },
+            { label: "Compliance Pass", value: "92%", trend: "Web3 Gate", trendUp: true, color: "indigo" },
+            { label: "Call Show-Up", value: "85%", trend: "Pre-paid Deposit", trendUp: false, color: "cyan" },
+            { label: "Payback", value: "13mo", trend: "@ $90k Build", trendUp: true, color: "purple" }
         ],
         execSummary: `
             <p class="text-gray-300 leading-relaxed text-sm mb-4">
-                The <strong class="text-white">Hybrid Nexus Gateway</strong> bridges the critical gap between legacy ISO 20022 banking standards and EVM-compatible liquidity pools. 
-                By implementing a dual-layer consensus mechanism, enterprise clients can transact on public blockchains with 
-                regulatory compliance guaranteed by a zero-knowledge proof oracle layer.
+                <strong class="text-white">OrbitAI Growth</strong> is a productized agency platform designed to solve the credibility and compliance bottlenecks in Web3 marketing. 
+                By replacing unstructured email threads with a <strong class="text-white">smart brief wizard</strong> and <strong class="text-white">automated compliance gating</strong>, 
+                it qualifies high-value leads before human stratgey time is invested.
             </p>
             <p class="text-gray-300 leading-relaxed text-sm">
-                This solution targets the \$2T cross-border payment market, offering instantaneous settlement with 40% lower fees 
-                than traditional SWIFT rails, while maintaining strict KYC/AML adherence via Soulbound Identity Tokens.
+                The solution targets B2B SaaS and Crypto teams, filtering out regulatory risks (UK FCA, EU MiCA) upfront while reducing the cognitive load of onboarding by 40%.
             </p>
             <div class="mt-4 flex gap-2">
-                <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] rounded border border-indigo-500/30">DeFi</span>
-                <span class="px-2 py-0.5 bg-cyan-500/20 text-cyan-300 text-[10px] rounded border border-cyan-500/30">Enterprise</span>
+                <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 text-[10px] rounded border border-indigo-500/30">MarTech SaaS</span>
+                <span class="px-2 py-0.5 bg-yellow-500/10 text-yellow-300 text-[10px] rounded border border-yellow-500/30">Regulated Promo</span>
             </div>
         `,
         riskMatrix: [
-            { id: 1, name: "Smart Contract Exploit", desc: "Re-entrancy vector in bridge liquidity pool", severity: "CRITICAL" },
-            { id: 2, name: "Regulatory Shift", desc: "MiCA stablecoin classification changes", severity: "HIGH" },
-            { id: 3, name: "Oracle Latency", desc: "Price feed deviation during volatility", severity: "HIGH" }
+            { id: 1, name: "Web3 Compliance", desc: "Blocked ad accounts due to region mismatch", severity: "HIGH" },
+            { id: 2, name: "Trust Deficit", desc: "Clients skepticism towards 'Agency' promises", severity: "MEDIUM" },
+            { id: 3, name: "Form Abandonment", desc: "Brief wizard perceived as 'mentally expensive'", severity: "MEDIUM" }
         ],
         solutionBullets: [
-            "Dual-lock mechanism prevents bridge hacks",
-            "ZK-Identity ensures GDPR-compliant transparency",
-            "Gasless meta-transactions for Web2 UX",
-            "Automated treasury rebalancing via AI agents"
+            "Regional Compliance Gate (FCA/MiCA aligned)",
+            "Progressive Disclosure Brief Wizard",
+            "Transparent Project Portal & Approval Logs",
+            "Productized Pricing (Sprints vs Retainers)"
         ],
         cost: {
-            range: "$120k - $180k",
-            timeline: "14-16 weeks",
-            team: "Team of 8"
+            range: "$65k - $140k",
+            timeline: "6 weeks (MVP)",
+            team: "Team of 6-8"
         }
     },
 
@@ -64,70 +63,98 @@ const SIMULATION_RESULT = {
     // ============================================
     build: {
         assumptions: [
-            { id: 1, label: "EVM Compatibility", desc: "Target chains support Shanghai upgrade", type: "assumed", confidence: "95%" },
-            { id: 2, label: "API Rate Limits", desc: "Banking partners provide 100 TPS", type: "in-scope", confidence: "100%" },
-            { id: 3, label: "Layer 1 Settlement", desc: "Ethereum Mainnet for finality", type: "assumed", confidence: "90%" }
+            { id: 1, label: "Productized Offers", desc: "Clients accept fixed packages over custom quotes", type: "validated", confidence: "Medium" },
+            { id: 2, label: "Web3 Region Locks", desc: "Strict region gating prevents ad ban strikes", type: "in-scope", confidence: "High" },
+            { id: 3, label: "Human Review", desc: "AI output requires human-in-the-loop for safety", type: "assumed", confidence: "High" }
         ],
         screens: [
             {
-                id: "SCREEN_01",
-                title: "Gateway Dashboard",
-                desc: "Real-time liquidity monitoring & API key management",
-                components: "Sidebar, Chart.js, DataGrid",
-                states: "Active, Paused, Emergency Stop",
+                id: "SCR_01",
+                title: "Home & Routing",
+                desc: "Credibility proof (Case Studies) and immediate Web2/Web3 segmentation.",
+                components: "Hero, Trust Cards, Case Grids",
+                states: "Default, Loading, Error",
                 color: "indigo"
             },
             {
-                id: "SCREEN_02",
-                title: "Tx Builder",
-                desc: "Low-code interface for constructing complex smart contract calls",
-                components: "Drag-drop Canvas, JSON Viewer",
-                states: "Draft, Validating, Signed",
+                id: "SCR_02",
+                title: "Service Selection",
+                desc: "Clear distinct tracks for Web2 Growth vs Web3 Compliance.",
+                components: "Tab Navigation, Service Cards",
+                states: "Active, Disabled (Gate)",
                 color: "cyan"
             },
             {
-                id: "SCREEN_03",
-                title: "Identity Vault",
-                desc: "KYC/AML status management and ZK-proof generation",
-                components: "FaceID Integration, File Upload",
-                states: "Verifying, Verified, Rejected",
+                id: "SCR_04",
+                title: "Pricing Packages",
+                desc: "Launch Sprint vs Monthly Retainer with explicit inclusions.",
+                components: "Pricing Cards, Comparison Rules",
+                states: "Default, Selected",
+                color: "green"
+            },
+            {
+                id: "SCR_05",
+                title: "Smart Brief Wizard",
+                desc: "4-step progressive form: Basics -> Audience -> Compliance -> Budget.",
+                components: "Stepper, Multi-Select, File Upload",
+                states: "Step 1-4, Loading, Error",
                 color: "purple"
+            },
+            {
+                id: "SCR_06",
+                title: "Compliance Gate",
+                desc: "Blocking review step if user selects restricted regions (UK/EU) for Crypto.",
+                components: "Warning Banner, Proof Upload",
+                states: "Pass, Review Required",
+                color: "red"
+            },
+            {
+                id: "SCR_08",
+                title: "Client Portal",
+                desc: "Post-kickoff dashboard for deliverables, approvals, and reporting.",
+                components: "Activity Stream, Approval Actions",
+                states: "Empty, Active Project",
+                color: "blue"
             }
         ],
         validation: [
-            { field: "Destination Chain", rule: "EIP-155 Chain ID", timing: "Pre-flight", error: "Unsupported Network" },
-            { field: "Liquidity Depth", rule: "Amount < Pool Reserve * 0.1", timing: "Execution", error: "High Slippage Warning" },
-            { field: "Compliance Proof", rule: "Valid ZK-SNARK", timing: "On-chain", error: "Revert: Not Authorized" }
+            { field: "Business Email", rule: "Format & Domain Check", timing: "On Blur", error: "Please use work email" },
+            { field: "Website URL", rule: "Reachable & Safe", timing: "Async Check", error: "Site not reachable" },
+            { field: "Region Selection", rule: "Min 1 Region Required", timing: "On Submit", error: "Select target market" }
         ],
         deepDives: [
             {
                 tag: "DEEP DIVE #1",
                 tagColor: "red",
-                label: "Most Likely Failure",
-                title: "Transaction Rejected",
-                cause: "User rejected MetaMask prompt",
-                copy: "\"Transaction cancelled. Ready when you are.\"",
-                recovery: "Show retry CTA, preserve input"
+                label: "Critical Failure",
+                title: "Web3 Eligibility Blocked",
+                cause: "Crypto Promo in Regulated Region (UK) w/o Proof",
+                copy: "Paid promotion in the UK needs an approved route. Switch to SEO?",
+                recovery: "Alternative 'Safe Path' or Manual Review"
             },
             {
                 tag: "DEEP DIVE #2",
                 tagColor: "orange",
-                label: "Highest Risk",
-                title: "Payment Timeout",
-                cause: "Network congestion, tx pending >5min",
-                copy: "\"Still processing. Check Etherscan: [link]\"",
-                recovery: "Poll status, email receipt, support link"
+                label: "UX Resilience",
+                title: "Brief Submit Timeout",
+                cause: "Network drop during long form submission",
+                copy: "We couldn't submit. Your answers are saved locally.",
+                recovery: "Retry action + 'Copy Answers' backup"
             }
         ],
         techSpecs: `
             <div class="space-y-2">
                 <div class="p-2 bg-black/30 rounded border border-white/10">
-                    <div class="text-[10px] text-gray-500 mb-1">CORE STACK</div>
-                    <div class="text-xs text-white font-mono">React, Node.js (NestJS), Solidity, Hardhat, The Graph</div>
+                    <div class="text-[10px] text-gray-500 mb-1">CORE APP</div>
+                    <div class="text-xs text-white font-mono">Next.js 14 (App Router), React Hook Form, Tailwind CSS</div>
                 </div>
                 <div class="p-2 bg-black/30 rounded border border-white/10">
-                    <div class="text-[10px] text-gray-500 mb-1">INFRASTRUCTURE</div>
-                    <div class="text-xs text-white font-mono">AWS Lambda, Alchemy RPC, IPFS (Metadata), Redis (Caching)</div>
+                    <div class="text-[10px] text-gray-500 mb-1">DATA & INFRA</div>
+                    <div class="text-xs text-white font-mono">Supabase (Postgres), Redis (Rate Limits), S3 (Assets)</div>
+                </div>
+                <div class="p-2 bg-black/30 rounded border border-white/10">
+                    <div class="text-[10px] text-gray-500 mb-1">INTEGRATIONS</div>
+                    <div class="text-xs text-white font-mono">HubSpot CRM, SendGrid, OpenAI API (Drafts)</div>
                 </div>
             </div>
         `
@@ -138,15 +165,16 @@ const SIMULATION_RESULT = {
     // ============================================
     evidence: {
         decisions: [
-            { item: "Hybrid Architecture", desc: "Off-chain order book, On-chain settlement", verdict: "APPROVED", impact: "High" },
-            { item: "Rollup Choice", desc: "Optimism vs Arbitrum", verdict: "ARBITRUM ONE", impact: "Medium" }
+            { item: "Brief Wizard Format", desc: "Multi-step vs Single Page", verdict: "APPROVED", impact: "High" },
+            { item: "On-Blur Validation", desc: "Reduce premature error stress", verdict: "APPROVED", impact: "Medium" },
+            { item: "Web3 Compliance Gate", desc: "Strict blocking vs Warning", verdict: "STRICT", impact: "High" }
         ],
-        research: "Analyzed 12 competitor protocols (Uniswap, Aave, LayerZero). Identified gap in institutional-grade compliance wrappers for DeFi pools.",
+        research: "User testing (n=8) showed 40% lower cognitive load with Wizard format. 'Smart Gate' increased trust for Web3 founders fearing bans.",
         roi: {
-            cost: "$150,000",
-            revenue: "$4.2M / yr",
-            breakEven: "4.5 Months",
-            uplift: "28x"
+            cost: "$90,000",
+            revenue: "$7.2k / mo",
+            breakEven: "13 Months",
+            uplift: "+25%"
         }
     }
 };
