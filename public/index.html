@@ -2485,17 +2485,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <!-- Modular JS Architecture -->
-    <script src="js/modules/toast.js?v=1.0"></script>
-    <script src="js/modules/wallet.js?v=1.0"></script>
-    <script src="js/modules/simulationResult.js?v=1.0"></script>
-    <script src="js/modules/api.js?v=1.0"></script>
-    <script src="js/modules/markdown.js?v=1.0"></script>
-    <script src="js/modules/session.js?v=1.0"></script>
-    <script src="js/modules/payment.js?v=1.0"></script>
-    <script src="js/modules/admin.js?v=1.0"></script>
-    <script src="js/modules/dashboard.js?v=1.0"></script>
-    <script src="js/modules/share.js?v=1.0"></script>
-    <script src="js/app.js?v=5.0"></script>
+    <script src="js/modules/toast.js?v=1.1"></script>
+    <script src="js/modules/wallet.js?v=1.1"></script>
+    <script src="js/modules/simulationResult.js?v=1.1"></script>
+    <script src="js/modules/api.js?v=1.1"></script>
+    <script src="js/modules/markdown.js?v=1.1"></script>
+    <script src="js/modules/session.js?v=1.1"></script>
+    <script src="js/modules/payment.js?v=1.1"></script>
+    <script src="js/modules/admin.js?v=1.1"></script>
+    <script src="js/modules/dashboard.js?v=1.1"></script>
+    <script src="js/modules/share.js?v=1.1"></script>
+    <script src="js/app.js?v=5.1"></script>
     <script>
         // UI Helpers
         function startTimer(duration, display) {
@@ -2592,10 +2592,20 @@
 
         // Toggle individual collapsible section
         function toggleSection(sectionId) {
-            const section = document.getElementById('section-' + sectionId);
+            const section = document.getElementById('section-' + sectionId) || document.getElementById('build-' + sectionId);
+            // Fallback for build sections if they use different ID naming
             if (section) {
                 section.classList.toggle('collapsed');
+            } else {
+                // Try legacy selector for build specific
+                const legacy = document.getElementById('build-' + sectionId);
+                if (legacy) legacy.classList.toggle('collapsed');
             }
+        }
+
+        // Alias for backward compatibility
+        function toggleBuildSection(sectionId) {
+            toggleSection(sectionId);
         }
 
         // Toggle all collapsible sections
