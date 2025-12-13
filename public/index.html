@@ -155,61 +155,68 @@
             --blob-3: rgba(6, 182, 212, 0.1);
         }
 
-        /* Light Theme - Vibrant 'Aurora' Gemini Style */
+        /* Light Theme - Exact Gemini MD3 Tokens */
         :root[data-theme="light"] {
-            /* Backgrounds */
+            /* Backgrounds - Exact MD3 Surface tokens */
             --bg-primary: #FFFFFF;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-tertiary: #F8F9FA;
+            /* surface */
+            --bg-secondary: #F0F4F9;
+            /* surface-container (THE key Gemini color) */
+            --bg-tertiary: #F7F9FC;
+            /* surface-container-low */
 
-            /* Glass & Panels - Crystal Clear */
-            --glass-bg: rgba(255, 255, 255, 0.4);
-            /* More transparent to show aurora */
-            --glass-hover: rgba(255, 255, 255, 0.6);
-            --panel-bg: rgba(255, 255, 255, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-border-hover: rgba(11, 87, 208, 0.2);
+            /* Glass & Panels - Solid, NOT transparent */
+            --glass-bg: #F0F4F9;
+            /* surface-container (solid) */
+            --glass-hover: #EBEBEB;
+            /* surface-container-high */
+            --panel-bg: #F0F4F9;
+            /* surface-container (solid) */
+            --glass-border: #C4C7C5;
+            /* outline-variant */
+            --glass-border-hover: #0B57D0;
+            /* primary */
 
-            /* Text Colors - Sharp & High Contrast */
+            /* Text Colors - Exact MD3 tokens */
             --text-primary: #1F1F1F;
-            --text-secondary: #444746;
-            --text-muted: #747775;
-            --text-dim: rgba(31, 31, 31, 0.4);
+            /* on-surface */
+            --text-secondary: #44474F;
+            /* on-surface-variant */
+            --text-muted: #74777F;
+            /* outline */
+            --text-dim: rgba(31, 31, 31, 0.38);
 
-            /* Accents - Gemini Brand Colors */
-            --accent-indigo: #1A73E8;
-            /* Google Blue */
-            --accent-purple: #9C27B0;
-            /* Bard/Gemini Purple */
-            --accent-cyan: #00796B;
-            /* Teal accent */
+            /* Accents - Exact MD3 */
+            --accent-indigo: #0B57D0;
+            /* primary */
+            --accent-purple: #00639B;
+            /* secondary */
+            --accent-cyan: #006D4E;
+            /* tertiary */
 
-            /* Shadows - Soft & Colored */
-            --shadow-soft: 0 4px 20px rgba(26, 115, 232, 0.08);
-            /* Blueish tint */
-            --shadow-hover: 0 8px 30px rgba(156, 39, 176, 0.12);
-            /* Purpleish tint */
+            /* Shadows - Subtle, no color tint */
+            --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.15);
 
-            /* Blur */
-            --blur-amount: 24px;
-            --blur-heavy: 80px;
+            /* Blur - Minimal since not using transparency */
+            --blur-amount: 0px;
+            --blur-heavy: 0px;
 
             /* Scrollbar */
-            --scrollbar-track: transparent;
-            --scrollbar-thumb: #DADCE0;
-            --scrollbar-thumb-hover: #1A73E8;
+            --scrollbar-track: #F0F4F9;
+            --scrollbar-thumb: #C4C7C5;
+            --scrollbar-thumb-hover: #0B57D0;
 
-            /* Noise Overlay - Minimal */
-            --noise-opacity: 0.1;
+            /* Noise Overlay - Off for clean look */
+            --noise-opacity: 0;
 
-            /* Fractal Blobs - The "Aurora" Effect */
-            /* These need to be VIBRANT to show up on white */
-            --blob-1: #D9E7FF;
-            /* Vivid Light Blue (Top Left) */
-            --blob-2: #F2E3FF;
-            /* Vivid Light Purple (Right) */
-            --blob-3: #FFE8E8;
-            /* Soft Peach/Pink (Bottom) */
+            /* Fractal Blobs - Using MD3 containers */
+            --blob-1: #D3E3FD;
+            /* primary-container */
+            --blob-2: #C2E7FF;
+            /* secondary-container */
+            --blob-3: #9EF3CF;
+            /* tertiary-container */
         }
 
         /* ========================================
