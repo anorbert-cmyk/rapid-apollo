@@ -1709,26 +1709,462 @@
 
                                 <!-- TAB: BUILD PACK -->
                                 <div id="output-content-build" class="output-tab-content hidden space-y-6">
-                                    <div class="dash-panel p-8 text-center">
-                                        <i class="ph-duotone ph-package text-6xl text-indigo-500/50 mb-4"></i>
-                                        <h3 class="text-xl text-white font-bold mb-2">Build Pack</h3>
-                                        <p class="text-gray-400 text-sm mb-4">Screen specs, validation rules, error
-                                            recovery, tech specs</p>
-                                        <p class="text-[10px] text-gray-500 font-mono">Content will be populated from
-                                            Gemini 3 output</p>
+
+                                    <!-- Assumptions & Scope -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <i class="ph-bold ph-list-checks text-indigo-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Assumptions & Scope</h3>
+                                            </div>
+                                            <button onclick="toggleBuildSection('assumptions')"
+                                                class="text-[10px] text-gray-500 hover:text-white transition">
+                                                <i class="ph-bold ph-caret-down"></i>
+                                            </button>
+                                        </div>
+                                        <div id="build-assumptions" class="space-y-2">
+                                            <div
+                                                class="flex items-center gap-3 p-3 bg-yellow-500/5 border border-yellow-500/10 rounded-lg">
+                                                <span
+                                                    class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-[9px] font-bold rounded">ASSUMED</span>
+                                                <span class="text-xs text-gray-300">User has existing wallet
+                                                    connected</span>
+                                                <span class="ml-auto text-[10px] text-gray-500">Confidence: 85%</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-3 p-3 bg-green-500/5 border border-green-500/10 rounded-lg">
+                                                <span
+                                                    class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-bold rounded">IN
+                                                    SCOPE</span>
+                                                <span class="text-xs text-gray-300">Payment flow (3 tiers)</span>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-3 p-3 bg-red-500/5 border border-red-500/10 rounded-lg">
+                                                <span
+                                                    class="px-2 py-0.5 bg-red-500/20 text-red-400 text-[9px] font-bold rounded">OUT
+                                                    OF SCOPE</span>
+                                                <span class="text-xs text-gray-300">Multi-chain support (Phase 2)</span>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <!-- Screen Specs Carousel -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <i class="ph-bold ph-devices text-cyan-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Screen Specifications (8 max)</h3>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <button onclick="prevScreen()"
+                                                    class="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-lg transition">
+                                                    <i class="ph-bold ph-caret-left text-gray-400"></i>
+                                                </button>
+                                                <span id="screen-counter"
+                                                    class="text-xs text-gray-400 font-mono">1/4</span>
+                                                <button onclick="nextScreen()"
+                                                    class="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-lg transition">
+                                                    <i class="ph-bold ph-caret-right text-gray-400"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="screen-carousel" class="relative overflow-hidden">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <!-- Screen Card 1 -->
+                                                <div
+                                                    class="bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/20 rounded-xl p-5">
+                                                    <div class="flex items-center justify-between mb-3">
+                                                        <span
+                                                            class="text-[10px] text-indigo-400 font-mono">SCREEN_01</span>
+                                                        <span
+                                                            class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] rounded">CORE</span>
+                                                    </div>
+                                                    <h4 class="text-white font-bold mb-2">Landing / Hero</h4>
+                                                    <p class="text-xs text-gray-400 mb-3">Primary conversion entry point
+                                                        with value proposition</p>
+                                                    <div class="space-y-1 text-[10px]">
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">Components:</span><span
+                                                                class="text-gray-300">Hero, Pricing, CTA</span></div>
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">States:</span><span
+                                                                class="text-gray-300">Default, Connected</span></div>
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">A11y:</span><span
+                                                                class="text-green-400">✓ WCAG 2.1 AA</span></div>
+                                                    </div>
+                                                </div>
+                                                <!-- Screen Card 2 -->
+                                                <div
+                                                    class="bg-gradient-to-br from-cyan-500/10 to-blue-500/5 border border-cyan-500/20 rounded-xl p-5">
+                                                    <div class="flex items-center justify-between mb-3">
+                                                        <span
+                                                            class="text-[10px] text-cyan-400 font-mono">SCREEN_02</span>
+                                                        <span
+                                                            class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] rounded">CORE</span>
+                                                    </div>
+                                                    <h4 class="text-white font-bold mb-2">Payment Flow</h4>
+                                                    <p class="text-xs text-gray-400 mb-3">Wallet connect → Tier select →
+                                                        Confirm</p>
+                                                    <div class="space-y-1 text-[10px]">
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">Components:</span><span
+                                                                class="text-gray-300">Modal, Progress, Confirm</span>
+                                                        </div>
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">States:</span><span
+                                                                class="text-gray-300">Loading, Success, Error</span>
+                                                        </div>
+                                                        <div class="flex justify-between"><span
+                                                                class="text-gray-500">A11y:</span><span
+                                                                class="text-green-400">✓ Focus trap</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Validation Rules -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <i class="ph-bold ph-shield-check text-green-400"></i>
+                                            <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                Validation Rules</h3>
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-xs">
+                                                <thead>
+                                                    <tr class="text-gray-500 border-b border-white/10">
+                                                        <th class="text-left py-2 px-3 font-mono">Field</th>
+                                                        <th class="text-left py-2 px-3 font-mono">Rule</th>
+                                                        <th class="text-left py-2 px-3 font-mono">Timing</th>
+                                                        <th class="text-left py-2 px-3 font-mono">Error Pattern</th>
+                                                        <th class="text-left py-2 px-3 font-mono">WHY</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="text-gray-300">
+                                                    <tr class="border-b border-white/5 hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">Wallet Address</td>
+                                                        <td class="py-3 px-3"><code
+                                                                class="bg-black/30 px-1 rounded">0x[a-fA-F0-9]{40}</code>
+                                                        </td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-cyan-500/20 text-cyan-400 rounded text-[9px]">on
+                                                                connect</span></td>
+                                                        <td class="py-3 px-3">Inline toast</td>
+                                                        <td class="py-3 px-3 text-gray-400">Prevents invalid tx, reduces
+                                                            gas waste</td>
+                                                    </tr>
+                                                    <tr class="border-b border-white/5 hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">ETH Balance</td>
+                                                        <td class="py-3 px-3"><code
+                                                                class="bg-black/30 px-1 rounded">≥ tier_price + gas</code>
+                                                        </td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-[9px]">pre-submit</span>
+                                                        </td>
+                                                        <td class="py-3 px-3">Modal warning</td>
+                                                        <td class="py-3 px-3 text-gray-400">Avoids failed tx, improves
+                                                            UX trust</td>
+                                                    </tr>
+                                                    <tr class="hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">Problem Input</td>
+                                                        <td class="py-3 px-3"><code
+                                                                class="bg-black/30 px-1 rounded">10-2000 chars</code>
+                                                        </td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-indigo-500/20 text-indigo-400 rounded text-[9px]">on
+                                                                blur</span></td>
+                                                        <td class="py-3 px-3">Inline helper</td>
+                                                        <td class="py-3 px-3 text-gray-400">Ensures quality AI output
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <!-- Error Recovery Map -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <i class="ph-bold ph-first-aid text-red-400"></i>
+                                            <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">Error
+                                                & Recovery Map</h3>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <!-- Deep Dive 1 -->
+                                            <div class="bg-red-500/5 border border-red-500/20 rounded-xl p-5">
+                                                <div class="flex items-center gap-2 mb-3">
+                                                    <span
+                                                        class="px-2 py-0.5 bg-red-500/30 text-red-400 text-[9px] font-bold rounded">DEEP
+                                                        DIVE #1</span>
+                                                    <span class="text-[10px] text-gray-500">Most Likely Failure</span>
+                                                </div>
+                                                <h4 class="text-white font-bold mb-2">Transaction Rejected</h4>
+                                                <div class="space-y-2 text-xs">
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Cause:</span><span
+                                                            class="text-gray-300">User rejected MetaMask prompt</span>
+                                                    </div>
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Copy:</span><span
+                                                            class="text-yellow-300">"Transaction cancelled. Ready when
+                                                            you are."</span></div>
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Recovery:</span><span
+                                                            class="text-green-400">Show retry CTA, preserve input</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Deep Dive 2 -->
+                                            <div class="bg-orange-500/5 border border-orange-500/20 rounded-xl p-5">
+                                                <div class="flex items-center gap-2 mb-3">
+                                                    <span
+                                                        class="px-2 py-0.5 bg-orange-500/30 text-orange-400 text-[9px] font-bold rounded">DEEP
+                                                        DIVE #2</span>
+                                                    <span class="text-[10px] text-gray-500">Highest Risk</span>
+                                                </div>
+                                                <h4 class="text-white font-bold mb-2">Payment Timeout</h4>
+                                                <div class="space-y-2 text-xs">
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Cause:</span><span
+                                                            class="text-gray-300">Network congestion, tx pending
+                                                            >5min</span></div>
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Copy:</span><span
+                                                            class="text-yellow-300">"Still processing. Check Etherscan:
+                                                            [link]"</span></div>
+                                                    <div class="flex gap-2"><span
+                                                            class="text-gray-500">Recovery:</span><span
+                                                            class="text-green-400">Poll status, email receipt, support
+                                                            link</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tech Specs -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <i class="ph-bold ph-code text-purple-400"></i>
+                                            <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                Technical Implementation</h3>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                                <h4 class="text-xs text-purple-400 font-mono mb-2">API Contract</h4>
+                                                <pre
+                                                    class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>POST /api/solve
+{
+  "problem": string,
+  "tier": "standard"|"medium"|"full",
+  "txHash": string
+}</code></pre>
+                                            </div>
+                                            <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                                <h4 class="text-xs text-purple-400 font-mono mb-2">Response Shape</h4>
+                                                <pre
+                                                    class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
+  "success": boolean,
+  "solution": string,
+  "sections": {...},
+  "meta": { tier, provider }
+}</code></pre>
+                                            </div>
+                                            <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                                <h4 class="text-xs text-purple-400 font-mono mb-2">Error Shape</h4>
+                                                <pre
+                                                    class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
+  "error": true,
+  "code": "TX_INVALID",
+  "message": string,
+  "retry": boolean
+}</code></pre>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 <!-- TAB: EVIDENCE -->
                                 <div id="output-content-evidence" class="output-tab-content hidden space-y-6">
-                                    <div class="dash-panel p-8 text-center">
-                                        <i class="ph-duotone ph-paperclip text-6xl text-purple-500/50 mb-4"></i>
-                                        <h3 class="text-xl text-white font-bold mb-2">Evidence & Appendix</h3>
-                                        <p class="text-gray-400 text-sm mb-4">Decision table, research plan, cost model,
-                                            ROI analysis</p>
-                                        <p class="text-[10px] text-gray-500 font-mono">Content will be populated from
-                                            Gemini 3 output</p>
+
+                                    <!-- Decision & Evidence Table -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-2">
+                                                <i class="ph-bold ph-table text-cyan-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Decision & Evidence Table</h3>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <select
+                                                    class="bg-black/30 border border-white/10 rounded px-2 py-1 text-[10px] text-gray-400">
+                                                    <option>All Confidence</option>
+                                                    <option>High Only</option>
+                                                    <option>Needs Validation</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-xs">
+                                                <thead>
+                                                    <tr class="text-gray-500 border-b border-white/10">
+                                                        <th class="text-left py-2 px-3 font-mono">Decision</th>
+                                                        <th class="text-left py-2 px-3 font-mono">User Impact</th>
+                                                        <th class="text-left py-2 px-3 font-mono">Business Impact</th>
+                                                        <th class="text-left py-2 px-3 font-mono">Confidence</th>
+                                                        <th class="text-left py-2 px-3 font-mono">How to Validate</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="text-gray-300">
+                                                    <tr class="border-b border-white/5 hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">Wizard vs Single
+                                                            Page</td>
+                                                        <td class="py-3 px-3">-40% cognitive load</td>
+                                                        <td class="py-3 px-3 text-green-400">+12% conversion</td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px]">HIGH</span>
+                                                        </td>
+                                                        <td class="py-3 px-3 text-indigo-400">A/B Test</td>
+                                                    </tr>
+                                                    <tr class="border-b border-white/5 hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">Inline Validation
+                                                        </td>
+                                                        <td class="py-3 px-3">Faster error recovery</td>
+                                                        <td class="py-3 px-3 text-green-400">-20% support tickets</td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-[9px]">MEDIUM</span>
+                                                        </td>
+                                                        <td class="py-3 px-3 text-indigo-400">User Testing</td>
+                                                    </tr>
+                                                    <tr class="hover:bg-white/5">
+                                                        <td class="py-3 px-3 font-medium text-white">3-Tier Pricing</td>
+                                                        <td class="py-3 px-3">Clear value ladder</td>
+                                                        <td class="py-3 px-3 text-green-400">+25% AOV</td>
+                                                        <td class="py-3 px-3"><span
+                                                                class="px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px]">HIGH</span>
+                                                        </td>
+                                                        <td class="py-3 px-3 text-indigo-400">Price Testing</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
+
+                                    <!-- Research Plan -->
+                                    <div class="dash-panel p-6">
+                                        <div class="flex items-center gap-2 mb-4">
+                                            <i class="ph-bold ph-flask text-indigo-400"></i>
+                                            <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                Research Plan</h3>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div class="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-4">
+                                                <div class="text-[10px] text-indigo-400 font-mono mb-2">DISCOVERY PHASE
+                                                </div>
+                                                <ul class="text-xs text-gray-300 space-y-1">
+                                                    <li>• 5x User Interviews</li>
+                                                    <li>• Competitor Analysis</li>
+                                                    <li>• Analytics Review</li>
+                                                </ul>
+                                            </div>
+                                            <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                                <div class="text-[10px] text-purple-400 font-mono mb-2">EVALUATIVE PHASE
+                                                </div>
+                                                <ul class="text-xs text-gray-300 space-y-1">
+                                                    <li>• Usability Testing (n=8)</li>
+                                                    <li>• A/B Testing (2 weeks)</li>
+                                                    <li>• Heuristic Evaluation</li>
+                                                </ul>
+                                            </div>
+                                            <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4">
+                                                <div class="text-[10px] text-cyan-400 font-mono mb-2">VALIDATION PHASE
+                                                </div>
+                                                <ul class="text-xs text-gray-300 space-y-1">
+                                                    <li>• Beta Launch (100 users)</li>
+                                                    <li>• NPS Survey</li>
+                                                    <li>• Support Ticket Analysis</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cost Model & ROI -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <!-- Cost Breakdown -->
+                                        <div class="dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-calculator text-green-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    Cost Model</h3>
+                                            </div>
+                                            <div class="space-y-3">
+                                                <div
+                                                    class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                                                    <span class="text-xs text-gray-300">Discovery & Design</span>
+                                                    <span class="text-white font-bold">$12,000</span>
+                                                </div>
+                                                <div
+                                                    class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                                                    <span class="text-xs text-gray-300">Frontend Development</span>
+                                                    <span class="text-white font-bold">$18,000</span>
+                                                </div>
+                                                <div
+                                                    class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                                                    <span class="text-xs text-gray-300">Backend & API</span>
+                                                    <span class="text-white font-bold">$15,000</span>
+                                                </div>
+                                                <div
+                                                    class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                                                    <span class="text-xs text-gray-300">QA & Testing</span>
+                                                    <span class="text-white font-bold">$8,000</span>
+                                                </div>
+                                                <div
+                                                    class="flex justify-between items-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                                                    <span class="text-sm text-white font-bold">Total Build Cost</span>
+                                                    <span class="text-green-400 font-bold text-lg">$53,000</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ROI Analysis -->
+                                        <div class="dash-panel p-6">
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <i class="ph-bold ph-trend-up text-green-400"></i>
+                                                <h3 class="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                                                    ROI Sensitivity</h3>
+                                            </div>
+                                            <div class="space-y-4">
+                                                <div
+                                                    class="text-center p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/5 rounded-xl border border-green-500/20">
+                                                    <div class="text-[10px] text-gray-400 mb-1">Expected ROI (12 months)
+                                                    </div>
+                                                    <div class="text-3xl font-bold text-green-400">+285%</div>
+                                                </div>
+                                                <div class="grid grid-cols-3 gap-2">
+                                                    <div class="text-center p-3 bg-red-500/5 rounded-lg">
+                                                        <div class="text-[9px] text-gray-500">WORST</div>
+                                                        <div class="text-sm font-bold text-red-400">+85%</div>
+                                                    </div>
+                                                    <div class="text-center p-3 bg-yellow-500/5 rounded-lg">
+                                                        <div class="text-[9px] text-gray-500">EXPECTED</div>
+                                                        <div class="text-sm font-bold text-yellow-400">+285%</div>
+                                                    </div>
+                                                    <div class="text-center p-3 bg-green-500/5 rounded-lg">
+                                                        <div class="text-[9px] text-gray-500">BEST</div>
+                                                        <div class="text-sm font-bold text-green-400">+520%</div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-[10px] text-gray-500 text-center">
+                                                    Based on +12% conversion @ $49 AOV, 10k monthly visitors
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                             </div>
