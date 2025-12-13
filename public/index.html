@@ -3450,14 +3450,18 @@
 
         // Toggle individual collapsible section
         function toggleSection(sectionId) {
-            const section = document.getElementById('section-' + sectionId) || document.getElementById('build-' + sectionId);
-            // Fallback for build sections if they use different ID naming
+            // Try various ID patterns:
+            // 1. Direct match with build- prefix
+            // 2. With -container suffix
+            // 3. section- prefix (legacy)
+            const section = document.getElementById('build-' + sectionId) ||
+                document.getElementById('build-' + sectionId + '-container') ||
+                document.getElementById('section-' + sectionId);
+
             if (section) {
                 section.classList.toggle('collapsed');
             } else {
-                // Try legacy selector for build specific
-                const legacy = document.getElementById('build-' + sectionId);
-                if (legacy) legacy.classList.toggle('collapsed');
+                console.warn('Section not found:', sectionId);
             }
         }
 
