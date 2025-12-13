@@ -76,6 +76,11 @@ window.addEventListener('wallet:connected', (event) => {
         window.AdminModule.checkStatus(address);
     }
 
+    // Re-load session history to show Dashboard button if user has previous sessions
+    if (window.SessionModule) {
+        window.SessionModule.load();
+    }
+
     // Update Navbar Button
     const walletBtn = document.getElementById('btn-connect-wallet');
     const walletSpan = document.getElementById('walletAddress');

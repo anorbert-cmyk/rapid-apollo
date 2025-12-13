@@ -1760,8 +1760,8 @@
                                 </div>
                             </div>
 
-                            <!-- TAB: VP SUMMARY -->
-                            <div id="output-content-vp" class="output-tab-content space-y-6">
+                            <!-- TAB: STRATEGY & ROI -->
+                            <div id="output-content-strategy" class="output-tab-content space-y-6">
 
                                 <!-- HERO KPI Section -->
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -2129,8 +2129,8 @@
                                 </div>
                             </div>
 
-                            <!-- TAB: BUILD PACK -->
-                            <div id="output-content-build" class="output-tab-content hidden space-y-6">
+                            <!-- TAB: DESIGN & UX -->
+                            <div id="output-content-design" class="output-tab-content hidden space-y-6">
 
                                 <!-- Assumptions & Scope -->
                                 <div class="dash-panel p-6">
@@ -2353,8 +2353,8 @@
 
                                 </div>
 
-                                <!-- TAB: EVIDENCE -->
-                                <div id="output-content-evidence" class="output-tab-content hidden space-y-6">
+                                <!-- TAB: ENGINEERING & BUILD -->
+                                <div id="output-content-engineering" class="output-tab-content hidden space-y-6">
 
                                     <!-- Decision & Evidence Table -->
                                     <div class="dash-panel p-6">
@@ -2659,7 +2659,7 @@
 
         // Output Tab Switcher (Strategy / Design / Engineering)
         function switchOutputTab(tabName) {
-            const tabs = ['vp', 'build', 'evidence'];
+            const tabs = ['strategy', 'design', 'engineering'];
             tabs.forEach(t => {
                 const content = document.getElementById('output-content-' + t);
                 const tab = document.getElementById('output-tab-' + t);
@@ -2907,18 +2907,6 @@
                                     "${Object.values(screen.copy)[0]}"
                                 </div>
                             </div>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-                // Exec Summary
-                const execContent = document.getElementById('exec-summary-content');
-                if (execContent) execContent.innerHTML = data.vp.execSummary;
-
-                // Risk Matrix
-                <div class="bg-white/5 p-2 rounded border-l-2 border-${screen.color}-500 italic text-[10px] text-white space-y-1">
-                    ${Object.entries(screen.copy).map(([k, v]) => `<div><span class="text-gray-500">${k}:</span> ${v}</div>`).join('')}
-                </div>
-                            </div > ` : ''}
                         </div>
                     </div>
                 `).join('');
