@@ -259,6 +259,24 @@
             transform: rotate(-90deg);
         }
 
+        /* Collapsible build sections */
+        #build-assumptions,
+        #build-scope-container,
+        #build-validation-container {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        #build-assumptions:not(.collapsed),
+        #build-scope-container:not(.collapsed),
+        #build-validation-container:not(.collapsed) {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
         /* Meta Bar */
         .meta-bar {
             display: flex;
@@ -1781,11 +1799,35 @@
                                                         <i
                                                             class="ph-bold ph-info text-gray-500 hover:text-indigo-400 cursor-help transition text-xs"></i>
                                                         <div
-                                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                            <p
-                                                                class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                                The single most important metric indicating product
-                                                                success. Focus all optimization efforts here.</p>
+                                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Context</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    The single most critical metric that best captures
+                                                                    the core value your product delivers to its
+                                                                    customers.</p>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Importance</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    Aligns the entire organization around a common goal,
+                                                                    ensuring long-term sustainable growth.</p>
+                                                            </div>
+                                                            <div>
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Usage</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    Use this to prioritize features. If a feature
+                                                                    doesn't drive this metric, deprioritize it.</p>
+                                                            </div>
                                                             <div
                                                                 class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                             </div>
@@ -1855,11 +1897,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-indigo-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            High-level overview of the strategic value and business
-                                                            goals. Use this for stakeholder updates.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                A high-level overview of the product strategy, value
+                                                                proposition, and competitive advantage.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Essential for quick stakeholder alignment and securing
+                                                                buy-in without reading full documentation.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Copy this for pitch decks or investor updates to
+                                                                communicate the "big picture" instantly.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -1912,11 +1977,35 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-red-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Critical risks that could derail the project. Prioritize
-                                                            solving 'High' severity items first.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                The most dangerous risks (technical, market, or
+                                                                operational) that could cause project failure.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Proactive identification prevents costly late-stage
+                                                                failures and "fire-fighting."</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Address "High" severity items immediately. Do not start
+                                                                build until these mitigation strategies are in place.
+                                                            </p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -1993,11 +2082,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-green-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Key features that directly address user pain points. Ensure
-                                                            these are preserved in the build.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                The core feature set that directly addresses the
+                                                                validated user problems.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Defines the Minimum Viable Product (MVP) scope to avoid
+                                                                feature creep.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Ensure these specific features are preserved in the
+                                                                final build. They are your value drivers.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2044,11 +2156,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-green-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Estimated budget and delivery schedule based on scope. Use
-                                                            for resource planning.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Estimated budget and delivery schedule based on the
+                                                                current feature scope and complexity.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Critical for resource allocation and setting realistic
+                                                                stakeholder expectations.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Use these ranges for initial budget approval. Update if
+                                                                scope changes.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2099,11 +2234,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-cyan-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Log of key design decisions and their rationale. Helps track
-                                                            trade-offs.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                A visible log of key product decisions, their evidence
+                                                                base, and confidence levels.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Prevents circular debates and "HiPPO" (Highest Paid
+                                                                Person's Opinion) decision making.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                When scope is challenged, refer to the "Confidence"
+                                                                column. validating low-confidence items first.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2171,11 +2329,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-blue-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Insights from user interviews and testing. Validates the
-                                                            problem-solution fit.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Key insights derived from user interviews, surveys, and
+                                                                behavioral data.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Validates that you are solving a real problem for real
+                                                                people, reducing market risk.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Use these quotes and insights to defend design choices
+                                                                against subjective opinions.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2199,11 +2380,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-green-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Financial modeling based on conversion uplifts. justifying
-                                                            the investment.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Financial modeling predicting the return on investment
+                                                                based on conversion uplifts.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Justifies the development cost by quantifying the
+                                                                expected business value.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Monitor the "Breakeven" point. If costs rise, ensure
+                                                                this metric stays positive.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2228,11 +2432,34 @@
                                                 <i
                                                     class="ph-bold ph-info text-gray-500 hover:text-indigo-400 cursor-help transition text-xs"></i>
                                                 <div
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                    <p
-                                                        class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                        Timeline and methods for validating assumptions. Ensure these
-                                                        are executed.</p>
+                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Context</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            A structured timeline of research activities (Discovery,
+                                                            Evaluative, Validation).</p>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Importance</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Ensures continuous learning and validation throughout the
+                                                            product lifecycle.</p>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Usage</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Execute these steps linearly. Do not skip "Usability
+                                                            Testing" before launch.</p>
+                                                    </div>
                                                     <div
                                                         class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                     </div>
@@ -2284,11 +2511,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-green-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Breakdown of development costs by phase. Used for budget
-                                                            allocation.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Detailed breakdown of development costs by phase
+                                                                (Discovery, Frontend, Backend, QA).</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Transparency in pricing builds trust and helps in
+                                                                detailed budget allocation.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Use "Discovery & Design" cost for the initial SOW if
+                                                                full build is not yet approved.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2332,11 +2582,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-500 hover:text-green-400 cursor-help transition text-xs"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Best/Worst case scenarios for returns. Helps assess
-                                                            financial risk.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Analysis of Best, Worst, and Expected case scenarios for
+                                                                financial returns.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Demonstrates risk awareness and prepares stakeholders
+                                                                for different outcomes.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Ensure the "Worst Case" scenario is still acceptable to
+                                                                the business.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2390,11 +2663,34 @@
                                                         <i
                                                             class="ph-bold ph-info text-gray-500 hover:text-pink-400 cursor-help transition text-xs"></i>
                                                         <div
-                                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                            <p
-                                                                class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                                Ready-to-use prompts for generating UI assets in Figma
-                                                                or MidJourney</p>
+                                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Context</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    A collection of ready-to-use GenAI prompts for
+                                                                    creating consistent UI assets.</p>
+                                                            </div>
+                                                            <div class="mb-2">
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Importance</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    Accelerates design velocity and ensures visual
+                                                                    consistency across the team.</p>
+                                                            </div>
+                                                            <div>
+                                                                <div
+                                                                    class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                    Usage</div>
+                                                                <p
+                                                                    class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                    Copy prompts into MidJourney/DALL-E to generate
+                                                                    placeholders or final assets.</p>
+                                                            </div>
                                                             <div
                                                                 class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                             </div>
@@ -2422,11 +2718,34 @@
                                                 <i
                                                     class="ph-bold ph-info text-gray-600 hover:text-cyan-400 cursor-help transition"></i>
                                                 <div
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                    <p
-                                                        class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                        Technical requirements for key screens. Developers should follow
-                                                        these strictly.</p>
+                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Context</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Detailed requirements for key screens, including states and
+                                                            behaviors.</p>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Importance</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Reduces ambiguity between Design and Engineering, preventing
+                                                            "pixel-pushing" later.</p>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Usage</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Developers must follow these specs strictly. Review before
+                                                            starting frontend code.</p>
+                                                    </div>
                                                     <div
                                                         class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                     </div>
@@ -2458,11 +2777,34 @@
                                                 <i
                                                     class="ph-bold ph-info text-gray-600 hover:text-indigo-400 cursor-help transition"></i>
                                                 <div
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                    <p
-                                                        class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                        Guiding principles for the user experience. Helps maintain
-                                                        consistency across the app.</p>
+                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Context</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            The guiding principles and "personality" of the product's
+                                                            user experience.</p>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Importance</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Ensures a cohesive feel across all features, even as
+                                                            different teams work on them.</p>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Usage</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Check every new design against these values. Does it feel
+                                                            "Fast" and "Intuitive"?</p>
+                                                    </div>
                                                     <div
                                                         class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                     </div>
@@ -2480,11 +2822,34 @@
                                                 <i
                                                     class="ph-bold ph-info text-gray-600 hover:text-indigo-400 cursor-help transition"></i>
                                                 <div
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                    <p
-                                                        class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                        Compliance levels (WCAG) required. Essential for legal and
-                                                        inclusivity goals.</p>
+                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Context</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            The targeted level of WCAG compliance (A, AA, or AAA) for
+                                                            inclusivity.</p>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Importance</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Legal compliance and moral imperative to make the product
+                                                            usable by everyone.</p>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Usage</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Run audits against these standards before every release. Fix
+                                                            critical issues immediately.</p>
+                                                    </div>
                                                     <div
                                                         class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                     </div>
@@ -2507,11 +2872,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-600 hover:text-indigo-400 cursor-help transition"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Design boundaries. 'Scope Lock' items are confirmed; others
-                                                            may change.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Explicit boundaries of what is included and excluded in
+                                                                this design phase.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Prevents "Scope Creep" where features are silently added
+                                                                without budget approval.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Refer to this list whenever a stakeholder asks "Can we
+                                                                just add this small thing?"</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2524,7 +2912,7 @@
                                             <i class="ph-bold ph-caret-down"></i>
                                         </button>
                                     </div>
-                                    <div id="build-assumptions" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div id="build-assumptions" class="collapsed grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <!-- Populated -->
                                     </div>
                                 </div>
@@ -2541,11 +2929,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-600 hover:text-purple-400 cursor-help transition"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Features explicitly included or excluded. Prevents scope
-                                                            creep during design.</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                The finalized list of features that are approved for
+                                                                development.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Protects the delivery timeline. Any changes here trigger
+                                                                a "Change Order."</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Once locked, Engineering can begin estimates with high
+                                                                confidence.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2558,7 +2969,7 @@
                                             <i class="ph-bold ph-caret-down"></i>
                                         </button>
                                     </div>
-                                    <div id="build-scope-container">
+                                    <div id="build-scope-container" class="collapsed">
                                         <!-- Populated -->
                                     </div>
                                 </div>
@@ -2575,11 +2986,34 @@
                                                     <i
                                                         class="ph-bold ph-info text-gray-600 hover:text-green-400 cursor-help transition"></i>
                                                     <div
-                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                        <p
-                                                            class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                            Methods to test the design (e.g., A/B testing, user
-                                                            interviews).</p>
+                                                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Context</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Specific tests (A/B, Usability) planned to verify the
+                                                                design's effectiveness.</p>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Importance</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Ensures we don't build the wrong thing efficiently. Data
+                                                                over opinion.</p>
+                                                        </div>
+                                                        <div>
+                                                            <div
+                                                                class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                                Usage</div>
+                                                            <p
+                                                                class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                                Schedule these sessions *before* writing production code
+                                                                for complex flows.</p>
+                                                        </div>
                                                         <div
                                                             class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                         </div>
@@ -2592,7 +3026,7 @@
                                             <i class="ph-bold ph-caret-down"></i>
                                         </button>
                                     </div>
-                                    <div id="build-validation-container" class="overflow-x-auto">
+                                    <div id="build-validation-container" class="collapsed overflow-x-auto">
                                         <!-- Populated by JS -->
                                     </div>
                                 </div>
@@ -2608,11 +3042,34 @@
                                                 <i
                                                     class="ph-bold ph-info text-gray-600 hover:text-red-400 cursor-help transition"></i>
                                                 <div
-                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                    <p
-                                                        class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                        How the UI handles failures. Critical for preventing user
-                                                        frustration.</p>
+                                                    class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Context</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            A planned strategy for handling failures (network, input,
+                                                            system errors).</p>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Importance</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Turning frustration into guidance significantly reduces
+                                                            churn.</p>
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                            Usage</div>
+                                                        <p
+                                                            class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                            Implement these specific error messages and retry states. Do
+                                                            not use generic alerts.</p>
+                                                    </div>
                                                     <div
                                                         class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
                                                     </div>
@@ -2672,71 +3129,91 @@
 
 
 
-                    </div>
+                        </div>
 
-                    <!-- TAB: ENGINEERING & BUILD -->
-                    <div id="output-content-engineering" class="output-tab-content hidden space-y-6">
+                        <!-- TAB: ENGINEERING & BUILD -->
+                        <div id="output-content-engineering" class="output-tab-content hidden space-y-6">
 
-                        <!-- Tech Specs (API Contract) -->
-                        <div class="dash-panel p-6" id="build-techspecs-container">
-                            <div class="flex items-center gap-2 mb-4">
-                                <i class="ph-bold ph-code text-purple-400"></i>
-                                <h3
-                                    class="text-xs font-mono text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                    Technical Implementation
-                                    <div class="group relative inline-block ml-1 align-middle">
-                                        <i
-                                            class="ph-bold ph-info text-gray-500 hover:text-purple-400 cursor-help transition text-xs"></i>
-                                        <div
-                                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                            <p
-                                                class="text-[10px] text-gray-300 leading-relaxed font-sans normal-case text-center">
-                                                API contracts and response schemas. Use this for backend development
-                                                reference.</p>
+                            <!-- Tech Specs (API Contract) -->
+                            <div class="dash-panel p-6" id="build-techspecs-container">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <i class="ph-bold ph-code text-purple-400"></i>
+                                    <h3
+                                        class="text-xs font-mono text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                        Technical Implementation
+                                        <div class="group relative inline-block ml-1 align-middle">
+                                            <i
+                                                class="ph-bold ph-info text-gray-500 hover:text-purple-400 cursor-help transition text-xs"></i>
                                             <div
-                                                class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
+                                                class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-[#0f111a] border border-white/10 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left">
+                                                <div class="mb-2">
+                                                    <div class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                        Context</div>
+                                                    <p
+                                                        class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                        The agreed-upon API contracts, data shapes, and system
+                                                        architecture.</p>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <div class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                        Importance</div>
+                                                    <p
+                                                        class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                        Decouples Frontend and Backend work. Allows parallel
+                                                        development.</p>
+                                                </div>
+                                                <div>
+                                                    <div class="text-[10px] uppercase text-gray-500 font-bold mb-0.5">
+                                                        Usage</div>
+                                                    <p
+                                                        class="text-[11px] text-gray-300 leading-snug font-sans normal-case">
+                                                        Mock these responses in the frontend immediately to start
+                                                        building UI.</p>
+                                                </div>
+                                                <div
+                                                    class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-[#0f111a]">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </h3>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
-                                    <h4 class="text-xs text-purple-400 font-mono mb-2">API Contract</h4>
-                                    <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>POST /api/solve
+                                    </h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                        <h4 class="text-xs text-purple-400 font-mono mb-2">API Contract</h4>
+                                        <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>POST /api/solve
 {
   "problem": string,
   "tier": "standard"|"medium"|"full",
   "txHash": string
 }</code></pre>
-                                </div>
-                                <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
-                                    <h4 class="text-xs text-purple-400 font-mono mb-2">Response Shape</h4>
-                                    <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
+                                    </div>
+                                    <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                        <h4 class="text-xs text-purple-400 font-mono mb-2">Response Shape</h4>
+                                        <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
   "success": boolean,
   "solution": string,
   "sections": {...},
   "meta": { tier, provider }
 }</code></pre>
-                                </div>
-                                <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
-                                    <h4 class="text-xs text-purple-400 font-mono mb-2">Error Shape</h4>
-                                    <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
+                                    </div>
+                                    <div class="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
+                                        <h4 class="text-xs text-purple-400 font-mono mb-2">Error Shape</h4>
+                                        <pre class="text-[10px] text-gray-300 bg-black/30 p-2 rounded overflow-x-auto"><code>{
   "error": true,
   "code": "TX_INVALID",
   "message": string,
   "retry": boolean
 }</code></pre>
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
 
                     </div>
-
                 </div>
-            </div>
 
-        </div>
+            </div>
         </div>
         </div>
 
