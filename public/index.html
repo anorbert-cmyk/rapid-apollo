@@ -639,7 +639,346 @@
             background: linear-gradient(90deg, transparent, #818cf8, transparent);
             animation: beam 1.5s linear infinite;
         }
+
+        /* ========================================
+           LIGHT THEME SPECIFIC OVERRIDES
+           Ensuring AA contrast and PromptDAO style
+        ======================================== */
+
+        /* Navigation - Light Mode */
+        :root[data-theme="light"] nav .hud-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        :root[data-theme="light"] nav .hud-card span {
+            color: #1A1A1A;
+        }
+
+        :root[data-theme="light"] nav button {
+            color: #374151;
+            background: transparent;
+            border-color: #E5E7EB;
+        }
+
+        :root[data-theme="light"] nav button:hover {
+            color: #1A1A1A;
+            background: #F3F4F6;
+        }
+
+        :root[data-theme="light"] #btn-connect-wallet {
+            background: #1F2937;
+            color: #FFFFFF;
+            border-color: #1F2937;
+        }
+
+        :root[data-theme="light"] #btn-connect-wallet:hover {
+            background: #111827;
+        }
+
+        /* Theme Toggle Light Mode */
+        :root[data-theme="light"] #theme-toggle {
+            background: #E5E7EB;
+        }
+
+        :root[data-theme="light"] #theme-toggle:hover {
+            background: #D1D5DB;
+        }
+
+        /* Alert Banner - Light Mode */
+        :root[data-theme="light"] .bg-red-950\/30 {
+            background: rgba(254, 226, 226, 0.9);
+            border-color: #FECACA;
+        }
+
+        :root[data-theme="light"] .bg-red-950\/30 span {
+            color: #991B1B;
+        }
+
+        /* Ticker - Light Mode */
+        :root[data-theme="light"] .border-y.bg-black\/40 {
+            background: rgba(249, 250, 251, 0.9);
+            border-color: #E5E7EB;
+        }
+
+        :root[data-theme="light"] .border-y.bg-black\/40 span {
+            color: #DC2626;
+        }
+
+        /* Hero Section - Light Mode */
+        :root[data-theme="light"] h1.text-white,
+        :root[data-theme="light"] h2.text-white,
+        :root[data-theme="light"] h3.text-white {
+            color: #1A1A1A;
+        }
+
+        :root[data-theme="light"] .text-gray-400,
+        :root[data-theme="light"] p.text-gray-400 {
+            color: #6B7280;
+        }
+
+        :root[data-theme="light"] .text-white {
+            color: #1A1A1A;
+        }
+
+        /* Text Gradients - Light Mode */
+        :root[data-theme="light"] .text-gradient-alert {
+            background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        :root[data-theme="light"] .text-gradient-primary {
+            background: linear-gradient(135deg, #1F2937 0%, #4338CA 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        /* Primary Button - Light Mode */
+        :root[data-theme="light"] .btn-primary {
+            background: #1F2937;
+            color: #FFFFFF;
+        }
+
+        :root[data-theme="light"] .btn-primary:hover {
+            background: #111827;
+        }
+
+        /* Cards/Panels - Light Mode */
+        :root[data-theme="light"] .hud-card,
+        :root[data-theme="light"] .glass-panel,
+        :root[data-theme="light"] .dash-panel {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+        }
+
+        :root[data-theme="light"] .hud-card:hover,
+        :root[data-theme="light"] .glass-panel:hover {
+            border-color: #1F2937;
+        }
+
+        /* Inputs - Light Mode */
+        :root[data-theme="light"] textarea,
+        :root[data-theme="light"] input {
+            background: #FFFFFF;
+            border-color: #D1D5DB;
+            color: #1A1A1A;
+        }
+
+        :root[data-theme="light"] textarea::placeholder,
+        :root[data-theme="light"] input::placeholder {
+            color: #9CA3AF;
+        }
+
+        :root[data-theme="light"] textarea:focus,
+        :root[data-theme="light"] input:focus {
+            border-color: #1F2937;
+            box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.1);
+        }
+
+        /* Section Headers - Light Mode */
+        :root[data-theme="light"] .section-header {
+            border-color: #E5E7EB;
+        }
+
+        :root[data-theme="light"] .section-header h3 {
+            color: #6B7280;
+        }
+
+        /* Muted text elements - Light Mode */
+        :root[data-theme="light"] .text-gray-600,
+        :root[data-theme="light"] .text-gray-500 {
+            color: #6B7280;
+        }
+
+        :root[data-theme="light"] .font-mono.text-gray-600 {
+            color: #9CA3AF;
+        }
+
+        /* Status badges - Light Mode */
+        :root[data-theme="light"] .text-green-500 {
+            color: #10B981;
+        }
+
+        :root[data-theme="light"] .text-red-300,
+        :root[data-theme="light"] .text-red-200 {
+            color: #DC2626;
+        }
+
+        :root[data-theme="light"] .text-indigo-400,
+        :root[data-theme="light"] .text-indigo-500 {
+            color: #4F46E5;
+        }
+
+        /* ========================================
+           COMPARISON PANEL COMPONENT
+           "Manuális Módszer" style from PromptDAO
+        ======================================== */
+
+        .comparison-panel {
+            display: none;
+        }
+
+        :root[data-theme="light"] .comparison-panel {
+            display: block;
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .method-old {
+            padding: 24px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .method-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .method-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #6B7280;
+        }
+
+        .badge-muted {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: #9CA3AF;
+            text-transform: uppercase;
+        }
+
+        .progress-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #E5E7EB;
+        }
+
+        .progress-bar.secondary {
+            width: 66%;
+            background: #F3F4F6;
+        }
+
+        .method-new {
+            padding: 24px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .label-badge {
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            background: #1F2937;
+            color: #FFFFFF;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            padding: 12px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .method-new-content {
+            flex: 1;
+        }
+
+        .method-new-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .method-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1A1A1A;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #10B981;
+        }
+
+        .badge-active::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+        }
+
+        .method-feature {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: #F9FAFB;
+            border-radius: 12px;
+            border: 1px solid #F3F4F6;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: #1F2937;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .feature-text strong {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 4px;
+        }
+
+        .feature-text span {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        /* Dark mode: hide comparison panel */
+        :root[data-theme="dark"] .comparison-panel,
+        :root .comparison-panel {
+            display: none;
+        }
+
+        :root[data-theme="light"] .comparison-panel {
+            display: block;
+        }
     </style>
+
 </head>
 
 <body class="font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
@@ -767,6 +1106,69 @@
                 <span>⚠ MARKET_ALERT: AI ADOPTION GAP WIDENING</span>
             </div>
         </div>
+
+        <!-- COMPARISON PANEL (Light Mode Only) - PromptDAO Style -->
+        <section class="py-16 relative z-10">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <!-- Left: Problem Statement Text -->
+                    <div class="comparison-panel-text">
+                        <span class="text-xs font-bold tracking-widest uppercase mb-4 block"
+                            style="color: #DC2626;">PIACI RIASZTÁS</span>
+                        <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight" style="color: #1A1A1A;">
+                            A Késlekedés Ára:<br>Pénzügyi Öngyilkosság
+                        </h2>
+                        <p class="text-base leading-relaxed mb-6" style="color: #374151;">
+                            Amíg te manuálisan írod a promptokat és reménykedsz a jó eredményben, az AI-natív designerek
+                            másodpercek alatt generálnak VP-szintű stratégiákat. A piacot nem érdekli a "fáradozásod".
+                            Csak az eredmény számít.
+                        </p>
+                        <!-- Quote Box -->
+                        <div class="comparison-panel p-4" style="border-left: 3px solid #FDA4AF; background: #FFF7F8;">
+                            <p class="italic text-sm" style="color: #374151;">
+                                "A Logic Engine-t használó juniorok 3x gyorsabban szállítanak, mint a manuálisan dolgozó
+                                seniorok."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Comparison Panel -->
+                    <div class="comparison-panel">
+                        <!-- Old Method Section -->
+                        <div class="method-old">
+                            <div class="method-header">
+                                <span class="method-label">Manuális Módszer</span>
+                                <span class="badge-muted">ELAVULT</span>
+                            </div>
+                            <div class="progress-bars">
+                                <div class="progress-bar"></div>
+                                <div class="progress-bar secondary"></div>
+                            </div>
+                        </div>
+
+                        <!-- New Method Section -->
+                        <div class="method-new">
+                            <div class="label-badge">EITT VAGY</div>
+                            <div class="method-new-content">
+                                <div class="method-new-header">
+                                    <span class="method-title">LOGIC ENGINE v8</span>
+                                    <span class="badge-active">AKTÍV</span>
+                                </div>
+                                <div class="method-feature">
+                                    <div class="icon-box">
+                                        <i class="ph-bold ph-lightning"></i>
+                                    </div>
+                                    <div class="feature-text">
+                                        <strong>Azonnali Stratégia</strong>
+                                        <span>ROI + Pszichológia + UX</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- THE PIPELINE -->
         <section id="protocol" class="py-32 relative z-10">
