@@ -8,6 +8,20 @@ const OutputRenderer = (function () {
 
     let currentLayer = 'one-pager';
 
+    // Color class mapping for Tailwind (dynamic classes don't work)
+    const colorMap = {
+        'red': 'text-red-400',
+        'green': 'text-green-400',
+        'blue': 'text-blue-400',
+        'indigo': 'text-indigo-400',
+        'purple': 'text-purple-400',
+        'cyan': 'text-cyan-400',
+        'yellow': 'text-yellow-400',
+        'orange': 'text-orange-400',
+        'pink': 'text-pink-400',
+        'gray': 'text-gray-400'
+    };
+
     function init() {
         renderLayerTabs();
         switchLayer('one-pager');
@@ -75,18 +89,24 @@ const OutputRenderer = (function () {
             return '<div class="text-center text-gray-400 py-12">No content available</div>';
         }
 
-        return sections.map((section, index) => `
+        return sections.map((section, index) => {
+            const iconColor = colorMap[section.color] || 'text-gray-400';
+            const isHidden = index >= 2 ? 'hidden' : '';
+            const rotateClass = index < 2 ? 'rotate-180' : '';
+
+            return `
             <div class="glass-panel collapsible-section ${section.isHighlight ? 'border-2 border-indigo-500/30' : ''}" id="section-${section.id}">
                 <div class="section-header cursor-pointer p-5 flex items-center gap-3" onclick="OutputRenderer.toggleSection('${section.id}')">
-                    <i class="ph-bold ${section.icon} text-${section.color}-400 text-xl"></i>
+                    <i class="ph-bold ${section.icon} ${iconColor} text-xl"></i>
                     <h3 class="flex-1 text-sm font-bold text-white">${section.title}</h3>
-                    <i class="ph-bold ph-caret-down collapse-icon text-gray-400 transition-transform"></i>
+                    <i class="ph-bold ph-caret-down collapse-icon text-gray-400 transition-transform ${rotateClass}"></i>
                 </div>
-                <div class="section-content px-5 pb-5 ${index < 2 ? '' : 'hidden'}">
+                <div class="section-content px-5 pb-5 ${isHidden}">
                     ${section.content}
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     function toggleSection(sectionId) {
@@ -106,13 +126,13 @@ const OutputRenderer = (function () {
     }
 
     function expandAll() {
-        document.querySelectorAll('.section-content').forEach(c => c.classList.remove('hidden'));
-        document.querySelectorAll('.collapse-icon').forEach(i => i.classList.add('rotate-180'));
+        document.querySelectorAll('#output-layer-content .section-content').forEach(c => c.classList.remove('hidden'));
+        document.querySelectorAll('#output-layer-content .collapse-icon').forEach(i => i.classList.add('rotate-180'));
     }
 
     function collapseAll() {
-        document.querySelectorAll('.section-content').forEach(c => c.classList.add('hidden'));
-        document.querySelectorAll('.collapse-icon').forEach(i => i.classList.remove('rotate-180'));
+        document.querySelectorAll('#output-layer-content .section-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('#output-layer-content .collapse-icon').forEach(i => i.classList.remove('rotate-180'));
     }
 
     return {
@@ -125,6 +145,20 @@ const OutputRenderer = (function () {
 })();
 
 window.OutputRenderer = OutputRenderer;
+
+// Global copyToClipboard function for Figma prompts
+window.copyToClipboard = function (elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        navigator.clipboard.writeText(el.innerText).then(() => {
+            if (window.ToastModule) {
+                window.ToastModule.success('Copied to clipboard!');
+            }
+        }).catch(err => {
+            console.error('Copy failed:', err);
+        });
+    }
+};
 
 // Auto-init when DOM ready
 document.addEventListener('DOMContentLoaded', function () {
