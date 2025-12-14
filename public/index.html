@@ -2343,28 +2343,20 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Tab Navigation -->
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="switchOutputTab('strategy')" id="output-tab-strategy"
-                                            class="output-tab-active px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-strategy"></i> Strategy & ROI
-                                        </button>
-                                        <button onclick="switchOutputTab('design')" id="output-tab-design"
-                                            class="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-paint-brush"></i> Design & UX
-                                        </button>
-                                        <button onclick="switchOutputTab('engineering')" id="output-tab-engineering"
-                                            class="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white rounded-lg transition-all flex items-center gap-2">
-                                            <i class="ph-bold ph-code"></i> Engineering & Build
-                                        </button>
-                                        <div class="h-6 w-px bg-white/10 mx-2"></div>
-                                        <button onclick="exportAllOutput()"
-                                            class="px-3 py-2 bg-indigo-500/10 text-indigo-400 text-xs font-bold rounded-lg border border-indigo-500/20 hover:bg-indigo-500/20 transition flex items-center gap-2">
-                                            <i class="ph-bold ph-download-simple"></i> Export
-                                        </button>
-                                        <button onclick="toggleAllSections()"
-                                            class="px-3 py-2 bg-white/5 text-gray-400 text-xs rounded-lg hover:bg-white/10 transition flex items-center gap-2">
+                                    <!-- Layer Navigation (Dynamic) -->
+                                    <div id="output-layer-tabs" class="flex items-center gap-2">
+                                        <!-- Populated by OutputRenderer.init() -->
+                                    </div>
+                                    <div class="flex items-center gap-2 ml-4">
+                                        <button onclick="OutputRenderer.expandAll()"
+                                            class="px-3 py-2 bg-white/5 text-gray-400 text-xs rounded-lg hover:bg-white/10 transition flex items-center gap-2"
+                                            title="Expand All">
                                             <i class="ph-bold ph-arrows-out-simple"></i>
+                                        </button>
+                                        <button onclick="OutputRenderer.collapseAll()"
+                                            class="px-3 py-2 bg-white/5 text-gray-400 text-xs rounded-lg hover:bg-white/10 transition flex items-center gap-2"
+                                            title="Collapse All">
+                                            <i class="ph-bold ph-arrows-in-simple"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -2372,27 +2364,21 @@
                                 <!-- Meta Bar -->
                                 <div class="meta-bar flex-wrap">
                                     <div class="meta-item">
-                                        <i class="ph-bold ph-buildings text-indigo-400"></i>
+                                        <i class="ph-bold ph-megaphone text-indigo-400"></i>
                                         <span class="label">Domain</span>
-                                        <span class="value">Fintech</span>
+                                        <span class="value">MarTech Agency</span>
                                     </div>
                                     <div class="w-px h-4 bg-white/10"></div>
                                     <div class="meta-item">
                                         <i class="ph-bold ph-warning-circle text-yellow-400"></i>
                                         <span class="label">Risk</span>
-                                        <div class="confidence-dots">
-                                            <div class="dot active"></div>
-                                            <div class="dot active"></div>
-                                            <div class="dot active"></div>
-                                            <div class="dot"></div>
-                                            <div class="dot"></div>
-                                        </div>
+                                        <span class="value text-yellow-400">Medium-High</span>
                                     </div>
                                     <div class="w-px h-4 bg-white/10"></div>
                                     <div class="meta-item">
-                                        <i class="ph-bold ph-seal-check text-green-400"></i>
-                                        <span class="label">Confidence</span>
-                                        <span class="value text-green-400">87%</span>
+                                        <i class="ph-bold ph-stack text-purple-400"></i>
+                                        <span class="label">Layers</span>
+                                        <span class="value">3</span>
                                     </div>
                                     <div class="w-px h-4 bg-white/10"></div>
                                     <div class="meta-item">
@@ -2410,8 +2396,13 @@
                                 </div>
                             </div>
 
-                            <!-- TAB: STRATEGY & ROI -->
-                            <div id="output-content-strategy" class="output-tab-content space-y-6">
+                            <!-- Dynamic Layer Content Container -->
+                            <div id="output-layer-content" class="space-y-4">
+                                <!-- Populated by OutputRenderer -->
+                            </div>
+
+                            <!-- OLD STATIC CONTENT (Hidden - now using dynamic renderer) -->
+                            <div id="output-content-strategy" class="output-tab-content space-y-6 hidden">
 
                                 <!-- HERO KPI Section -->
                                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -4012,6 +4003,11 @@
     <script src="js/modules/payment.js?v=1.6"></script>
     <script src="js/modules/admin.js?v=1.6"></script>
     <script src="js/modules/dashboard.js?v=1.6"></script>
+    <script src="js/modules/outputContent.js?v=1.0"></script>
+    <script src="js/modules/outputContentL2.js?v=1.0"></script>
+    <script src="js/modules/outputContentL2B.js?v=1.0"></script>
+    <script src="js/modules/outputContentL3.js?v=1.0"></script>
+    <script src="js/modules/outputRenderer.js?v=1.0"></script>
     <script src="js/modules/share.js?v=1.6"></script>
     <script src="js/app.js?v=5.6"></script>
     <script>
