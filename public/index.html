@@ -976,170 +976,53 @@
         }
 
         /* ========================================
-           COMPARISON PANEL COMPONENT
-           "Manuális Módszer" style from PromptDAO
+           PROBLEM INPUT - LIGHT THEME
+           Clean black/white/grey styling
         ======================================== */
 
-        .comparison-panel {
-            display: none;
-        }
-
-        :root[data-theme="light"] .comparison-panel {
-            display: block;
-            background: #FFFFFF;
+        /* Problem input container - light theme */
+        :root[data-theme="light"] .bg-\[#0a0a0f\]\/80 {
+            background: #FFFFFF !important;
             border: 1px solid #E5E7EB;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
         }
 
-        .method-old {
-            padding: 24px;
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        .method-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .method-label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+        /* Input label - light theme */
+        :root[data-theme="light"] .text-indigo-400.font-mono.text-xs {
             color: #6B7280;
         }
 
-        .badge-muted {
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
-            color: #9CA3AF;
-            text-transform: uppercase;
-        }
-
-        .progress-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            background: #E5E7EB;
-        }
-
-        .progress-bar.secondary {
-            width: 66%;
-            background: #F3F4F6;
-        }
-
-        .method-new {
-            padding: 24px;
-            display: flex;
-            gap: 16px;
-        }
-
-        .label-badge {
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            background: #1F2937;
-            color: #FFFFFF;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            padding: 12px 6px;
-            border-radius: 6px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .method-new-content {
-            flex: 1;
-        }
-
-        .method-new-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .method-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1A1A1A;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .badge-active {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #10B981;
-        }
-
-        .badge-active::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #10B981;
-            border-radius: 50%;
-        }
-
-        .method-feature {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
+        /* Textarea - light theme (black/white/grey) */
+        :root[data-theme="light"] #problemInput {
             background: #F9FAFB;
-            border-radius: 12px;
-            border: 1px solid #F3F4F6;
-        }
-
-        .icon-box {
-            width: 48px;
-            height: 48px;
-            background: #1F2937;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #FFFFFF;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .feature-text strong {
-            display: block;
-            font-size: 16px;
-            font-weight: 600;
+            border: 1px solid #E5E7EB;
             color: #1A1A1A;
-            margin-bottom: 4px;
+            border-radius: 12px;
+            font-family: inherit;
         }
 
-        .feature-text span {
-            font-size: 13px;
-            color: #6B7280;
+        :root[data-theme="light"] #problemInput::placeholder {
+            color: #9CA3AF;
         }
 
-        /* Dark mode: hide comparison panel */
-        :root[data-theme="dark"] .comparison-panel,
-        :root .comparison-panel {
-            display: none;
+        :root[data-theme="light"] #problemInput:focus {
+            border-color: #1F2937;
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+            outline: none;
         }
 
-        :root[data-theme="light"] .comparison-panel {
-            display: block;
+        /* Status text - light theme */
+        :root[data-theme="light"] .text-gray-400.font-mono.text-\[10px\] {
+            color: #9CA3AF;
+        }
+
+        :root[data-theme="light"] .text-indigo-500 {
+            color: #374151;
+        }
+
+        /* Pulse dots - light theme */
+        :root[data-theme="light"] .bg-indigo-500.animate-pulse {
+            background: #9CA3AF;
         }
     </style>
 
