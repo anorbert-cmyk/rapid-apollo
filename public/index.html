@@ -52,6 +52,11 @@
     </script>
     <link rel="icon" type="image/png" href="/favicon.png">
 
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <!-- Chart.js (Analytics) -->
@@ -813,92 +818,240 @@
 
         /* ========================================
            PRICING SECTION - LIGHT THEME
-           PromptDAO Style Cards
+           "World Class" Design - PromptDAO Style
         ======================================== */
+
+        /* Typography */
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
 
         /* Section title */
         :root[data-theme="light"] #mint h2 {
             color: #1A1A1A;
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            /* Larger, more editorial */
         }
 
         :root[data-theme="light"] #mint p {
             color: #6B7280;
+            font-family: 'Space Grotesk', monospace;
+            /* Keep subtitle techy/mono */
+            letter-spacing: 0.05em;
         }
 
         /* All pricing cards - base light style */
         :root[data-theme="light"] #mint .hud-card {
             background: #FFFFFF;
             border: 1px solid #E5E7EB;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-radius: 24px;
+            /* Softer, more premium roundness */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* Tier 1 & 3: Muted cards */
         :root[data-theme="light"] #mint .pricing-tier-muted {
-            opacity: 0.85;
+            opacity: 0.6;
+            /* More faded as per reference */
             background: #FAFAFA;
             border: 1px solid #F3F4F6;
+            transform: scale(0.95);
+            /* Slightly smaller to emphasize middle */
         }
 
         :root[data-theme="light"] #mint .pricing-tier-muted:hover {
             opacity: 1;
+            transform: scale(0.98);
             border-color: #E5E7EB;
         }
 
         :root[data-theme="light"] #mint .pricing-tier-muted h3 {
-            color: #6B7280;
+            color: #9CA3AF;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
         }
 
-        :root[data-theme="light"] #mint .pricing-tier-muted .text-4xl {
-            color: #374151;
+        :root[data-theme="light"] #mint .pricing-tier-muted .text-4xl,
+        :root[data-theme="light"] #mint .pricing-tier-muted .price-display {
+            color: #D1D5DB;
+            font-family: 'Playfair Display', serif;
         }
 
         :root[data-theme="light"] #mint .pricing-tier-muted ul li {
-            color: #6B7280;
+            color: #9CA3AF;
+            font-size: 0.75rem;
         }
 
         :root[data-theme="light"] #mint .pricing-tier-muted .pay-btn {
             background: transparent;
-            border: 1px solid #D1D5DB;
-            color: #6B7280;
+            border: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 0.7rem;
         }
 
         :root[data-theme="light"] #mint .pricing-tier-muted .pay-btn:hover {
             background: #F3F4F6;
             color: #374151;
+            border-color: #D1D5DB;
         }
 
-        /* Tier 2: Highlighted card (BENNFENTES) */
+        /* Tier 2: Highlighted card (BENNFENTES) - THE HERO */
         :root[data-theme="light"] #mint .pricing-tier-highlight {
             background: #FFFFFF;
-            border: 2px solid #1F2937;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-
-        :root[data-theme="light"] #mint .pricing-tier-highlight .bg-\[\.0b0c16\],
-        :root[data-theme="light"] #mint .pricing-tier-highlight>div>div {
-            background: #FFFFFF !important;
+            border: 3px solid #1A1A1A;
+            /* Thicker, bolder border */
+            border-radius: 24px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.12);
+            /* Deep, premium shadow */
+            transform: scale(1.05);
+            /* Physically larger */
+            z-index: 10;
+            padding: 3rem !important;
+            /* More breathing room */
         }
 
         :root[data-theme="light"] #mint .pricing-tier-highlight h3 {
             color: #1A1A1A;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.125rem;
+            letter-spacing: 0.05em;
         }
 
-        :root[data-theme="light"] #mint .pricing-tier-highlight .text-6xl {
+        /* Genesis Mint Badge */
+        .genesis-badge {
+            display: none;
+        }
+
+        :root[data-theme="light"] .genesis-badge {
+            display: inline-block;
+            border: 1px solid #1A1A1A;
+            color: #1A1A1A;
+            padding: 4px 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+            background: transparent;
+        }
+
+        :root[data-theme="light"] #mint .pricing-tier-highlight .text-6xl,
+        :root[data-theme="light"] #mint .pricing-tier-highlight .price-display {
             color: #1A1A1A;
             background: none;
             -webkit-text-fill-color: #1A1A1A;
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            /* Massive price */
         }
 
         :root[data-theme="light"] #mint .pricing-tier-highlight .line-through {
             color: #9CA3AF;
+            font-family: 'Playfair Display', serif;
+        }
+
+        :root[data-theme="light"] #mint .pricing-tier-highlight ul li {
+            color: #4B5563;
+            font-weight: 500;
+        }
+
+        :root[data-theme="light"] #mint .pricing-tier-highlight .pay-btn {
+            background: #1A1A1A;
+            color: #FFFFFF;
+            border: none;
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        :root[data-theme="light"] #mint .pricing-tier-highlight .pay-btn:hover {
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Urgency text */
+        :root[data-theme="light"] #mint .urgency-text {
+            color: #EF4444;
+            /* Standard red */
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 0.1em;
+            font-size: 0.65rem;
         }
 
         :root[data-theme="light"] #mint .pricing-tier-highlight .badge-genesis {
+            background: transparent;
+            border: 1px solid #1A1A1A;
+            color: #1A1A1A;
+        }
+
+        /* ========================================
+           LOGIC PIPELINE - MODERN REDESIGN
+        ======================================== */
+        :root[data-theme="light"] #protocol .hud-card {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(12px);
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+        }
+
+        :root[data-theme="light"] #protocol h3 {
+            color: #1A1A1A;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        :root[data-theme="light"] #protocol .text-gray-400 {
+            color: #6B7280;
+        }
+
+        :root[data-theme="light"] #protocol .text-gray-600 {
+            color: #9CA3AF;
+        }
+
+        /* Central Card Highlight */
+        :root[data-theme="light"] #protocol .hud-card.card-highlight {
+            background: #FFFFFF !important;
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1), 0 10px 15px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #E5E7EB;
+            transform: scale(1.05);
+        }
+
+        :root[data-theme="light"] #protocol .border-white\/10,
+        :root[data-theme="light"] #protocol .border-white\/5 {
+            border-color: #E5E7EB;
+        }
+
+        /* Input Area - Light Theme Overrides */
+        :root[data-theme="light"] #protocol .bg-\[\#050508\] {
             background: #FFFFFF;
-            border: 1px solid #1F2937;
-            color: #1F2937;
+        }
+
+        :root[data-theme="light"] #protocol .bg-\[\#0a0a0f\]\/80 {
+            background: #F9FAFB;
+        }
+
+        :root[data-theme="light"] #protocol textarea {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            color: #1A1A1A;
+        }
+
+        :root[data-theme="light"] #protocol textarea::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* Connector Lines */
+        :root[data-theme="light"] .flow-line {
+            background: #F3F4F6;
+        }
+
+        :root[data-theme="light"] .flow-beam {
+            background: linear-gradient(90deg, transparent, #4F46E5, transparent);
         }
 
         :root[data-theme="light"] #mint .pricing-tier-highlight ul li,
@@ -1006,8 +1159,9 @@
         }
 
         :root[data-theme="light"] #problemInput:focus {
-            border-color: #1F2937;
-            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+            border-color: #6366F1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            background: #FFFFFF;
             outline: none;
         }
 
@@ -1154,76 +1308,12 @@
             </div>
         </div>
 
-        <!-- COMPARISON PANEL (Light Mode Only) - PromptDAO Style -->
-        <section class="py-16 relative z-10">
-            <div class="max-w-4xl mx-auto px-4">
-                <div class="grid md:grid-cols-2 gap-8 items-start">
-                    <!-- Left: Problem Statement Text -->
-                    <div class="comparison-panel-text">
-                        <span class="text-xs font-bold tracking-widest uppercase mb-4 block"
-                            style="color: #DC2626;">PIACI RIASZTÁS</span>
-                        <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight" style="color: #1A1A1A;">
-                            A Késlekedés Ára:<br>Pénzügyi Öngyilkosság
-                        </h2>
-                        <p class="text-base leading-relaxed mb-6" style="color: #374151;">
-                            Amíg te manuálisan írod a promptokat és reménykedsz a jó eredményben, az AI-natív designerek
-                            másodpercek alatt generálnak VP-szintű stratégiákat. A piacot nem érdekli a "fáradozásod".
-                            Csak az eredmény számít.
-                        </p>
-                        <!-- Quote Box -->
-                        <div class="comparison-panel p-4" style="border-left: 3px solid #FDA4AF; background: #FFF7F8;">
-                            <p class="italic text-sm" style="color: #374151;">
-                                "A Logic Engine-t használó juniorok 3x gyorsabban szállítanak, mint a manuálisan dolgozó
-                                seniorok."
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Right: Comparison Panel -->
-                    <div class="comparison-panel">
-                        <!-- Old Method Section -->
-                        <div class="method-old">
-                            <div class="method-header">
-                                <span class="method-label">Manuális Módszer</span>
-                                <span class="badge-muted">ELAVULT</span>
-                            </div>
-                            <div class="progress-bars">
-                                <div class="progress-bar"></div>
-                                <div class="progress-bar secondary"></div>
-                            </div>
-                        </div>
-
-                        <!-- New Method Section -->
-                        <div class="method-new">
-                            <div class="label-badge">EITT VAGY</div>
-                            <div class="method-new-content">
-                                <div class="method-new-header">
-                                    <span class="method-title">LOGIC ENGINE v8</span>
-                                    <span class="badge-active">AKTÍV</span>
-                                </div>
-                                <div class="method-feature">
-                                    <div class="icon-box">
-                                        <i class="ph-bold ph-lightning"></i>
-                                    </div>
-                                    <div class="feature-text">
-                                        <strong>Azonnali Stratégia</strong>
-                                        <span>ROI + Pszichológia + UX</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- THE PIPELINE -->
         <section id="protocol" class="py-32 relative z-10">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="text-center mb-20">
-                    <h2 class="text-3xl font-bold text-white mb-2">The Logic Pipeline</h2>
-                    <p class="text-gray-400 font-mono text-xs uppercase tracking-widest">Transmuting
-                        Ambiguity into
+                    <h2 class="text-4xl font-bold text-white mb-2 font-playfair">The Logic Pipeline</h2>
+                    <p class="text-gray-400 font-mono text-xs uppercase tracking-widest">Transmuting Ambiguity into
                         Strategy</p>
                 </div>
 
@@ -1291,10 +1381,12 @@
                     </div>
                     <!-- Connector 1 -->
                     <div class="hidden md:flex flex-col items-center justify-center w-24">
-                        <div class="flow-line w-full mb-1">
-                            <div class="flow-beam"></div>
+                        <div class="flow-line w-full mb-1 h-[2px] bg-gray-800 rounded-full relative overflow-hidden">
+                            <div
+                                class="flow-beam absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-[shimmer_2s_infinite]">
+                            </div>
                         </div>
-                        <span class="text-[10px] font-mono text-indigo-500/50">INJECT</span>
+                        <span class="text-[10px] font-mono text-indigo-500/50 mt-2">INJECT</span>
                     </div>
                     <!-- Stage 2: The Core -->
                     <div class="relative z-10 group">
@@ -1302,7 +1394,7 @@
                             class="absolute inset-0 bg-indigo-600/20 blur-xl rounded-full animate-pulse-slow group-hover:bg-indigo-600/40 transition">
                         </div>
                         <div
-                            class="hud-card p-8 rounded-2xl text-center border-indigo-500/30 group-hover:border-indigo-500 group-hover:scale-105 transition-all duration-300 relative bg-[#0a0b14]">
+                            class="hud-card card-highlight p-8 rounded-2xl text-center border-indigo-500/30 group-hover:border-indigo-500 group-hover:scale-105 transition-all duration-300 relative">
                             <div
                                 class="w-16 h-16 mx-auto bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20 mb-4 group-hover:rotate-180 transition duration-700">
                                 <i class="ph-fill ph-cpu text-3xl text-indigo-400"></i>
@@ -1313,10 +1405,11 @@
                     </div>
                     <!-- Connector 2 -->
                     <div class="hidden md:flex flex-col items-center justify-center w-24">
-                        <div class="flow-line w-full mb-1">
-                            <div class="flow-beam" style="animation-delay: 0.75s"></div>
+                        <div class="flow-line w-full mb-1 h-[2px] bg-gray-800 rounded-full relative overflow-hidden">
+                            <div class="flow-beam absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-green-500 to-transparent animate-[shimmer_2s_infinite]"
+                                style="animation-delay: 0.75s"></div>
                         </div>
-                        <span class="text-[10px] font-mono text-green-500/50">EXTRACT</span>
+                        <span class="text-[10px] font-mono text-green-500/50 mt-2">EXTRACT</span>
                     </div>
                     <!-- Stage 3: Output -->
                     <div class="group">
@@ -1346,92 +1439,65 @@
                     <p class="text-gray-400 font-mono text-sm">Játékos vagy NPC akarsz lenni?</p>
                 </div>
 
-                <div class="grid lg:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
-
+                <div class="grid md:grid-cols-3 gap-6 relative items-center max-w-5xl mx-auto" id="mint-cards">
                     <!-- TIER 1: MEGFIGYELŐ -->
                     <div
                         class="hud-card pricing-tier-muted rounded-2xl p-8 relative overflow-hidden group transition-all duration-300">
                         <div class="flex justify-between items-start mb-8">
                             <div>
-                                <h3 class="text-lg font-semibold tracking-widest uppercase">MEGFIGYELŐ</h3>
+                                <h3 class="text-xs font-semibold tracking-widest uppercase mb-1">MEGFIGYELŐ</h3>
                             </div>
-                            <i class="ph-bold ph-eye-slash text-gray-400 text-xl"></i>
+                            <i class="ph-duotone ph-eye text-lg text-gray-400"></i>
                         </div>
                         <div class="mb-8">
-                            <span class="text-4xl font-bold">$19</span>
-                            <!-- Logic Hook: Price ID -->
-                            <div class="text-xs text-indigo-400 mt-1 hidden" id="eth-standard">~ETH</div>
+                            <span class="text-4xl font-bold font-playfair price-display">$19</span>
                         </div>
-                        <ul class="space-y-4 mb-8 text-sm border-t border-gray-200 pt-8">
-                            <li class="flex gap-3 items-center"><span class="text-gray-400">✓</span>
-                                Statikus Szövegfájl
-                            </li>
-                            <li class="flex gap-3 items-center text-amber-600"><i class="ph-bold ph-warning"></i> Nincs
-                                Logic Engine</li>
-                            <li class="flex gap-3 items-center text-amber-600"><i class="ph-bold ph-warning"></i> 24ó
-                                Adatkésés</li>
+                        <ul class="space-y-4 mb-8 text-xs border-t border-gray-100 pt-8">
+                            <li class="flex gap-3 items-center"><span>✓</span> Statikus Szövegfájl</li>
+                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> Nincs Logic Engine</li>
+                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> 24ó Adatkésés</li>
                         </ul>
-                        <!-- Logic Hook: payAndSolve -->
-                        <button id="btn-pay-standard"
-                            class="pay-btn w-full py-4 border rounded-xl font-semibold text-xs uppercase tracking-widest transition">
+                        <button
+                            class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
                             Korlátok Elfogadása
                         </button>
                     </div>
 
-                    <!-- TIER 2: BENNFENTES (Highlighted) -->
-                    <div class="relative z-20 pricing-tier-highlight">
-                        <div class="absolute inset-0 bg-indigo-600/20 blur-2xl animate-pulse-slow">
-                        </div>
-                        <div
-                            class="hud-card rounded-2xl p-1 bg-gradient-to-b from-indigo-500 to-purple-900 h-full relative">
-                            <div class="bg-[#0b0c16] rounded-xl p-8 h-full relative overflow-hidden">
-                                <div class="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 class="text-xl font-bold flex items-center gap-2">
-                                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                            BENNFENTES
-                                        </h3>
-                                    </div>
-                                    <div class="badge-genesis px-3 py-1 rounded text-[10px] font-bold tracking-wider">
-                                        GENESIS MINT
-                                    </div>
-                                </div>
-                                <div class="my-8">
-                                    <div class="flex items-baseline gap-3">
-                                        <span class="text-6xl font-bold">$49</span>
-                                        <span class="text-lg line-through">$149</span>
-                                    </div>
-                                    <div class="text-xs text-indigo-400 mt-1 hidden" id="eth-medium">~ETH</div>
-                                </div>
-                                <div class="space-y-4 mb-8 text-sm font-medium border-t border-gray-200 pt-8">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-5 h-5 rounded flex items-center justify-center">
-                                            <i class="ph-bold ph-lightning"></i>
-                                        </div>
-                                        <span>Logic Engine v8.0</span>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-5 h-5 rounded flex items-center justify-center">
-                                            <i class="ph-bold ph-brain"></i>
-                                        </div>
-                                        <span>Pszichológiai Könyvtár</span>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-5 h-5 rounded flex items-center justify-center">
-                                            <i class="ph-bold ph-figma-logo"></i>
-                                        </div>
-                                        <span>Figma Auto-Generátor</span>
-                                    </div>
-                                </div>
-                                <!-- Logic Hook: payAndSolve -->
-                                <button id="btn-pay-medium"
-                                    class="pay-btn btn-primary w-full py-4 rounded-xl font-bold text-white text-sm uppercase tracking-wider hover:scale-[1.02] transition-transform">
-                                    Hozzáférés Kiváltása
-                                </button>
-                                <div class="urgency-text text-center mt-4 text-xs font-bold tracking-wide">
-                                    ⚡ MÁR CSAK 3 HELY VAN EZEN AZ ÁRON
-                                </div>
+                    <!-- TIER 2: BENNFENTES (HIGHLIGHTED) -->
+                    <div
+                        class="hud-card pricing-tier-highlight rounded-2xl p-10 relative overflow-hidden transform md:-translate-y-4 z-10 transition-all duration-300">
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                                <h3 class="text-lg font-bold tracking-tight uppercase">BENNFENTES</h3>
                             </div>
+                            <span class="genesis-badge">GENESIS MINT</span>
+                        </div>
+                        <div class="mb-8 flex items-baseline gap-4">
+                            <span class="text-6xl font-bold font-playfair price-display">$49</span>
+                            <span
+                                class="text-xl text-gray-400 line-through font-playfair decoration-gray-300">$149</span>
+                        </div>
+                        <ul class="space-y-4 mb-10 text-sm">
+                            <li class="flex gap-3 items-center">
+                                <i class="ph-fill ph-lightning text-black"></i> Logic Engine v8.0
+                            </li>
+                            <li class="flex gap-3 items-center">
+                                <i class="ph-fill ph-brain text-black"></i> Pszichológiai Könyvtár
+                            </li>
+                            <li class="flex gap-3 items-center">
+                                <i class="ph-fill ph-code text-black"></i> Figma Auto-Generátor
+                            </li>
+                        </ul>
+                        <!-- Logic Hook: payAndSolve -->
+                        <button id="btn-pay-discount"
+                            class="pay-btn w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition mb-4">
+                            HOZZÁFÉRÉS KIVÁLTÁSA
+                        </button>
+                        <div class="text-center">
+                            <p class="urgency-text animate-pulse">
+                                ⚠ MÁR CSAK 3 HELY VAN EZEN AZ ÁRON
+                            </p>
                         </div>
                     </div>
 
@@ -1440,27 +1506,24 @@
                         class="hud-card pricing-tier-muted pricing-tier-purple rounded-2xl p-8 relative overflow-hidden group transition-all duration-300">
                         <div class="flex justify-between items-start mb-8">
                             <div>
-                                <h3 class="text-lg font-semibold tracking-widest uppercase">SZINDIKÁTUS</h3>
+                                <h3 class="text-xs font-semibold tracking-widest uppercase text-purple-400">SZINDIKÁTUS
+                                </h3>
                             </div>
-                            <i class="ph-duotone ph-crown text-2xl"></i>
+                            <i class="ph-duotone ph-crown text-lg text-purple-300"></i>
                         </div>
                         <div class="mb-8">
-                            <span class="text-4xl font-bold">$199</span>
-                            <div class="text-xs text-indigo-400 mt-1 hidden" id="eth-full">~ETH</div>
+                            <span class="text-4xl font-bold font-playfair price-display">$199</span>
                         </div>
-                        <ul class="space-y-4 mb-8 text-sm border-t border-gray-200 pt-8">
+                        <ul class="space-y-4 mb-8 text-xs border-t border-gray-100 pt-8">
                             <li class="flex gap-3 items-center"><span>✓</span> Minden "Bennfentes" elem</li>
                             <li class="flex gap-3 items-center"><span>✓</span> 10 Wallet Licensz</li>
-                            <li class="flex gap-3 items-center"><span>✓</span> Prioritásos Támogatás
-                            </li>
+                            <li class="flex gap-3 items-center"><span>✓</span> Prioritásos Támogatás</li>
                         </ul>
-                        <!-- Logic Hook: payAndSolve -->
-                        <button id="btn-pay-full"
-                            class="pay-btn w-full py-4 rounded-xl font-semibold text-xs uppercase tracking-widest transition">
+                        <button
+                            class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
                             Csapat Csatlakoztatása
                         </button>
                     </div>
-
                 </div>
             </div>
         </section>
