@@ -155,69 +155,63 @@
             --blob-3: rgba(6, 182, 212, 0.1);
         }
 
-        /* Light Theme - "Soft Blue" Palette (Trust & Professionalism) */
+        /* Light Theme - PromptDAO Style (Clean & Premium) */
         :root[data-theme="light"] {
-            /* Surfaces - Blue-tinted whites */
+            /* Backgrounds - Pure white base */
             --bg-primary: #FFFFFF;
-            /* Pure white base */
-            --bg-secondary: #EFF6FF;
-            /* blue-50 - Cards, panels */
-            --bg-tertiary: #F8FAFC;
-            /* Subtle sections */
+            --bg-secondary: #FAFAFA;
+            --bg-tertiary: #F9FAFB;
 
-            /* Glass & Panels - Soft blue tint */
-            --glass-bg: #EFF6FF;
-            /* blue-50 */
-            --glass-hover: #DBEAFE;
-            /* blue-100 */
-            --panel-bg: #EFF6FF;
-            /* blue-50 */
-            --glass-border: #BFDBFE;
-            /* blue-200 */
-            --glass-border-hover: #3B82F6;
-            /* blue-500 */
+            /* Cards/Panels - Clean white with subtle borders */
+            --glass-bg: #FFFFFF;
+            --glass-hover: #FAFAFA;
+            --panel-bg: #FFFFFF;
+            --glass-border: #E5E7EB;
+            /* Subtle grey border */
+            --glass-border-hover: #1F2937;
+            /* Dark on hover */
 
-            /* Text Colors - Deep blue, high contrast */
-            --text-primary: #1E3A5F;
-            /* Custom navy - 10.2:1 ✓ */
-            --text-secondary: #334155;
-            /* slate-700 - 8.6:1 ✓ */
-            --text-muted: #64748B;
-            /* slate-500 - 4.7:1 ✓ */
-            --text-dim: #94A3B8;
-            /* slate-400 */
+            /* Text Colors - High contrast, near-black */
+            --text-primary: #1A1A1A;
+            /* Headlines - 17:1 ✓ */
+            --text-secondary: #374151;
+            /* Body - 10:1 ✓ */
+            --text-muted: #6B7280;
+            /* Muted - 5.5:1 ✓ */
+            --text-dim: #9CA3AF;
+            /* Labels */
 
-            /* Accents - Vibrant blue family */
-            --accent-indigo: #3B82F6;
-            /* blue-500 - 4.5:1 ✓ */
-            --accent-purple: #6366F1;
-            /* indigo-500 - 4.9:1 ✓ */
-            --accent-cyan: #0EA5E9;
-            /* sky-500 - 3.5:1 (large text) */
+            /* Accents - PromptDAO style */
+            --accent-indigo: #1F2937;
+            /* Near-black CTA */
+            --accent-purple: #8B5CF6;
+            /* Purple labels */
+            --accent-cyan: #10B981;
+            /* Success green */
 
-            /* Shadows - Blue-tinted soft shadows */
-            --shadow-soft: 0 1px 3px rgba(59, 130, 246, 0.08);
-            --shadow-hover: 0 4px 12px rgba(59, 130, 246, 0.15);
+            /* Shadows - Ultra subtle */
+            --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
-            /* Effects */
-            --blur-amount: 0px;
-            --blur-heavy: 0px;
+            /* Effects - Blur for animated blobs */
+            --blur-amount: 80px;
+            --blur-heavy: 120px;
 
             /* Scrollbar */
-            --scrollbar-track: #EFF6FF;
-            --scrollbar-thumb: #BFDBFE;
-            --scrollbar-thumb-hover: #3B82F6;
+            --scrollbar-track: #F9FAFB;
+            --scrollbar-thumb: #D1D5DB;
+            --scrollbar-thumb-hover: #1F2937;
 
             /* Noise - Off for clean look */
             --noise-opacity: 0;
 
-            /* Decorative blobs - Blue gradient */
-            --blob-1: #DBEAFE;
-            /* blue-100 */
-            --blob-2: #BFDBFE;
-            /* blue-200 */
-            --blob-3: #E0F2FE;
-            /* sky-100 */
+            /* Animated Gradient Blobs - Pastel iridescence */
+            --blob-1: #FFE4EC;
+            /* Soft pink */
+            --blob-2: #E0E7FF;
+            /* Soft blue */
+            --blob-3: #F3E8FF;
+            /* Soft lavender */
         }
 
         /* ========================================
