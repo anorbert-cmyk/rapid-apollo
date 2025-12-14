@@ -1383,7 +1383,7 @@
                     <div class="hidden md:flex flex-col items-center justify-center w-24">
                         <div class="flow-line w-full mb-1 h-[2px] bg-gray-800 rounded-full relative overflow-hidden">
                             <div
-                                class="flow-beam absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-[shimmer_2s_infinite]">
+                                class="flow-beam absolute w-1/2 h-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-beam">
                             </div>
                         </div>
                         <span class="text-[10px] font-mono text-indigo-500/50 mt-2">INJECT</span>
@@ -1406,7 +1406,7 @@
                     <!-- Connector 2 -->
                     <div class="hidden md:flex flex-col items-center justify-center w-24">
                         <div class="flow-line w-full mb-1 h-[2px] bg-gray-800 rounded-full relative overflow-hidden">
-                            <div class="flow-beam absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-green-500 to-transparent animate-[shimmer_2s_infinite]"
+                            <div class="flow-beam absolute w-1/2 h-full bg-gradient-to-r from-transparent via-green-500 to-transparent animate-beam"
                                 style="animation-delay: 0.75s"></div>
                         </div>
                         <span class="text-[10px] font-mono text-green-500/50 mt-2">EXTRACT</span>
@@ -1435,8 +1435,8 @@
         <section id="mint" class="py-24 relative z-10">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="text-center mb-20">
-                    <h2 class="text-4xl font-bold text-white mb-4">Válaszd ki a Szereped</h2>
-                    <p class="text-gray-400 font-mono text-sm">Játékos vagy NPC akarsz lenni?</p>
+                    <h2 class="text-4xl font-bold text-white mb-4">Choose Your Role</h2>
+                    <p class="text-gray-400 font-mono text-sm">Are you a Player or an NPC?</p>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6 relative items-center max-w-5xl mx-auto" id="mint-cards">
@@ -1445,7 +1445,7 @@
                         class="hud-card pricing-tier-muted rounded-2xl p-8 relative overflow-hidden group transition-all duration-300">
                         <div class="flex justify-between items-start mb-8">
                             <div>
-                                <h3 class="text-xs font-semibold tracking-widest uppercase mb-1">MEGFIGYELŐ</h3>
+                                <h3 class="text-xs font-semibold tracking-widest uppercase mb-1">OBSERVER</h3>
                             </div>
                             <i class="ph-duotone ph-eye text-lg text-gray-400"></i>
                         </div>
@@ -1453,13 +1453,13 @@
                             <span class="text-4xl font-bold font-playfair price-display">$19</span>
                         </div>
                         <ul class="space-y-4 mb-8 text-xs border-t border-gray-100 pt-8">
-                            <li class="flex gap-3 items-center"><span>✓</span> Statikus Szövegfájl</li>
-                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> Nincs Logic Engine</li>
-                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> 24ó Adatkésés</li>
+                            <li class="flex gap-3 items-center"><span>✓</span> Static Text File</li>
+                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> No Logic Engine</li>
+                            <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> 24hr Data Delay</li>
                         </ul>
                         <button
                             class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
-                            Korlátok Elfogadása
+                            Accept Limitations
                         </button>
                     </div>
 
@@ -1469,7 +1469,7 @@
                         <div class="flex justify-between items-center mb-8">
                             <div class="flex items-center gap-2">
                                 <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                <h3 class="text-lg font-bold tracking-tight uppercase">BENNFENTES</h3>
+                                <h3 class="text-lg font-bold tracking-tight uppercase">INSIDER</h3>
                             </div>
                             <span class="genesis-badge">GENESIS MINT</span>
                         </div>
@@ -1483,20 +1483,20 @@
                                 <i class="ph-fill ph-lightning text-black"></i> Logic Engine v8.0
                             </li>
                             <li class="flex gap-3 items-center">
-                                <i class="ph-fill ph-brain text-black"></i> Pszichológiai Könyvtár
+                                <i class="ph-fill ph-brain text-black"></i> Psychology Library
                             </li>
                             <li class="flex gap-3 items-center">
-                                <i class="ph-fill ph-code text-black"></i> Figma Auto-Generátor
+                                <i class="ph-fill ph-code text-black"></i> Figma Auto-Generator
                             </li>
                         </ul>
                         <!-- Logic Hook: payAndSolve -->
                         <button id="btn-pay-discount"
                             class="pay-btn w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition mb-4">
-                            HOZZÁFÉRÉS KIVÁLTÁSA
+                            UNLOCK ACCESS
                         </button>
                         <div class="text-center">
                             <p class="urgency-text animate-pulse">
-                                ⚠ MÁR CSAK 3 HELY VAN EZEN AZ ÁRON
+                                ⚠ ONLY 3 SPOTS LEFT AT THIS PRICE
                             </p>
                         </div>
                     </div>
@@ -1506,7 +1506,7 @@
                         class="hud-card pricing-tier-muted pricing-tier-purple rounded-2xl p-8 relative overflow-hidden group transition-all duration-300">
                         <div class="flex justify-between items-start mb-8">
                             <div>
-                                <h3 class="text-xs font-semibold tracking-widest uppercase text-purple-400">SZINDIKÁTUS
+                                <h3 class="text-xs font-semibold tracking-widest uppercase text-purple-400">SYNDICATE
                                 </h3>
                             </div>
                             <i class="ph-duotone ph-crown text-lg text-purple-300"></i>
@@ -1515,13 +1515,13 @@
                             <span class="text-4xl font-bold font-playfair price-display">$199</span>
                         </div>
                         <ul class="space-y-4 mb-8 text-xs border-t border-gray-100 pt-8">
-                            <li class="flex gap-3 items-center"><span>✓</span> Minden "Bennfentes" elem</li>
-                            <li class="flex gap-3 items-center"><span>✓</span> 10 Wallet Licensz</li>
-                            <li class="flex gap-3 items-center"><span>✓</span> Prioritásos Támogatás</li>
+                            <li class="flex gap-3 items-center"><span>✓</span> All "Insider" Features</li>
+                            <li class="flex gap-3 items-center"><span>✓</span> 10 Wallet Licenses</li>
+                            <li class="flex gap-3 items-center"><span>✓</span> Priority Support</li>
                         </ul>
                         <button
                             class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
-                            Csapat Csatlakoztatása
+                            Connect Your Team
                         </button>
                     </div>
                 </div>
