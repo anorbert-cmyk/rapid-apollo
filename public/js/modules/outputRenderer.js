@@ -93,12 +93,19 @@ const OutputRenderer = (function () {
             const iconColor = colorMap[section.color] || 'text-gray-400';
             const isHidden = index >= 2 ? 'hidden' : '';
             const rotateClass = index < 2 ? 'rotate-180' : '';
+            const infoDesc = section.description || getDefaultDescription(section.id);
 
             return `
             <div class="glass-panel collapsible-section ${section.isHighlight ? 'border-2 border-indigo-500/30' : ''}" id="section-${section.id}">
                 <div class="section-header cursor-pointer p-5 flex items-center gap-3" onclick="OutputRenderer.toggleSection('${section.id}')">
                     <i class="ph-bold ${section.icon} ${iconColor} text-xl"></i>
                     <h3 class="flex-1 text-sm font-bold text-white">${section.title}</h3>
+                    <div class="relative group" onclick="event.stopPropagation()">
+                        <i class="ph-bold ph-info text-gray-500 hover:text-indigo-400 text-sm cursor-help transition"></i>
+                        <div class="info-tooltip absolute right-0 top-6 w-64 p-3 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <p class="text-xs text-gray-300 leading-relaxed">${infoDesc}</p>
+                        </div>
+                    </div>
                     <i class="ph-bold ph-caret-down collapse-icon text-gray-400 transition-transform ${rotateClass}"></i>
                 </div>
                 <div class="section-content px-5 pb-5 ${isHidden}">
@@ -107,6 +114,43 @@ const OutputRenderer = (function () {
             </div>
         `;
         }).join('');
+    }
+
+    // Default descriptions for sections that don't have one
+    function getDefaultDescription(sectionId) {
+        const descriptions = {
+            // Layer 1 - One Pager
+            'exec-problem': 'Összefoglalja a fő problémát és a megoldásunk célját egyszerű nyelven.',
+            'exec-domain': 'Megmutatja a lehetséges szakterületeket és a kockázati szintet.',
+            'exec-baseline': 'Az iparági sztenderdek: mentális modellek, tipikus folyamatok, gyakori hibák és KPI-k.',
+            'exec-northstar': 'Az egyetlen legfontosabb metrika, ami a sikert méri.',
+            'exec-breakers': 'A top 5 kritikus kockázat, ami megakadályozhatja a sikert.',
+            // Layer 1 Plus - Buyer Summary
+            'buyer-package': 'Mit kapsz a 3 rétegben: One Pager, Build Pack, Appendix.',
+            'buyer-timeline': 'Lépésről lépésre útmutató az első napokra.',
+            'buyer-data': 'Hogyan értelmezd a riportokat és az adatokat.',
+            'buyer-responsibilities': 'Mi a te feladatod és mi a miénk.',
+            // Layer 2 - Build Pack
+            'build-assumptions': 'Feltételezések listája, amiket validálni kell a projekt előtt.',
+            'build-strategy': 'Jobs To Be Done, félelmek, értékcsere térkép.',
+            'build-research': 'Kutatási terv: interjúk, tesztek, validációs módszerek.',
+            'build-ux': 'Teljes felhasználói út a csomagválasztástól a riportig.',
+            'build-screens': 'Mind a 8 képernyő specifikációja: cél, sikerkritérium, edge case-ek.',
+            'build-validation': 'Validációs szabályok: mikor és hogyan jelenjen meg hiba.',
+            'build-rationale': 'Miért pont így döntöttünk - user, business, tech szempontból.',
+            'build-resilience': 'Hibakezelés: mi történik ha elromlik valami, hogyan állunk helyre.',
+            'build-quality': 'Design minőségi checklist: láthatóság, hibaprevenció, felismerhetőség.',
+            'build-specs': 'Technikai spec: komponensek, event tracking, API-k.',
+            'build-tech': 'Architektúra: frontend, backend, adatbázis, integrációk.',
+            'build-team': 'Csapat felépítés és 4 hetes fázisterv.',
+            // Layer 3 - Appendix
+            'appendix-cost': 'Nemzetközi bérköltség benchmark és MVP költségbecslés.',
+            'appendix-roi': 'Üzleti eset: worst/expected/best case szcenáriók.',
+            'appendix-decisions': 'Döntési táblázat: user impact, business impact, confidence, validáció.',
+            'appendix-figma': 'Figma AI promptok: copy-paste készen a designhoz.',
+            'appendix-qa': 'QA checklist a Figma outputhoz.'
+        };
+        return descriptions[sectionId] || 'Ez a szekció további részleteket tartalmaz a témával kapcsolatban.';
     }
 
     function toggleSection(sectionId) {
