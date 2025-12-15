@@ -691,6 +691,20 @@
             background: #D1D5DB;
         }
 
+        /* Theme Toggle Icons - Light Mode */
+        :root[data-theme="light"] .ph-sun {
+            color: #F59E0B !important;
+        }
+
+        :root[data-theme="light"] .ph-moon {
+            color: #6366F1 !important;
+        }
+
+        /* Connect Wallet Button Icon - Light Mode */
+        :root[data-theme="light"] #btn-connect-wallet i {
+            color: #FFFFFF !important;
+        }
+
         /* Alert Banner - Light Mode */
         :root[data-theme="light"] .bg-red-950\/30 {
             background: rgba(254, 226, 226, 0.9);
@@ -1011,6 +1025,11 @@
 
         :root[data-theme="light"] #protocol .text-gray-600 {
             color: #9CA3AF;
+        }
+
+        /* Pipeline Section Text - Light Mode */
+        :root[data-theme="light"] #protocol .text-white {
+            color: #1A1A1A;
         }
 
         /* Central Card Highlight */
@@ -1457,10 +1476,24 @@
                             <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> No Logic Engine</li>
                             <li class="flex gap-3 items-center text-gray-400"><span>⚠️</span> 24hr Data Delay</li>
                         </ul>
+                        <!-- STRIPE BUTTON TIER 1 -->
                         <button
-                            class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
-                            Accept Limitations
+                            class="pay-btn w-full py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 group hover:scale-[1.02] active:scale-[0.98]"
+                            style="background-color: #635BFF; color: white;">
+                            <span>Pay with</span>
+                            <svg class="h-3 w-auto fill-white group-hover:brightness-110" viewBox="0 0 40 17"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.929 13.918c0 1.96-2.522 2.695-4.482 1.96V10.89c.7.49 1.47.887 2.38.887.63 0 .91-.21.91-.56 0-.91-3.29-1.027-3.29-3.71 0-1.89 1.96-2.8 4.06-2.193v3.125c-.7-.408-1.4-.7-2.1-.7-.63 0-.84.233-.84.513 0 .91 3.29.933 3.29 3.663h.073v1.993zM6.92 15.694h3.64v-10.5h-3.64v10.5zM12.358 15.694h3.64v-4.877c0-1.283.91-1.75 1.75-1.75.28 0 .56.047.77.094v-3.36a3.89 3.89 0 0 0-2.38.91l-.14-2.8h-3.64v11.783zM20.211 15.694h3.64v-10.5h-3.64v10.5zM20.246 2.012c0 1.12.91 2.03 2.03 2.03s2.03-.91 2.03-2.03-.91-2.03-2.03-2.03-2.03.91-2.03 2.03zM25.761 18.261h3.64v-4.083c.91.98 2.31 1.727 4.06 1.727 3.36 0 5.46-2.614 5.46-6.417 0-3.64-2.24-6.23-5.32-6.23-1.68 0-3.08.746-3.85 1.773v-1.47h-3.64v14.163h-.35v.537zm3.64-9.356c0-1.75 1.05-3.033 2.66-3.033 1.61 0 2.66 1.283 2.66 3.033 0 1.75-1.05 3.033-2.66 3.033-1.61 0-2.66-1.283-2.66-3.033zM36.195 9.873c.07-2.31 1.68-3.477 3.64-3.477 1.61 0 2.89.96 3.22 2.76.024.12.032.227.032.333l.006.19a3.84 3.84 0 0 1-.02.404h-6.86a3.29 3.29 0 0 0 3.29 2.8c1.19 0 2.03-.537 2.45-1.424l3.15 1.4c-1.12 1.797-2.94 3.01-5.67 3.01-3.64 0-5.88-2.52-5.88-6.02h2.64v.024zm3.71-.91h-3.08c.28-1.004 1.12-1.54 2.03-1.54.91 0 1.61.63 1.05 1.54z" />
+                            </svg>
                         </button>
+                        <!-- CRYPTO PAYMENT LINK -->
+                        <a href="#"
+                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            class="block text-center text-xs mt-3 transition-colors duration-200"
+                            style="color: var(--text-primary);">
+                            Pay with Crypto →
+                        </a>
                     </div>
 
                     <!-- TIER 2: BENNFENTES (HIGHLIGHTED) -->
@@ -1489,11 +1522,24 @@
                                 <i class="ph-fill ph-code text-black"></i> Figma Auto-Generator
                             </li>
                         </ul>
-                        <!-- Logic Hook: payAndSolve -->
+                        <!-- STRIPE BUTTON TIER 2 (PRIMARY) -->
                         <button id="btn-pay-discount"
-                            class="pay-btn w-full py-4 rounded-xl font-bold text-xs uppercase tracking-widest transition mb-4">
-                            UNLOCK ACCESS
+                            class="pay-btn w-full py-2.5 rounded-lg font-bold text-[10px] uppercase tracking-widest transition mb-4 flex items-center justify-center gap-2 group shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98]"
+                            style="background-color: #635BFF; color: white;">
+                            <span>Pay with</span>
+                            <svg class="h-4 w-auto fill-white group-hover:brightness-110" viewBox="0 0 40 17"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.929 13.918c0 1.96-2.522 2.695-4.482 1.96V10.89c.7.49 1.47.887 2.38.887.63 0 .91-.21.91-.56 0-.91-3.29-1.027-3.29-3.71 0-1.89 1.96-2.8 4.06-2.193v3.125c-.7-.408-1.4-.7-2.1-.7-.63 0-.84.233-.84.513 0 .91 3.29.933 3.29 3.663h.073v1.993zM6.92 15.694h3.64v-10.5h-3.64v10.5zM12.358 15.694h3.64v-4.877c0-1.283.91-1.75 1.75-1.75.28 0 .56.047.77.094v-3.36a3.89 3.89 0 0 0-2.38.91l-.14-2.8h-3.64v11.783zM20.211 15.694h3.64v-10.5h-3.64v10.5zM20.246 2.012c0 1.12.91 2.03 2.03 2.03s2.03-.91 2.03-2.03-.91-2.03-2.03-2.03-2.03.91-2.03 2.03zM25.761 18.261h3.64v-4.083c.91.98 2.31 1.727 4.06 1.727 3.36 0 5.46-2.614 5.46-6.417 0-3.64-2.24-6.23-5.32-6.23-1.68 0-3.08.746-3.85 1.773v-1.47h-3.64v14.163h-.35v.537zm3.64-9.356c0-1.75 1.05-3.033 2.66-3.033 1.61 0 2.66 1.283 2.66 3.033 0 1.75-1.05 3.033-2.66 3.033-1.61 0-2.66-1.283-2.66-3.033zM36.195 9.873c.07-2.31 1.68-3.477 3.64-3.477 1.61 0 2.89.96 3.22 2.76.024.12.032.227.032.333l.006.19a3.84 3.84 0 0 1-.02.404h-6.86a3.29 3.29 0 0 0 3.29 2.8c1.19 0 2.03-.537 2.45-1.424l3.15 1.4c-1.12 1.797-2.94 3.01-5.67 3.01-3.64 0-5.88-2.52-5.88-6.02h2.64v.024zm3.71-.91h-3.08c.28-1.004 1.12-1.54 2.03-1.54.91 0 1.61.63 1.05 1.54z" />
+                            </svg>
                         </button>
+                        <!-- CRYPTO PAYMENT LINK -->
+                        <a href="#"
+                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            class="block text-center text-xs mt-3 mb-4 transition-colors duration-200"
+                            style="color: var(--text-primary);">
+                            Pay with Crypto →
+                        </a>
                         <div class="text-center">
                             <p class="urgency-text animate-pulse">
                                 ⚠ ONLY 3 SPOTS LEFT AT THIS PRICE
@@ -1519,10 +1565,24 @@
                             <li class="flex gap-3 items-center"><span>✓</span> 10 Wallet Licenses</li>
                             <li class="flex gap-3 items-center"><span>✓</span> Priority Support</li>
                         </ul>
+                        <!-- STRIPE BUTTON TIER 3 -->
                         <button
-                            class="pay-btn w-full py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition">
-                            Connect Your Team
+                            class="pay-btn w-full py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 group hover:scale-[1.02] active:scale-[0.98]"
+                            style="background-color: #635BFF; color: white;">
+                            <span>Pay with</span>
+                            <svg class="h-3 w-auto fill-white group-hover:brightness-110" viewBox="0 0 40 17"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M3.929 13.918c0 1.96-2.522 2.695-4.482 1.96V10.89c.7.49 1.47.887 2.38.887.63 0 .91-.21.91-.56 0-.91-3.29-1.027-3.29-3.71 0-1.89 1.96-2.8 4.06-2.193v3.125c-.7-.408-1.4-.7-2.1-.7-.63 0-.84.233-.84.513 0 .91 3.29.933 3.29 3.663h.073v1.993zM6.92 15.694h3.64v-10.5h-3.64v10.5zM12.358 15.694h3.64v-4.877c0-1.283.91-1.75 1.75-1.75.28 0 .56.047.77.094v-3.36a3.89 3.89 0 0 0-2.38.91l-.14-2.8h-3.64v11.783zM20.211 15.694h3.64v-10.5h-3.64v10.5zM20.246 2.012c0 1.12.91 2.03 2.03 2.03s2.03-.91 2.03-2.03-.91-2.03-2.03-2.03-2.03.91-2.03 2.03zM25.761 18.261h3.64v-4.083c.91.98 2.31 1.727 4.06 1.727 3.36 0 5.46-2.614 5.46-6.417 0-3.64-2.24-6.23-5.32-6.23-1.68 0-3.08.746-3.85 1.773v-1.47h-3.64v14.163h-.35v.537zm3.64-9.356c0-1.75 1.05-3.033 2.66-3.033 1.61 0 2.66 1.283 2.66 3.033 0 1.75-1.05 3.033-2.66 3.033-1.61 0-2.66-1.283-2.66-3.033zM36.195 9.873c.07-2.31 1.68-3.477 3.64-3.477 1.61 0 2.89.96 3.22 2.76.024.12.032.227.032.333l.006.19a3.84 3.84 0 0 1-.02.404h-6.86a3.29 3.29 0 0 0 3.29 2.8c1.19 0 2.03-.537 2.45-1.424l3.15 1.4c-1.12 1.797-2.94 3.01-5.67 3.01-3.64 0-5.88-2.52-5.88-6.02h2.64v.024zm3.71-.91h-3.08c.28-1.004 1.12-1.54 2.03-1.54.91 0 1.61.63 1.05 1.54z" />
+                            </svg>
                         </button>
+                        <!-- CRYPTO PAYMENT LINK -->
+                        <a href="#"
+                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            class="block text-center text-xs mt-3 transition-colors duration-200"
+                            style="color: var(--text-primary);">
+                            Pay with Crypto →
+                        </a>
                     </div>
                 </div>
             </div>
