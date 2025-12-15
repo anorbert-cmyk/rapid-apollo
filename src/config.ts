@@ -28,6 +28,18 @@ const envSchema = z.object({
     TIER_STANDARD_USD: z.number().default(19),
     TIER_MEDIUM_USD: z.number().default(49),
     TIER_FULL_USD: z.number().default(199),
+
+    // Stripe Payment Integration (optional - leave empty to disable)
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    STRIPE_SUCCESS_URL: z.string().optional(),
+    STRIPE_CANCEL_URL: z.string().optional(),
+
+    // Coinbase Commerce Integration (optional - leave empty to disable)
+    COINBASE_COMMERCE_API_KEY: z.string().optional(),
+    COINBASE_WEBHOOK_SECRET: z.string().optional(),
+    COINBASE_SUCCESS_URL: z.string().optional(),
+    COINBASE_CANCEL_URL: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

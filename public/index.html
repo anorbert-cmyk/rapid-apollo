@@ -1478,6 +1478,7 @@
                         </ul>
                         <!-- STRIPE BUTTON TIER 1 -->
                         <button
+                            onclick="if(window.StripePaymentModule) window.StripePaymentModule.handlePayment('standard');"
                             class="pay-btn w-full py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 group hover:scale-[1.02] active:scale-[0.98]"
                             style="background-color: #635BFF; color: white;">
                             <span>Pay with</span>
@@ -1489,7 +1490,7 @@
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
                         <a href="#"
-                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('standard'); return false;"
                             class="block text-center text-xs mt-3 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -1524,6 +1525,7 @@
                         </ul>
                         <!-- STRIPE BUTTON TIER 2 (PRIMARY) -->
                         <button id="btn-pay-discount"
+                            onclick="if(window.StripePaymentModule) window.StripePaymentModule.handlePayment('medium');"
                             class="pay-btn w-full py-2.5 rounded-lg font-bold text-[10px] uppercase tracking-widest transition mb-4 flex items-center justify-center gap-2 group shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-[0.98]"
                             style="background-color: #635BFF; color: white;">
                             <span>Pay with</span>
@@ -1535,7 +1537,7 @@
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
                         <a href="#"
-                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('medium'); return false;"
                             class="block text-center text-xs mt-3 mb-4 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -1567,6 +1569,7 @@
                         </ul>
                         <!-- STRIPE BUTTON TIER 3 -->
                         <button
+                            onclick="if(window.StripePaymentModule) window.StripePaymentModule.handlePayment('full');"
                             class="pay-btn w-full py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 group hover:scale-[1.02] active:scale-[0.98]"
                             style="background-color: #635BFF; color: white;">
                             <span>Pay with</span>
@@ -1578,7 +1581,7 @@
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
                         <a href="#"
-                            onclick="alert('Crypto payment coming soon! Coinbase Commerce integration pending.'); return false;"
+                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('full'); return false;"
                             class="block text-center text-xs mt-3 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -4061,6 +4064,8 @@
     <script src="js/modules/markdown.js?v=1.6"></script>
     <script src="js/modules/session.js?v=1.6"></script>
     <script src="js/modules/payment.js?v=1.6"></script>
+    <script src="js/modules/stripePayment.js?v=1.0"></script>
+    <script src="js/modules/coinbasePayment.js?v=1.0"></script>
     <script src="js/modules/admin.js?v=1.6"></script>
     <script src="js/modules/dashboard.js?v=1.6"></script>
     <script src="js/modules/outputContent.js?v=1.0"></script>

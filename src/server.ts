@@ -15,6 +15,7 @@ import {
 import apiRoutes from './routes';
 import path from 'path';
 import adminRoutes from './routes/admin';
+import paymentRoutes from './routes/payment';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 
@@ -136,10 +137,12 @@ app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRa
 // API v1 Routes (new versioned endpoints)
 app.use('/api/v1', apiRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 
 // Legacy Routes (backward compatibility - will be deprecated)
 app.use('/api', apiRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorMonitoringMiddleware);

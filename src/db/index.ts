@@ -130,6 +130,60 @@ export async function closeDatabase(): Promise<void> {
     }
 }
 
+/**
+ * Execute a callback within a database transaction
+ * Automatically commits on success, rollbacks on failure
+ * @param callback - Function to execute within the transaction
+ * @returns Result of the callback function
+ */
+export async function withTransaction<T>(
+    callback: (client: PoolClient) => Promise<T>
+): Promise<T> {
+    if (!pool) {
+        throw new Error('Database not initialized');
+    }
+
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+        logger.debug('Transaction started');
+
+        const result = await callback(client);
+
+        await client.query('COMMIT');
+        logger.debug('Transaction committed');
+
+        return result;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        logger.warn('Transaction rolled back', { error: (error as Error).message });
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
+/**
+ * Execute multiple queries atomically
+ * @param queries - Array of query objects with text and params
+ * @returns Array of results for each query
+ */
+export async function executeAtomic(
+    queries: Array<{ text: string; params?: any[] }>
+): Promise<any[]> {
+    return withTransaction(async (client) => {
+        const results: any[] = [];
+
+        for (const q of queries) {
+            const result = await client.query(q.text, q.params);
+            results.push(result.rows);
+        }
+
+        return results;
+    });
+}
+
 // Initialize on import if DATABASE_URL is set
 if (process.env.DATABASE_URL) {
     initDatabase();
