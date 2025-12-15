@@ -717,7 +717,8 @@
         }
 
         /* Connect Wallet Button Icon - Light Mode */
-        :root[data-theme="light"] #btn-connect-wallet i {
+        :root[data-theme="light"] #btn-connect-wallet i,
+        :root[data-theme="light"] #btn-connect-wallet span {
             color: #FFFFFF !important;
         }
 
@@ -1275,7 +1276,8 @@
 
                     <!-- Theme Toggle Switch -->
                     <div class="flex items-center gap-2 bg-white/5 px-2 py-2 rounded-full border border-white/10">
-                        <i class="ph-bold ph-sun text-yellow-400 text-sm"></i>
+                        <i id="theme-icon-sun"
+                            class="ph-bold ph-sun text-yellow-400 text-sm transition-opacity duration-300"></i>
                         <button id="theme-toggle"
                             class="relative w-14 h-7 bg-gray-700 rounded-full transition-colors duration-300 hover:bg-gray-600"
                             aria-label="Toggle theme">
@@ -1283,7 +1285,8 @@
                                 class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-lg">
                             </div>
                         </button>
-                        <i class="ph-bold ph-moon text-indigo-400 text-sm"></i>
+                        <i id="theme-icon-moon"
+                            class="ph-bold ph-moon text-indigo-400 text-sm transition-opacity duration-300"></i>
                     </div>
 
                     <!-- Connect Wallet Button -->
@@ -4549,6 +4552,8 @@
         (function () {
             const toggle = document.getElementById('theme-toggle');
             const toggleDot = document.getElementById('theme-toggle-dot');
+            const iconSun = document.getElementById('theme-icon-sun');
+            const iconMoon = document.getElementById('theme-icon-moon');
             const root = document.documentElement;
             const dashboard = document.getElementById('app-dashboard');
 
@@ -4585,14 +4590,33 @@
                 root.setAttribute('data-theme', theme);
 
                 // Animate toggle dot and button background
+                // Animate toggle dot and button background
                 if (theme === 'light') {
                     toggleDot.style.transform = 'translateX(28px)';
                     toggle.classList.add('bg-indigo-500');
                     toggle.classList.remove('bg-gray-700');
+
+                    // Show Sun, Hide Moon (Light Mode)
+                    // Sun Active
+                    iconSun.classList.remove('opacity-30', 'text-gray-500', 'hidden');
+                    iconSun.classList.add('opacity-100', 'text-yellow-500');
+
+                    // Moon Inactive
+                    iconMoon.classList.remove('opacity-100', 'text-indigo-400', 'hidden');
+                    iconMoon.classList.add('opacity-30', 'text-gray-400');
                 } else {
                     toggleDot.style.transform = 'translateX(0)';
                     toggle.classList.add('bg-gray-700');
                     toggle.classList.remove('bg-indigo-500');
+
+                    // Show Moon, Hide Sun (Dark Mode)
+                    // Moon Active
+                    iconMoon.classList.remove('opacity-30', 'text-gray-400', 'hidden');
+                    iconMoon.classList.add('opacity-100', 'text-indigo-400');
+
+                    // Sun Inactive
+                    iconSun.classList.remove('opacity-100', 'text-yellow-500', 'hidden');
+                    iconSun.classList.add('opacity-30', 'text-gray-500');
                 }
             }
 
