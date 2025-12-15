@@ -8,7 +8,7 @@ import { resultStore, usedTxHashes, userHistoryStore, transactionLogStore } from
 import { isDatabaseAvailable, withTransaction } from '../db';
 import * as solutionRepo from '../db/solutionRepository';
 import { stripeSessionRequestSchema, coinbaseChargeRequestSchema } from '../utils/validators';
-import { isWebhookProcessed, markWebhookProcessed } from '../utils/webhookIdempotency';
+import { tryMarkWebhookProcessed } from '../utils/webhookIdempotency';
 import { ZodError } from 'zod';
 
 const router = Router();
@@ -149,17 +149,18 @@ router.post('/webhooks/stripe', async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Invalid signature' });
         }
 
-        // Check for duplicate webhook (idempotency)
         const eventId = event.id;
-        if (isWebhookProcessed(eventId, 'stripe')) {
-            logger.info('Stripe webhook already processed (idempotent)', { eventId, type: event.type });
-            return res.json({ received: true, duplicate: true });
-        }
-
         logger.info('Stripe webhook received', { type: event.type, eventId });
 
         switch (event.type) {
             case 'checkout.session.completed': {
+                // Atomic check-and-mark to prevent race conditions
+                const isNew = await tryMarkWebhookProcessed(eventId, event.type, 'stripe');
+                if (!isNew) {
+                    logger.info('Stripe webhook already processed (idempotent)', { eventId, type: event.type });
+                    return res.json({ received: true, duplicate: true });
+                }
+
                 const session = event.data.object as any;
                 const sessionId = session.id;
                 const metadata = session.metadata || {};
@@ -171,18 +172,17 @@ router.post('/webhooks/stripe', async (req: Request, res: Response) => {
                     'stripe',
                     session.customer_email
                 );
-
-                // Mark as processed after successful handling
-                markWebhookProcessed(eventId, event.type, 'stripe');
                 break;
             }
             case 'checkout.session.expired': {
+                const isNew = await tryMarkWebhookProcessed(eventId, event.type, 'stripe');
+                if (!isNew) return res.json({ received: true, duplicate: true });
+
                 const session = event.data.object as any;
                 const pending = pendingSessions.get(session.id);
                 if (pending) {
                     pending.status = 'failed';
                 }
-                markWebhookProcessed(eventId, event.type, 'stripe');
                 logger.info('Stripe session expired', { sessionId: session.id });
                 break;
             }
@@ -215,17 +215,18 @@ router.post('/webhooks/coinbase', async (req: Request, res: Response) => {
 
         const event = req.body;
 
-        // Check for duplicate webhook (idempotency)
         const eventId = event.id || `${event.type}_${Date.now()}`;
-        if (isWebhookProcessed(eventId, 'coinbase')) {
-            logger.info('Coinbase webhook already processed (idempotent)', { eventId, type: event.type });
-            return res.json({ received: true, duplicate: true });
-        }
-
         logger.info('Coinbase webhook received', { type: event.type, eventId });
 
         switch (event.type) {
             case 'charge:confirmed': {
+                // Atomic check-and-mark to prevent race conditions
+                const isNew = await tryMarkWebhookProcessed(eventId, event.type, 'coinbase');
+                if (!isNew) {
+                    logger.info('Coinbase webhook already processed (idempotent)', { eventId, type: event.type });
+                    return res.json({ received: true, duplicate: true });
+                }
+
                 const charge = event.data;
                 const metadata = charge.metadata || {};
 
@@ -236,12 +237,12 @@ router.post('/webhooks/coinbase', async (req: Request, res: Response) => {
                     'coinbase',
                     metadata.customerWallet
                 );
-
-                // Mark as processed after successful handling
-                markWebhookProcessed(eventId, event.type, 'coinbase');
                 break;
             }
             case 'charge:failed': {
+                const isNew = await tryMarkWebhookProcessed(eventId, event.type, 'coinbase');
+                if (!isNew) return res.json({ received: true, duplicate: true });
+
                 const charge = event.data;
                 const sessionId = charge.metadata?.sessionId;
                 if (sessionId) {
@@ -250,7 +251,6 @@ router.post('/webhooks/coinbase', async (req: Request, res: Response) => {
                         pending.status = 'failed';
                     }
                 }
-                markWebhookProcessed(eventId, event.type, 'coinbase');
                 logger.info('Coinbase charge failed', { chargeId: charge.id });
                 break;
             }
