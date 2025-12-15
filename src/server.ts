@@ -16,8 +16,11 @@ import apiRoutes from './routes';
 import path from 'path';
 import adminRoutes from './routes/admin';
 import paymentRoutes from './routes/payment';
+import healthRoutes from './routes/health';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
+import { initSentry, sentryErrorHandler, flushSentry } from './utils/sentry';
+import { initRedisStore, closeRedisStore } from './utils/redisStore';
 
 // Load OpenAPI Spec
 let swaggerDocument: any;
@@ -134,15 +137,29 @@ const useRedisRateLimiter = config.NODE_ENV === 'production' && process.env.REDI
 app.use('/api/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 
+// Health check routes (no rate limiting, no auth)
+app.use('/health', healthRoutes);
+
 // API v1 Routes (new versioned endpoints)
 app.use('/api/v1', apiRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 
-// Legacy Routes (backward compatibility - will be deprecated)
-app.use('/api', apiRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/payments', paymentRoutes);
+// Deprecation middleware for legacy routes
+const deprecationMiddleware = (_req: any, res: any, next: any) => {
+    res.setHeader('Deprecation', 'true');
+    res.setHeader('Sunset', 'Sat, 01 Mar 2025 00:00:00 GMT');
+    res.setHeader('Link', '</api/v1>; rel="successor-version"');
+    next();
+};
+
+// Legacy Routes (backward compatibility - DEPRECATED)
+app.use('/api', deprecationMiddleware, apiRoutes);
+app.use('/api/admin', deprecationMiddleware, adminRoutes);
+app.use('/api/payments', deprecationMiddleware, paymentRoutes);
+
+// Sentry error handler (must be before other error handlers)
+app.use(sentryErrorHandler());
 
 // Error handling middleware (must be last)
 app.use(errorMonitoringMiddleware);
