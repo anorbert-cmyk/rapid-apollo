@@ -128,55 +128,55 @@ const OutputRenderer = (function () {
         });
     }
 
-    // Content box tooltips mapping
+    // Content box tooltips mapping - Format: Context | Importance | Usage
     function getBoxTooltip(headerText) {
         const tooltips = {
             // Strategy
-            'Primary JTBD': 'Jobs To Be Done: The core outcome the customer is trying to achieve.',
-            'Secondary JTBD': 'Secondary jobs that support the primary goal.',
-            'User Anxieties & Trust Blockers': 'Common fears that prevent customers from buying.',
-            'Value Exchange Map': 'What the customer gives vs. what they receive.',
+            'Primary JTBD': '<b>Context:</b> Jobs To Be Done framework from Clayton Christensen.<br><b>Importance:</b> Defines the core outcome customers hire your product for.<br><b>Usage:</b> Use to prioritize features that serve this job.',
+            'Secondary JTBD': '<b>Context:</b> Supporting jobs beyond the main goal.<br><b>Importance:</b> Adds retention and expands value.<br><b>Usage:</b> Consider in Phase 2 after primary is solved.',
+            'User Anxieties & Trust Blockers': '<b>Context:</b> Fears that prevent purchase decisions.<br><b>Importance:</b> Must address these or lose conversions.<br><b>Usage:</b> Design trust signals and copy to mitigate each.',
+            'Value Exchange Map': '<b>Context:</b> What customer gives vs receives.<br><b>Importance:</b> Balance determines perceived value.<br><b>Usage:</b> Price and position based on this balance.',
             // Assumptions & Scope
-            '✓ In Scope': 'Features and deliverables included in this phase.',
-            '✗ Out of Scope (Phase 2)': 'Items intentionally excluded from initial release.',
+            '✓ In Scope': '<b>Context:</b> Committed deliverables for this phase.<br><b>Importance:</b> Prevents scope creep and sets expectations.<br><b>Usage:</b> Reference in every planning meeting.',
+            '✗ Out of Scope (Phase 2)': '<b>Context:</b> Deferred items with clear reasoning.<br><b>Importance:</b> Protects timeline and focus.<br><b>Usage:</b> Move to backlog, revisit after launch.',
             // Research
-            'Discovery': 'Understanding user needs and context.',
-            'Evaluative': 'Testing solutions with real users.',
-            'IA': 'Information Architecture—how content is organized.',
-            'Primary Method': 'The main research technique being used.',
-            'Add-ons': 'Supplementary research methods.',
-            'Recruiting Criteria': 'Who qualifies for research participation.',
+            'Discovery': '<b>Context:</b> Early-phase research to understand users.<br><b>Importance:</b> Reduces risk of building wrong thing.<br><b>Usage:</b> Run before any design work begins.',
+            'Evaluative': '<b>Context:</b> Testing prototypes with real users.<br><b>Importance:</b> Validates assumptions before dev investment.<br><b>Usage:</b> Run on mockups, not just final builds.',
+            'IA': '<b>Context:</b> Information Architecture research.<br><b>Importance:</b> Ensures users find what they need.<br><b>Usage:</b> Card sorting, tree testing methods.',
+            'Primary Method': '<b>Context:</b> Main research technique selected.<br><b>Importance:</b> Focus resources for max insight.<br><b>Usage:</b> Execute this first, add extras if budget allows.',
+            'Add-ons': '<b>Context:</b> Supplementary research methods.<br><b>Importance:</b> Adds depth if primary leaves gaps.<br><b>Usage:</b> Optional based on timeline.',
+            'Recruiting Criteria': '<b>Context:</b> Who qualifies for research.<br><b>Importance:</b> Wrong participants = wrong insights.<br><b>Usage:</b> Screen strictly, no internal employees.',
             // UX
-            'IA & Navigation Model': 'The main navigation structure.',
-            'Gating Rules': 'Conditions that must be met before proceeding.',
+            'IA & Navigation Model': '<b>Context:</b> Main menu and content structure.<br><b>Importance:</b> Determines findability and mental model.<br><b>Usage:</b> Test with card sort before finalizing.',
+            'Gating Rules': '<b>Context:</b> Conditions before user can proceed.<br><b>Importance:</b> Protects against irreversible errors.<br><b>Usage:</b> Apply to payments, launches, deletions.',
             // Validation
-            'Inline Errors': 'Errors shown directly next to the field.',
-            'Summary at Top': 'A list of all errors shown at the top of the form.',
-            'Blur + Submit': 'Validation triggers when leaving field or submitting.',
+            'Inline Errors': '<b>Context:</b> Error displayed at the field.<br><b>Importance:</b> Fastest user understanding of issue.<br><b>Usage:</b> Always show inline, never modal-only.',
+            'Summary at Top': '<b>Context:</b> Aggregated error list above form.<br><b>Importance:</b> Helps when multiple errors exist.<br><b>Usage:</b> Combine with inline for best UX.',
+            'Blur + Submit': '<b>Context:</b> Validation timing strategy.<br><b>Importance:</b> Avoids annoying mid-typing errors.<br><b>Usage:</b> Validate on blur, re-validate on submit.',
             // Resilience
-            'Integration Token Connection': 'OAuth token linking external services.',
-            'Irreversible Campaign Launch': 'Actions that cannot be undone once started.',
+            'Integration Token Connection': '<b>Context:</b> OAuth tokens linking external APIs.<br><b>Importance:</b> Tokens expire—users must understand this.<br><b>Usage:</b> Show clear Reconnect CTA when expired.',
+            'Irreversible Campaign Launch': '<b>Context:</b> Actions that start live spend.<br><b>Importance:</b> Mistakes cost real money.<br><b>Usage:</b> Require explicit review + confirm step.',
             // Quality
-            'Visibility of Status': 'Users should always see system state.',
-            'Error Prevention': 'Design that prevents mistakes before they happen.',
-            'Recognition > Recall': 'Users should recognize options, not memorize them.',
+            'Visibility of Status': '<b>Context:</b> Nielsen heuristic #1.<br><b>Importance:</b> Users need to know what\'s happening.<br><b>Usage:</b> Add loaders, status chips, progress bars.',
+            'Error Prevention': '<b>Context:</b> Design that stops mistakes.<br><b>Importance:</b> Better than good error messages.<br><b>Usage:</b> Disable invalid options, use defaults.',
+            'Recognition > Recall': '<b>Context:</b> Show options, don\'t ask to remember.<br><b>Importance:</b> Reduces cognitive load significantly.<br><b>Usage:</b> Use dropdowns, autocomplete, recent items.',
             // Cost
-            'Rate Sourcing': 'Where salary/cost data comes from.',
-            'MVP Portal Build Cost (6-8 weeks)': 'Estimated hours per role for MVP.',
+            'Rate Sourcing': '<b>Context:</b> Where salary benchmarks come from.<br><b>Importance:</b> Credibility of cost estimates.<br><b>Usage:</b> Cite sources in client proposals.',
+            'MVP Portal Build Cost (6-8 weeks)': '<b>Context:</b> Hours breakdown by role.<br><b>Importance:</b> Sets budget expectations.<br><b>Usage:</b> Multiply by local rates for estimate.',
             // ROI
-            'Worst Case': 'Conservative scenario with low conversion.',
-            'Expected': 'Most likely scenario based on assumptions.',
-            'Best Case': 'Optimistic scenario with high conversion.',
-            'Impact Hypothesis': 'Expected business outcomes from the solution.',
+            'Worst Case': '<b>Context:</b> Conservative scenario assumptions.<br><b>Importance:</b> Sets floor for decision-making.<br><b>Usage:</b> Use for risk-averse stakeholders.',
+            'Expected': '<b>Context:</b> Most likely outcome scenario.<br><b>Importance:</b> Primary planning target.<br><b>Usage:</b> Base all projections on this.',
+            'Best Case': '<b>Context:</b> Optimistic assumptions scenario.<br><b>Importance:</b> Shows upside potential.<br><b>Usage:</b> Use for investor pitches.',
+            'Impact Hypothesis': '<b>Context:</b> Expected business outcome statement.<br><b>Importance:</b> Defines success criteria.<br><b>Usage:</b> Measure against this post-launch.',
             // Decisions
-            'Top 3 Risk Decisions': 'Highest-risk choices requiring careful consideration.',
+            'Top 3 Risk Decisions': '<b>Context:</b> Highest-stakes choices in project.<br><b>Importance:</b> These can sink the project if wrong.<br><b>Usage:</b> Get explicit stakeholder sign-off.',
             // Figma
-            'Prompt A: High Fidelity Happy Path UI': 'Main screens for ideal user flows.',
-            'Prompt B: Critical Error & Recovery UI': 'Error states and recovery screens.',
-            'Prompt C: Component Library': 'Reusable UI building blocks.',
+            'Prompt A: High Fidelity Happy Path UI': '<b>Context:</b> Main flow screens for ideal journey.<br><b>Importance:</b> Core experience users see most.<br><b>Usage:</b> Start here, iterate until solid.',
+            'Prompt B: Critical Error & Recovery UI': '<b>Context:</b> Error states and recovery flows.<br><b>Importance:</b> Defines trust during failures.<br><b>Usage:</b> Design after happy path is done.',
+            'Prompt C: Component Library': '<b>Context:</b> Reusable UI building blocks.<br><b>Importance:</b> Ensures consistency across screens.<br><b>Usage:</b> Build this first for efficiency.',
             // QA
-            'QA Checklist': 'Quality checks before design handoff.',
-            'Execution Order': 'Recommended sequence for design work.'
+            'QA Checklist': '<b>Context:</b> Quality gates before handoff.<br><b>Importance:</b> Catches issues before development.<br><b>Usage:</b> Run on every design before dev.',
+            'Execution Order': '<b>Context:</b> Recommended work sequence.<br><b>Importance:</b> Optimizes dependencies and rework.<br><b>Usage:</b> Follow this order for best results.'
         };
         return tooltips[headerText] || null;
     }
@@ -213,41 +213,41 @@ const OutputRenderer = (function () {
         }).join('');
     }
 
-    // Default descriptions for sections that don't have one
+    // Default descriptions for sections - Format: Context | Importance | Usage
     function getDefaultDescription(sectionId) {
         const descriptions = {
             // Layer 1 - One Pager
-            'exec-problem': 'Summarizes the core problem and our solution goal in plain language.',
-            'exec-domain': 'Shows potential domains and the associated risk level.',
-            'exec-baseline': 'Industry standards: mental models, typical flows, common failures, and KPIs.',
-            'exec-northstar': 'The single most important metric that defines success.',
-            'exec-breakers': 'Top 5 critical risks that could prevent success.',
+            'exec-problem': '<b>Context:</b> Core problem and solution goal.<br><b>Importance:</b> Aligns all stakeholders on mission.<br><b>Usage:</b> Share with leadership to confirm direction.',
+            'exec-domain': '<b>Context:</b> Industry and risk classification.<br><b>Importance:</b> Determines compliance requirements.<br><b>Usage:</b> Reference for legal and marketing teams.',
+            'exec-baseline': '<b>Context:</b> Industry benchmarks and standards.<br><b>Importance:</b> Sets realistic expectations.<br><b>Usage:</b> Compare your metrics to these baselines.',
+            'exec-northstar': '<b>Context:</b> Single success metric.<br><b>Importance:</b> Unifies team focus.<br><b>Usage:</b> Track weekly, report monthly.',
+            'exec-breakers': '<b>Context:</b> Critical risks to project.<br><b>Importance:</b> Early mitigation saves projects.<br><b>Usage:</b> Address each before launch.',
             // Layer 1 Plus - Buyer Summary
-            'buyer-package': 'What you get across 3 layers: One Pager, Build Pack, Appendix.',
-            'buyer-timeline': 'Step-by-step guide for the first few days.',
-            'buyer-data': 'How to interpret reports and data.',
-            'buyer-responsibilities': 'What\'s your responsibility vs. ours.',
+            'buyer-package': '<b>Context:</b> Overview of all deliverables.<br><b>Importance:</b> Sets clear expectations.<br><b>Usage:</b> Share with procurement and stakeholders.',
+            'buyer-timeline': '<b>Context:</b> Day-by-day action plan.<br><b>Importance:</b> Ensures smooth onboarding.<br><b>Usage:</b> Follow sequentially, check off each step.',
+            'buyer-data': '<b>Context:</b> Guide to reading reports.<br><b>Importance:</b> Enables data-driven decisions.<br><b>Usage:</b> Reference when reviewing any report.',
+            'buyer-responsibilities': '<b>Context:</b> RACI matrix simplified.<br><b>Importance:</b> Prevents gaps and overlaps.<br><b>Usage:</b> Review before kickoff meeting.',
             // Layer 2 - Build Pack
-            'build-assumptions': 'List of assumptions that need validation before the project.',
-            'build-strategy': 'Jobs To Be Done, anxieties, value exchange map.',
-            'build-research': 'Research plan: interviews, tests, validation methods.',
-            'build-ux': 'Complete user journey from package selection to reporting.',
-            'build-screens': 'All 8 screen specifications: goals, success criteria, edge cases.',
-            'build-validation': 'Validation rules: when and how errors should appear.',
-            'build-rationale': 'Why we made these decisions—user, business, and tech perspective.',
-            'build-resilience': 'Error handling: what happens when things break, how we recover.',
-            'build-quality': 'Design quality checklist: visibility, error prevention, recognition.',
-            'build-specs': 'Technical specs: components, event tracking, APIs.',
-            'build-tech': 'Architecture: frontend, backend, database, integrations.',
-            'build-team': 'Team structure and 4-week phase plan.',
+            'build-assumptions': '<b>Context:</b> Hypotheses needing validation.<br><b>Importance:</b> Unvalidated = high risk.<br><b>Usage:</b> Test each before committing resources.',
+            'build-strategy': '<b>Context:</b> JTBD and value exchange framework.<br><b>Importance:</b> Guides all product decisions.<br><b>Usage:</b> Reference during feature prioritization.',
+            'build-research': '<b>Context:</b> Research methodology plan.<br><b>Importance:</b> Reduces building wrong thing.<br><b>Usage:</b> Execute before design phase.',
+            'build-ux': '<b>Context:</b> End-to-end user journey.<br><b>Importance:</b> Ensures seamless experience.<br><b>Usage:</b> Walk through with stakeholders.',
+            'build-screens': '<b>Context:</b> Per-screen specifications.<br><b>Importance:</b> Reduces dev ambiguity.<br><b>Usage:</b> Hand to designers and developers.',
+            'build-validation': '<b>Context:</b> Form validation rules.<br><b>Importance:</b> Prevents bad data entry.<br><b>Usage:</b> Implement exactly as specified.',
+            'build-rationale': '<b>Context:</b> Decision reasoning documented.<br><b>Importance:</b> Enables future iteration.<br><b>Usage:</b> Reference when questioning decisions.',
+            'build-resilience': '<b>Context:</b> Error recovery playbook.<br><b>Importance:</b> Builds user trust.<br><b>Usage:</b> Implement all listed scenarios.',
+            'build-quality': '<b>Context:</b> Nielsen heuristics checklist.<br><b>Importance:</b> Catches UX issues early.<br><b>Usage:</b> Review every screen against this.',
+            'build-specs': '<b>Context:</b> Component and API specs.<br><b>Importance:</b> Enables clean implementation.<br><b>Usage:</b> Developers reference during build.',
+            'build-tech': '<b>Context:</b> System architecture overview.<br><b>Importance:</b> Guides infrastructure decisions.<br><b>Usage:</b> Share with engineering team.',
+            'build-team': '<b>Context:</b> Team structure and phases.<br><b>Importance:</b> Ensures proper resourcing.<br><b>Usage:</b> Use for hiring and timeline planning.',
             // Layer 3 - Appendix
-            'appendix-cost': 'International salary benchmarks and MVP cost estimation.',
-            'appendix-roi': 'Business case: worst/expected/best case scenarios.',
-            'appendix-decisions': 'Decision table: user impact, business impact, confidence, validation.',
-            'appendix-figma': 'Figma AI prompts: copy-paste ready for design.',
-            'appendix-qa': 'QA checklist for Figma output.'
+            'appendix-cost': '<b>Context:</b> International salary data.<br><b>Importance:</b> Grounds budget in reality.<br><b>Usage:</b> Multiply hours by local rates.',
+            'appendix-roi': '<b>Context:</b> Business case scenarios.<br><b>Importance:</b> Justifies investment.<br><b>Usage:</b> Present to finance and leadership.',
+            'appendix-decisions': '<b>Context:</b> Risk decision matrix.<br><b>Importance:</b> Documents accountability.<br><b>Usage:</b> Get sign-off on high-risk items.',
+            'appendix-figma': '<b>Context:</b> Copy-paste AI prompts.<br><b>Importance:</b> Speeds up design work.<br><b>Usage:</b> Use directly in Figma AI.',
+            'appendix-qa': '<b>Context:</b> Design quality checklist.<br><b>Importance:</b> Catches issues pre-dev.<br><b>Usage:</b> Run on every design file.'
         };
-        return descriptions[sectionId] || 'This section contains additional details about the topic.';
+        return descriptions[sectionId] || '<b>Context:</b> Additional topic details.<br><b>Importance:</b> Provides supplementary info.<br><b>Usage:</b> Reference as needed.';
     }
 
     function toggleSection(sectionId) {
