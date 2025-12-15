@@ -646,6 +646,22 @@
         }
 
         /* ========================================
+           THEME TOGGLE ICONS - ALWAYS VISIBLE
+           Dark mode defaults + Light mode overrides
+        ======================================== */
+
+        /* Dark Mode Icon Styles (default) */
+        .ph-sun {
+            display: inline-block !important;
+            color: #FBBF24 !important;
+        }
+
+        .ph-moon {
+            display: inline-block !important;
+            color: #818CF8 !important;
+        }
+
+        /* ========================================
            LIGHT THEME SPECIFIC OVERRIDES
            Ensuring AA contrast and PromptDAO style
         ======================================== */
@@ -4534,6 +4550,13 @@
             const toggle = document.getElementById('theme-toggle');
             const toggleDot = document.getElementById('theme-toggle-dot');
             const root = document.documentElement;
+            const dashboard = document.getElementById('app-dashboard');
+
+            // Check if dashboard is currently visible
+            function isDashboardVisible() {
+                return dashboard && !dashboard.classList.contains('hidden') &&
+                    window.getComputedStyle(dashboard).display !== 'none';
+            }
 
             // Load saved theme or default to dark
             const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -4541,6 +4564,12 @@
 
             // Toggle button click handler
             toggle.addEventListener('click', () => {
+                // If dashboard is visible, don't allow theme toggle
+                if (isDashboardVisible()) {
+                    console.log('Theme toggle disabled on dashboard');
+                    return;
+                }
+
                 const currentTheme = root.getAttribute('data-theme') || 'dark';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 setTheme(newTheme);
@@ -4548,6 +4577,11 @@
             });
 
             function setTheme(theme) {
+                // Force dark theme on dashboard
+                if (isDashboardVisible()) {
+                    theme = 'dark';
+                }
+
                 root.setAttribute('data-theme', theme);
 
                 // Animate toggle dot and button background
@@ -4561,6 +4595,21 @@
                     toggle.classList.remove('bg-indigo-500');
                 }
             }
+
+            // Listen for dashboard visibility changes
+            // MutationObserver to detect when dashboard becomes visible
+            const observer = new MutationObserver(() => {
+                if (isDashboardVisible()) {
+                    setTheme('dark');
+                }
+            });
+
+            if (dashboard) {
+                observer.observe(dashboard, { attributes: true, attributeFilter: ['class', 'style'] });
+            }
+
+            // Also expose setTheme globally for manual forcing
+            window.forceTheme = setTheme;
         })();
     </script>
 </body>
