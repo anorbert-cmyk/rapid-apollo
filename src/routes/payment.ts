@@ -9,27 +9,23 @@ import { isDatabaseAvailable, withTransaction } from '../db';
 import * as solutionRepo from '../db/solutionRepository';
 import { stripeSessionRequestSchema, coinbaseChargeRequestSchema } from '../utils/validators';
 import { tryMarkWebhookProcessed } from '../utils/webhookIdempotency';
+import * as redisStore from '../utils/redisStore';
 import { ZodError } from 'zod';
 
 const router = Router();
 
-// In-memory store for pending payment sessions
-const pendingSessions: Map<string, {
+// Type definition for stored sessions
+interface PaymentSession {
     tier: Tier;
     problemStatement: string;
     createdAt: number;
     status: 'pending' | 'completed' | 'failed';
-}> = new Map();
+}
 
-// Clean up old sessions (older than 24 hours)
-setInterval(() => {
-    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-    for (const [id, session] of pendingSessions.entries()) {
-        if (session.createdAt < cutoff) {
-            pendingSessions.delete(id);
-        }
-    }
-}, 60 * 60 * 1000); // Run every hour
+const SESSION_TTL = 24 * 60 * 60; // 24 hours in seconds
+
+// Helper to get session key
+const getSessionKey = (sessionId: string) => `payment_session:${sessionId}`;
 
 /**
  * POST /api/payments/stripe/create-session
@@ -58,14 +54,19 @@ router.post('/stripe/create-session', async (req: Request, res: Response) => {
             return res.status(500).json({ error: result.error });
         }
 
-        // Store pending session
+        // Store pending session in Redis
         if (result.sessionId) {
-            pendingSessions.set(result.sessionId, {
+            const sessionData: PaymentSession = {
                 tier: tier as Tier,
                 problemStatement,
                 createdAt: Date.now(),
                 status: 'pending'
-            });
+            };
+            await redisStore.set(
+                getSessionKey(result.sessionId),
+                JSON.stringify(sessionData),
+                SESSION_TTL
+            );
         }
 
         return res.json({
@@ -109,13 +110,18 @@ router.post('/coinbase/create-charge', async (req: Request, res: Response) => {
             return res.status(500).json({ error: result.error });
         }
 
-        // Store pending session
-        pendingSessions.set(sessionId, {
+        // Store pending session in Redis
+        const sessionData: PaymentSession = {
             tier: tier as Tier,
             problemStatement,
             createdAt: Date.now(),
             status: 'pending'
-        });
+        };
+        await redisStore.set(
+            getSessionKey(sessionId),
+            JSON.stringify(sessionData),
+            SESSION_TTL
+        );
 
         return res.json({
             success: true,
@@ -179,9 +185,13 @@ router.post('/webhooks/stripe', async (req: Request, res: Response) => {
                 if (!isNew) return res.json({ received: true, duplicate: true });
 
                 const session = event.data.object as any;
-                const pending = pendingSessions.get(session.id);
-                if (pending) {
+                const key = getSessionKey(session.id);
+                const pendingData = await redisStore.get(key);
+
+                if (pendingData) {
+                    const pending: PaymentSession = JSON.parse(pendingData);
                     pending.status = 'failed';
+                    await redisStore.set(key, JSON.stringify(pending), SESSION_TTL);
                 }
                 logger.info('Stripe session expired', { sessionId: session.id });
                 break;
@@ -246,9 +256,12 @@ router.post('/webhooks/coinbase', async (req: Request, res: Response) => {
                 const charge = event.data;
                 const sessionId = charge.metadata?.sessionId;
                 if (sessionId) {
-                    const pending = pendingSessions.get(sessionId);
-                    if (pending) {
+                    const key = getSessionKey(sessionId);
+                    const pendingData = await redisStore.get(key);
+                    if (pendingData) {
+                        const pending: PaymentSession = JSON.parse(pendingData);
                         pending.status = 'failed';
+                        await redisStore.set(key, JSON.stringify(pending), SESSION_TTL);
                     }
                 }
                 logger.info('Coinbase charge failed', { chargeId: charge.id });
@@ -270,9 +283,10 @@ router.post('/webhooks/coinbase', async (req: Request, res: Response) => {
 router.get('/status/:sessionId', async (req: Request, res: Response) => {
     try {
         const { sessionId } = req.params;
-        const session = pendingSessions.get(sessionId);
+        const key = getSessionKey(sessionId);
+        const sessionData = await redisStore.get(key);
 
-        if (!session) {
+        if (!sessionData) {
             // Try to get from Stripe if it looks like a Stripe session ID
             if (sessionId.startsWith('cs_')) {
                 const stripeSession = await getCheckoutSession(sessionId);
@@ -285,6 +299,8 @@ router.get('/status/:sessionId', async (req: Request, res: Response) => {
             }
             return res.status(404).json({ error: 'Session not found' });
         }
+
+        const session: PaymentSession = JSON.parse(sessionData);
 
         return res.json({
             status: session.status,
@@ -318,7 +334,9 @@ async function processSuccessfulPayment(
     customerIdentifier?: string
 ): Promise<void> {
     try {
-        const pending = pendingSessions.get(sessionId);
+        const key = getSessionKey(sessionId);
+        const pendingData = await redisStore.get(key);
+        const pending: PaymentSession | null = pendingData ? JSON.parse(pendingData) : null;
 
         // Use stored data if available, otherwise use provided data
         const actualTier = pending?.tier || tier;
@@ -363,9 +381,10 @@ async function processSuccessfulPayment(
             timestamp: Date.now()
         });
 
-        // Update session status
+        // Update session status in Redis
         if (pending) {
             pending.status = 'completed';
+            await redisStore.set(key, JSON.stringify(pending), SESSION_TTL);
         }
 
         // Store in database if available

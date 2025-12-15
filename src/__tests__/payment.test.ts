@@ -8,16 +8,16 @@ import {
     markWebhookProcessed,
     clearWebhookStore,
     getWebhookStoreStats
-} from '../src/utils/webhookIdempotency';
+} from '../utils/webhookIdempotency';
 import {
     stripeSessionRequestSchema,
     coinbaseChargeRequestSchema
-} from '../src/utils/validators';
+} from '../utils/validators';
 
 // Mock Stripe and Coinbase services
-jest.mock('../src/services/stripeService', () => ({
+jest.mock('../services/stripeService', () => ({
     isStripeConfigured: () => true,
-    createCheckoutSession: jest.fn().mockResolvedValue({
+    createCheckoutSession: jest.fn<any>().mockResolvedValue({
         success: true,
         sessionId: 'cs_test_123',
         url: 'https://checkout.stripe.com/test'
@@ -26,9 +26,9 @@ jest.mock('../src/services/stripeService', () => ({
     getCheckoutSession: jest.fn()
 }));
 
-jest.mock('../src/services/coinbaseService', () => ({
+jest.mock('../services/coinbaseService', () => ({
     isCoinbaseConfigured: () => true,
-    createCharge: jest.fn().mockResolvedValue({
+    createCharge: jest.fn<any>().mockResolvedValue({
         success: true,
         chargeId: 'charge_123',
         code: 'ABC123',
