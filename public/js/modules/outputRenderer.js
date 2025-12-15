@@ -82,6 +82,103 @@ const OutputRenderer = (function () {
         }
 
         container.innerHTML = renderSections(sections);
+
+        // Auto-enhance content boxes with info tooltips
+        setTimeout(() => enhanceContentBoxes(container), 100);
+    }
+
+    // Add info tooltips to content boxes inside sections
+    function enhanceContentBoxes(container) {
+        // Target all panel headers that could use an explanation
+        const boxSelectors = [
+            '.bg-purple-500\\/10',
+            '.bg-indigo-500\\/10',
+            '.bg-red-500\\/10',
+            '.bg-green-500\\/10',
+            '.bg-cyan-500\\/10',
+            '.bg-yellow-500\\/10',
+            '.bg-blue-500\\/10',
+            '.bg-orange-500\\/10',
+            '.bg-pink-500\\/10'
+        ];
+
+        const boxes = container.querySelectorAll(boxSelectors.join(', '));
+
+        boxes.forEach(box => {
+            // Find the header element in the box
+            const header = box.querySelector('.font-bold');
+            if (!header || box.querySelector('.box-info-btn')) return;
+
+            // Get tooltip text based on header content
+            const headerText = header.textContent.trim();
+            const tooltipText = getBoxTooltip(headerText);
+
+            if (tooltipText) {
+                // Create info button
+                const infoBtn = document.createElement('span');
+                infoBtn.className = 'box-info-btn relative group inline-block ml-2 cursor-help';
+                infoBtn.innerHTML = `
+                    <i class="ph-bold ph-info text-current opacity-50 hover:opacity-100 text-[10px] transition"></i>
+                    <span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2 bg-gray-900 border border-white/10 rounded-lg shadow-xl text-[10px] text-gray-300 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                        ${tooltipText}
+                    </span>
+                `;
+                header.appendChild(infoBtn);
+            }
+        });
+    }
+
+    // Content box tooltips mapping
+    function getBoxTooltip(headerText) {
+        const tooltips = {
+            // Strategy
+            'Primary JTBD': 'Jobs To Be Done: The core outcome the customer is trying to achieve.',
+            'Secondary JTBD': 'Secondary jobs that support the primary goal.',
+            'User Anxieties & Trust Blockers': 'Common fears that prevent customers from buying.',
+            'Value Exchange Map': 'What the customer gives vs. what they receive.',
+            // Assumptions & Scope
+            '✓ In Scope': 'Features and deliverables included in this phase.',
+            '✗ Out of Scope (Phase 2)': 'Items intentionally excluded from initial release.',
+            // Research
+            'Discovery': 'Understanding user needs and context.',
+            'Evaluative': 'Testing solutions with real users.',
+            'IA': 'Information Architecture—how content is organized.',
+            'Primary Method': 'The main research technique being used.',
+            'Add-ons': 'Supplementary research methods.',
+            'Recruiting Criteria': 'Who qualifies for research participation.',
+            // UX
+            'IA & Navigation Model': 'The main navigation structure.',
+            'Gating Rules': 'Conditions that must be met before proceeding.',
+            // Validation
+            'Inline Errors': 'Errors shown directly next to the field.',
+            'Summary at Top': 'A list of all errors shown at the top of the form.',
+            'Blur + Submit': 'Validation triggers when leaving field or submitting.',
+            // Resilience
+            'Integration Token Connection': 'OAuth token linking external services.',
+            'Irreversible Campaign Launch': 'Actions that cannot be undone once started.',
+            // Quality
+            'Visibility of Status': 'Users should always see system state.',
+            'Error Prevention': 'Design that prevents mistakes before they happen.',
+            'Recognition > Recall': 'Users should recognize options, not memorize them.',
+            // Cost
+            'Rate Sourcing': 'Where salary/cost data comes from.',
+            'MVP Portal Build Cost (6-8 weeks)': 'Estimated hours per role for MVP.',
+            // ROI
+            'Worst Case': 'Conservative scenario with low conversion.',
+            'Expected': 'Most likely scenario based on assumptions.',
+            'Best Case': 'Optimistic scenario with high conversion.',
+            'Impact Hypothesis': 'Expected business outcomes from the solution.',
+            // Decisions
+            'Top 3 Risk Decisions': 'Highest-risk choices requiring careful consideration.',
+            // Figma
+            'Prompt A: High Fidelity Happy Path UI': 'Main screens for ideal user flows.',
+            'Prompt B: Critical Error & Recovery UI': 'Error states and recovery screens.',
+            'Prompt C: Component Library': 'Reusable UI building blocks.',
+            // QA
+            'QA Checklist': 'Quality checks before design handoff.',
+            'Execution Order': 'Recommended sequence for design work.'
+        };
+        return tooltips[headerText] || null;
     }
 
     function renderSections(sections) {
