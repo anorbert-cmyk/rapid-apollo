@@ -120,37 +120,37 @@ const OutputRenderer = (function () {
     function getDefaultDescription(sectionId) {
         const descriptions = {
             // Layer 1 - One Pager
-            'exec-problem': 'Összefoglalja a fő problémát és a megoldásunk célját egyszerű nyelven.',
-            'exec-domain': 'Megmutatja a lehetséges szakterületeket és a kockázati szintet.',
-            'exec-baseline': 'Az iparági sztenderdek: mentális modellek, tipikus folyamatok, gyakori hibák és KPI-k.',
-            'exec-northstar': 'Az egyetlen legfontosabb metrika, ami a sikert méri.',
-            'exec-breakers': 'A top 5 kritikus kockázat, ami megakadályozhatja a sikert.',
+            'exec-problem': 'Summarizes the core problem and our solution goal in plain language.',
+            'exec-domain': 'Shows potential domains and the associated risk level.',
+            'exec-baseline': 'Industry standards: mental models, typical flows, common failures, and KPIs.',
+            'exec-northstar': 'The single most important metric that defines success.',
+            'exec-breakers': 'Top 5 critical risks that could prevent success.',
             // Layer 1 Plus - Buyer Summary
-            'buyer-package': 'Mit kapsz a 3 rétegben: One Pager, Build Pack, Appendix.',
-            'buyer-timeline': 'Lépésről lépésre útmutató az első napokra.',
-            'buyer-data': 'Hogyan értelmezd a riportokat és az adatokat.',
-            'buyer-responsibilities': 'Mi a te feladatod és mi a miénk.',
+            'buyer-package': 'What you get across 3 layers: One Pager, Build Pack, Appendix.',
+            'buyer-timeline': 'Step-by-step guide for the first few days.',
+            'buyer-data': 'How to interpret reports and data.',
+            'buyer-responsibilities': 'What\'s your responsibility vs. ours.',
             // Layer 2 - Build Pack
-            'build-assumptions': 'Feltételezések listája, amiket validálni kell a projekt előtt.',
-            'build-strategy': 'Jobs To Be Done, félelmek, értékcsere térkép.',
-            'build-research': 'Kutatási terv: interjúk, tesztek, validációs módszerek.',
-            'build-ux': 'Teljes felhasználói út a csomagválasztástól a riportig.',
-            'build-screens': 'Mind a 8 képernyő specifikációja: cél, sikerkritérium, edge case-ek.',
-            'build-validation': 'Validációs szabályok: mikor és hogyan jelenjen meg hiba.',
-            'build-rationale': 'Miért pont így döntöttünk - user, business, tech szempontból.',
-            'build-resilience': 'Hibakezelés: mi történik ha elromlik valami, hogyan állunk helyre.',
-            'build-quality': 'Design minőségi checklist: láthatóság, hibaprevenció, felismerhetőség.',
-            'build-specs': 'Technikai spec: komponensek, event tracking, API-k.',
-            'build-tech': 'Architektúra: frontend, backend, adatbázis, integrációk.',
-            'build-team': 'Csapat felépítés és 4 hetes fázisterv.',
+            'build-assumptions': 'List of assumptions that need validation before the project.',
+            'build-strategy': 'Jobs To Be Done, anxieties, value exchange map.',
+            'build-research': 'Research plan: interviews, tests, validation methods.',
+            'build-ux': 'Complete user journey from package selection to reporting.',
+            'build-screens': 'All 8 screen specifications: goals, success criteria, edge cases.',
+            'build-validation': 'Validation rules: when and how errors should appear.',
+            'build-rationale': 'Why we made these decisions—user, business, and tech perspective.',
+            'build-resilience': 'Error handling: what happens when things break, how we recover.',
+            'build-quality': 'Design quality checklist: visibility, error prevention, recognition.',
+            'build-specs': 'Technical specs: components, event tracking, APIs.',
+            'build-tech': 'Architecture: frontend, backend, database, integrations.',
+            'build-team': 'Team structure and 4-week phase plan.',
             // Layer 3 - Appendix
-            'appendix-cost': 'Nemzetközi bérköltség benchmark és MVP költségbecslés.',
-            'appendix-roi': 'Üzleti eset: worst/expected/best case szcenáriók.',
-            'appendix-decisions': 'Döntési táblázat: user impact, business impact, confidence, validáció.',
-            'appendix-figma': 'Figma AI promptok: copy-paste készen a designhoz.',
-            'appendix-qa': 'QA checklist a Figma outputhoz.'
+            'appendix-cost': 'International salary benchmarks and MVP cost estimation.',
+            'appendix-roi': 'Business case: worst/expected/best case scenarios.',
+            'appendix-decisions': 'Decision table: user impact, business impact, confidence, validation.',
+            'appendix-figma': 'Figma AI prompts: copy-paste ready for design.',
+            'appendix-qa': 'QA checklist for Figma output.'
         };
-        return descriptions[sectionId] || 'Ez a szekció további részleteket tartalmaz a témával kapcsolatban.';
+        return descriptions[sectionId] || 'This section contains additional details about the topic.';
     }
 
     function toggleSection(sectionId) {
