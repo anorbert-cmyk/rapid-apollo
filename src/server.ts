@@ -151,27 +151,44 @@ export { app };
 
 // Only start the server if this file is run directly (not imported for tests)
 if (require.main === module) {
-    const server = app.listen(config.PORT, () => {
-        const redisStatus = getRedisStatus();
-
-        logger.info('Server started', {
-            port: config.PORT,
-            env: config.NODE_ENV,
-            apiVersion: CONSTANTS.API_VERSION
-        });
-
-        logger.info('Security enabled', {
-            helmet: true,
-            ipRateLimiting: true,
-            walletRateLimiting: true,
-            rateLimitStorage: redisStatus.type,
-            errorMonitoring: true
-        });
-
-        if (config.NODE_ENV !== 'production') {
-            logger.debug('Development mode', {
-                wallet: config.RECEIVER_WALLET_ADDRESS
-            });
+    // Async startup function
+    (async () => {
+        // Run database migrations if DATABASE_URL is set
+        if (process.env.DATABASE_URL) {
+            try {
+                const { initDatabase, runMigrations } = await import('./db');
+                initDatabase();
+                await runMigrations();
+                logger.info('Database initialized and migrations applied');
+            } catch (error) {
+                logger.error('Database initialization failed', error as Error);
+                // Continue without DB - will use in-memory fallback
+            }
         }
-    });
+
+        // Start the server
+        const server = app.listen(config.PORT, () => {
+            const redisStatus = getRedisStatus();
+
+            logger.info('Server started', {
+                port: config.PORT,
+                env: config.NODE_ENV,
+                apiVersion: CONSTANTS.API_VERSION
+            });
+
+            logger.info('Security enabled', {
+                helmet: true,
+                ipRateLimiting: true,
+                walletRateLimiting: true,
+                rateLimitStorage: redisStatus.type,
+                errorMonitoring: true
+            });
+
+            if (config.NODE_ENV !== 'production') {
+                logger.debug('Development mode', {
+                    wallet: config.RECEIVER_WALLET_ADDRESS
+                });
+            }
+        });
+    })();
 }

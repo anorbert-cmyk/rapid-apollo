@@ -2,15 +2,17 @@
 
 > **AI-powered problem solver with Ethereum payment gateway**
 
-A crypto-gated AI backend that provides tiered access to advanced problem-solving capabilities, powered by Google Gemini.
+A crypto-gated AI backend that provides tiered access to advanced problem-solving capabilities, powered by OpenAI GPT-5.2 and o3-mini.
 
 ## ✨ Features
 
 - **🔐 Ethereum Payment Verification** - Direct on-chain payment validation
-- **🧠 Tiered AI Responses** - Standard, Medium, and Full tier solutions via Gemini
+- **💳 Stripe & Coinbase Commerce** - Alternative payment methods with webhooks
+- **🧠 Tiered AI Responses** - Standard (o3-mini), Medium & Full (GPT-5.2) solutions
 - **📊 Admin Dashboard** - Real-time analytics and transaction history
 - **🔒 Security First** - Double-spend protection, signature replay prevention, rate limiting
 - **☁️ Redis Support** - Scalable session storage for production
+- **🗄️ PostgreSQL** - Persistent data storage with auto-migrations
 - **📝 Structured Logging** - Production-ready JSON logs with sensitive data redaction
 
 ## 🛠️ Tech Stack
@@ -18,8 +20,10 @@ A crypto-gated AI backend that provides tiered access to advanced problem-solvin
 | Layer | Technology |
 |-------|------------|
 | Backend | Express.js + TypeScript |
-| AI | Google Gemini API |
+| AI | OpenAI API (GPT-5.2, o3-mini) |
 | Blockchain | Ethereum Mainnet (ethers.js) |
+| Payments | Stripe, Coinbase Commerce |
+| Database | PostgreSQL (optional) |
 | Cache | Redis (optional) |
 | Testing | Jest + Playwright |
 | Deployment | Railway / Docker |
@@ -28,10 +32,10 @@ A crypto-gated AI backend that provides tiered access to advanced problem-solvin
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - npm or yarn
 - Ethereum wallet (for receiving payments)
-- Google Gemini API key
+- OpenAI API key
 
 ### Installation
 
@@ -56,10 +60,11 @@ npm run dev
 ```env
 PORT=3000
 NODE_ENV=development
-GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=sk-your_openai_api_key
 RECEIVER_WALLET_ADDRESS=0xYourEthereumAddress
 ADMIN_WALLET_ADDRESS=0xAdminWallet
 REDIS_URL=redis://localhost:6379  # Optional
+DATABASE_URL=postgresql://...     # Optional
 ```
 
 ## 📦 Scripts
@@ -86,6 +91,15 @@ REDIS_URL=redis://localhost:6379  # Optional
 | POST | `/api/share/create` | Create shareable link |
 | GET | `/api/share/:uuid` | View shared result |
 
+### Payments
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/payments/stripe/create-session` | Create Stripe checkout |
+| POST | `/api/payments/coinbase/create-charge` | Create Coinbase charge |
+| POST | `/api/payments/webhooks/stripe` | Stripe webhook handler |
+| POST | `/api/payments/webhooks/coinbase` | Coinbase webhook handler |
+
 ### Admin (Wallet-authenticated)
 
 | Method | Endpoint | Description |
@@ -106,16 +120,24 @@ src/
 ├── config.ts         # Environment validation (Zod)
 ├── constants.ts      # Magic numbers centralized
 ├── store.ts          # Redis/Memory abstraction
+├── db/               # PostgreSQL layer
+│   ├── index.ts      # Connection pool & migrations
+│   ├── schema.sql    # Database schema
+│   └── solutionRepository.ts
 ├── routes/
 │   ├── index.ts      # API routes
-│   └── admin.ts      # Admin endpoints
+│   ├── admin.ts      # Admin endpoints
+│   ├── payment.ts    # Stripe/Coinbase routes
+│   └── health.ts     # Health checks
 ├── services/
-│   ├── aiService.ts      # Gemini integration
-│   ├── paymentService.ts # Ethereum verification
-│   └── priceService.ts   # ETH price fetching
+│   ├── aiService.ts       # OpenAI integration
+│   ├── paymentService.ts  # Ethereum verification
+│   ├── stripeService.ts   # Stripe checkout
+│   ├── coinbaseService.ts # Coinbase Commerce
+│   └── priceService.ts    # ETH price fetching
 ├── utils/
 │   ├── logger.ts             # Structured logging
-│   ├── errorMonitoring.ts    # Error tracking
+│   ├── sentry.ts             # Error tracking
 │   ├── walletRateLimiter.ts  # Per-wallet limits
 │   ├── redisRateLimiter.ts   # Production limiter
 │   └── signatureStore.ts     # Replay protection
@@ -137,18 +159,20 @@ docker run -p 3000:3000 --env-file .env rapid-apollo
 - **Helmet** - Secure HTTP headers
 - **Rate Limiting** - IP-based (100 req/15min) + wallet-based (10 req/min)
 - **Double-Spend Protection** - Atomic transaction locking
-- **Signature Replay Prevention** - Used signatures tracked
+- **Signature Replay Prevention** - Used signatures tracked with TTL
+- **Admin Auth** - Timestamped signatures (5 min expiry)
 - **Input Validation** - Zod schemas on all endpoints
 - **Body Size Limit** - 100KB max payload
-- **Graceful Shutdown** - Clean Redis disconnection
+- **Graceful Shutdown** - Clean Redis/DB disconnection
+- **Unhandled Rejection Capture** - Sentry integration
 
 ## 📈 Tiers & Pricing
 
-| Tier | USD | Response Style |
-|------|-----|----------------|
-| Standard | $19 | Concise, direct answer |
-| Medium | $49 | Detailed with examples |
-| Full | $199 | PhD-level deep dive |
+| Tier | USD | AI Model | Response Style |
+|------|-----|----------|----------------|
+| Standard | $19 | o3-mini | Concise, direct answer |
+| Medium | $49 | GPT-5.2 | Detailed with examples |
+| Full | $199 | GPT-5.2 | PhD-level deep dive |
 
 ## 📝 License
 

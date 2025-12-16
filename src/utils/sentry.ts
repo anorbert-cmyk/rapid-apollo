@@ -71,6 +71,21 @@ export function initSentry(app?: Express): boolean {
 
         sentryInitialized = true;
         logger.info('Sentry error monitoring initialized');
+
+        // Capture unhandled promise rejections
+        process.on('unhandledRejection', (reason: any) => {
+            logger.error('Unhandled Promise Rejection', reason instanceof Error ? reason : new Error(String(reason)));
+            Sentry.captureException(reason);
+        });
+
+        // Capture uncaught exceptions
+        process.on('uncaughtException', (error: Error) => {
+            logger.error('Uncaught Exception', error);
+            Sentry.captureException(error);
+            // Give Sentry time to send the event before crashing
+            Sentry.close(2000).then(() => process.exit(1));
+        });
+
         return true;
 
     } catch (error) {
