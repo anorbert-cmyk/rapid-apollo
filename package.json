@@ -22,7 +22,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@sentry/node": "^10.30.0",
     "axios": "^1.13.2",
     "coinbase-commerce-node": "^1.0.4",

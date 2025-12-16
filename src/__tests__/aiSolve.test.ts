@@ -19,7 +19,7 @@ function createMockResponse(solutionText: string, tier: 'standard' | 'medium' | 
         meta: {
             originalProblem: 'Test problem',
             tier,
-            provider: 'gemini',
+            provider: 'openai-o3',
             generatedAt: Date.now()
         },
         sections: {
@@ -136,7 +136,7 @@ describe('POST /api/solve (Integration)', () => {
 
     it('should handle AI service failure (500)', async () => {
         mockVerifyTransaction.mockResolvedValue({ valid: true, from: '0xClient' });
-        mockSolveProblem.mockRejectedValue(new Error('Gemini Error'));
+        mockSolveProblem.mockRejectedValue(new Error('OpenAI Error'));
 
         const res = await request(app)
             .post('/api/solve')

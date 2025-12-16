@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS solutions (
     problem_statement TEXT NOT NULL,
     sections JSONB NOT NULL,
     raw_markdown TEXT,
-    provider VARCHAR(20) DEFAULT 'gemini',
+    provider VARCHAR(20) DEFAULT 'openai-o3',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
