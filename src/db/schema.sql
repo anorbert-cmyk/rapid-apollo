@@ -51,3 +51,23 @@ INSERT INTO stats (key, value) VALUES
     ('count_medium', 0),
     ('count_full', 0)
 ON CONFLICT (key) DO NOTHING;
+
+-- ===========================================
+-- MAGIC LINKS - Email-based authentication
+-- ===========================================
+
+CREATE TABLE IF NOT EXISTS magic_links (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(64) UNIQUE NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    solution_id VARCHAR(100) NOT NULL,
+    tier VARCHAR(10) NOT NULL,
+    problem_summary TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    used_at TIMESTAMP WITH TIME ZONE,
+    is_valid BOOLEAN DEFAULT true
+);
+
+CREATE INDEX IF NOT EXISTS idx_magic_links_token ON magic_links(token);
+CREATE INDEX IF NOT EXISTS idx_magic_links_email ON magic_links(email);
+CREATE INDEX IF NOT EXISTS idx_magic_links_solution ON magic_links(solution_id);

@@ -11,6 +11,8 @@ import { stripeSessionRequestSchema, coinbaseChargeRequestSchema } from '../util
 import { tryMarkWebhookProcessed } from '../utils/webhookIdempotency';
 import * as redisStore from '../utils/redisStore';
 import { ZodError } from 'zod';
+import { createMagicLink, getMagicLinkUrl } from '../services/magicLinkService';
+import { sendMagicLinkEmail, isEmailConfigured } from '../services/emailService';
 
 const router = Router();
 
@@ -416,6 +418,31 @@ async function processSuccessfulPayment(
         });
         if (txLog.length > 100) txLog.length = 100;
         await transactionLogStore.set('all', txLog);
+
+        // Send magic link email if email is available and service is configured
+        if (customerIdentifier && customerIdentifier.includes('@') && isEmailConfigured()) {
+            try {
+                const magicToken = await createMagicLink(
+                    customerIdentifier,
+                    txId,
+                    actualTier,
+                    actualProblem.substring(0, 200)
+                );
+                const magicLinkUrl = getMagicLinkUrl(magicToken);
+
+                await sendMagicLinkEmail({
+                    to: customerIdentifier,
+                    magicLink: magicLinkUrl,
+                    tier: actualTier,
+                    problemSummary: actualProblem
+                });
+
+                logger.info('Magic link email sent', { email: customerIdentifier.substring(0, 5) + '***' });
+            } catch (emailError) {
+                logger.error('Failed to send magic link email', emailError instanceof Error ? emailError : new Error(String(emailError)));
+                // Don't fail the payment processing if email fails
+            }
+        }
 
         logger.info('Payment processed successfully', { txId, tier: actualTier });
 

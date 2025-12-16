@@ -1,0 +1,227 @@
+// ===========================================
+// AUTH ROUTES - Magic Link Authentication
+// ===========================================
+
+import { Router, Request, Response } from 'express';
+import { validateMagicToken, getSolutionsByEmail } from '../services/magicLinkService';
+import { resultStore } from '../store';
+import { logger } from '../utils/logger';
+
+const router = Router();
+
+// Session cookie name
+const SESSION_COOKIE = 'aether_session';
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// In-memory session store (use Redis in production)
+const sessions = new Map<string, { email: string; createdAt: number }>();
+
+/**
+ * GET /auth/magic/:token
+ * Validate magic link and create session
+ */
+router.get('/magic/:token', async (req: Request, res: Response) => {
+    const { token } = req.params;
+
+    if (!token || token.length < 20) {
+        return res.status(400).send(renderErrorPage('Invalid Link', 'This magic link appears to be invalid.'));
+    }
+
+    try {
+        const magicData = await validateMagicToken(token);
+
+        if (!magicData) {
+            logger.warn('Invalid magic link attempt', { token: token.substring(0, 8) + '...' });
+            return res.status(404).send(renderErrorPage('Link Not Found', 'This magic link is invalid or has been revoked.'));
+        }
+
+        // Create session
+        const sessionId = generateSessionId();
+        sessions.set(sessionId, {
+            email: magicData.email,
+            createdAt: Date.now()
+        });
+
+        // Set session cookie
+        res.cookie(SESSION_COOKIE, sessionId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: SESSION_MAX_AGE
+        });
+
+        logger.info('Magic link validated, session created', { email: magicData.email });
+
+        // Redirect to dashboard with solution ID
+        return res.redirect(`/dashboard?solution=${magicData.solutionId}`);
+
+    } catch (error) {
+        logger.error('Magic link validation error', error instanceof Error ? error : new Error(String(error)));
+        return res.status(500).send(renderErrorPage('Error', 'Something went wrong. Please try again.'));
+    }
+});
+
+/**
+ * GET /auth/session
+ * Get current session info
+ */
+router.get('/session', (req: Request, res: Response) => {
+    const sessionId = req.cookies?.[SESSION_COOKIE];
+
+    if (!sessionId) {
+        return res.json({ authenticated: false });
+    }
+
+    const session = sessions.get(sessionId);
+    if (!session) {
+        return res.json({ authenticated: false });
+    }
+
+    // Check session expiry
+    if (Date.now() - session.createdAt > SESSION_MAX_AGE) {
+        sessions.delete(sessionId);
+        return res.json({ authenticated: false });
+    }
+
+    return res.json({
+        authenticated: true,
+        email: maskEmail(session.email)
+    });
+});
+
+/**
+ * GET /auth/solutions
+ * Get all solutions for authenticated user
+ */
+router.get('/solutions', async (req: Request, res: Response) => {
+    const sessionId = req.cookies?.[SESSION_COOKIE];
+
+    if (!sessionId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const session = sessions.get(sessionId);
+    if (!session) {
+        return res.status(401).json({ error: 'Session expired' });
+    }
+
+    try {
+        const magicLinks = await getSolutionsByEmail(session.email);
+
+        // Fetch full solution data for each
+        const solutions = [];
+        for (const link of magicLinks) {
+            const stored = await resultStore.get(link.solutionId);
+            if (stored) {
+                solutions.push({
+                    id: link.solutionId,
+                    tier: link.tier,
+                    problem: link.problemSummary,
+                    createdAt: link.createdAt,
+                    solution: stored.data
+                });
+            }
+        }
+
+        return res.json({ solutions });
+
+    } catch (error) {
+        logger.error('Failed to get user solutions', error instanceof Error ? error : new Error(String(error)));
+        return res.status(500).json({ error: 'Failed to load solutions' });
+    }
+});
+
+/**
+ * POST /auth/logout
+ * Clear session
+ */
+router.post('/logout', (req: Request, res: Response) => {
+    const sessionId = req.cookies?.[SESSION_COOKIE];
+
+    if (sessionId) {
+        sessions.delete(sessionId);
+    }
+
+    res.clearCookie(SESSION_COOKIE);
+    return res.json({ success: true });
+});
+
+// Helper: Generate session ID
+function generateSessionId(): string {
+    const { nanoid } = require('nanoid');
+    return nanoid(32);
+}
+
+// Helper: Mask email for privacy
+function maskEmail(email: string): string {
+    const [local, domain] = email.split('@');
+    if (!domain) return '***@***.***';
+
+    const maskedLocal = local.length > 2
+        ? local.substring(0, 2) + '***'
+        : '***';
+
+    return `${maskedLocal}@${domain}`;
+}
+
+// Helper: Render error page
+function renderErrorPage(title: string, message: string): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - Aether Logic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ef4444;
+        }
+        p {
+            font-size: 18px;
+            color: #a0aec0;
+            margin-bottom: 30px;
+        }
+        a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        a:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚠️</h1>
+        <p>${message}</p>
+        <a href="/">Go to Homepage</a>
+    </div>
+</body>
+</html>
+    `;
+}
+
+export default router;

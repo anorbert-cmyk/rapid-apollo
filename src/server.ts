@@ -17,6 +17,8 @@ import path from 'path';
 import adminRoutes from './routes/admin';
 import paymentRoutes from './routes/payment';
 import healthRoutes from './routes/health';
+import authRoutes from './routes/auth';
+import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 import { initSentry, sentryErrorHandler, flushSentry } from './utils/sentry';
@@ -92,8 +94,14 @@ const useRedisRateLimiter = config.NODE_ENV === 'production' && process.env.REDI
 app.use('/api/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 
+// Cookie parser for session management
+app.use(cookieParser());
+
 // Health check routes (no rate limiting, no auth)
 app.use('/health', healthRoutes);
+
+// Auth routes (magic link)
+app.use('/auth', authRoutes);
 
 // API v1 Routes (new versioned endpoints)
 app.use('/api/v1', apiRoutes);
