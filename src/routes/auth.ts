@@ -159,11 +159,24 @@ router.get('/solution/:id', async (req: Request, res: Response) => {
 
         // Get the solution data
         const stored = await resultStore.get(solutionId);
+
+        // If no solution yet, check if it's still processing
         if (!stored) {
+            // Check if this is a known magic link (payment was made but AI not done)
+            if (owned) {
+                return res.status(202).json({
+                    status: 'processing',
+                    message: 'Your analysis is being generated. Please check back in a few minutes.',
+                    tier: owned.tier,
+                    problem: owned.problemSummary,
+                    createdAt: owned.createdAt
+                });
+            }
             return res.status(404).json({ error: 'Solution not found' });
         }
 
         return res.json({
+            status: 'completed',
             id: solutionId,
             tier: owned.tier,
             problem: owned.problemSummary,

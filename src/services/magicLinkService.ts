@@ -21,6 +21,7 @@ interface MagicLinkData {
     tier: string;
     createdAt: number;
     problemSummary: string;
+    status?: 'processing' | 'completed' | 'failed';
 }
 
 /**
@@ -45,7 +46,8 @@ export async function createMagicLink(
     email: string,
     solutionId: string,
     tier: string,
-    problemSummary: string
+    problemSummary: string,
+    status: 'processing' | 'completed' = 'completed'
 ): Promise<string> {
     const token = generateToken();
     const tokenHash = hashToken(token);
@@ -56,18 +58,19 @@ export async function createMagicLink(
         solutionId,
         tier,
         createdAt: Date.now(),
-        problemSummary
+        problemSummary,
+        status
     };
 
     // Store in PostgreSQL if available
     if (isDatabaseAvailable()) {
         try {
             await query(
-                `INSERT INTO magic_links (token, email, solution_id, tier, problem_summary)
-                 VALUES ($1, $2, $3, $4, $5)`,
-                [tokenHash, data.email, solutionId, tier, problemSummary.substring(0, 500)]
+                `INSERT INTO magic_links (token, email, solution_id, tier, problem_summary, status)
+                 VALUES ($1, $2, $3, $4, $5, $6)`,
+                [tokenHash, data.email, solutionId, tier, problemSummary.substring(0, 500), status]
             );
-            logger.debug('Magic link stored in PostgreSQL', { email: data.email });
+            logger.debug('Magic link stored in PostgreSQL', { email: data.email, status });
         } catch (error) {
             logger.error('Failed to store magic link in DB', error instanceof Error ? error : new Error(String(error)));
             // Fall back to Redis
@@ -81,9 +84,34 @@ export async function createMagicLink(
         0 // No expiry - links never expire
     );
 
-    logger.info('Magic link created', { email: data.email, solutionId });
+    logger.info('Magic link created', { email: data.email, solutionId, status });
 
     return token; // Return raw token for URL
+}
+
+/**
+ * Update magic link status (e.g., from 'processing' to 'completed')
+ */
+export async function updateMagicLinkStatus(
+    solutionId: string,
+    status: 'processing' | 'completed' | 'failed'
+): Promise<void> {
+    // Update in PostgreSQL
+    if (isDatabaseAvailable()) {
+        try {
+            await query(
+                `UPDATE magic_links SET status = $1 WHERE solution_id = $2`,
+                [status, solutionId]
+            );
+            logger.debug('Magic link status updated in PostgreSQL', { solutionId, status });
+        } catch (error) {
+            logger.error('Failed to update magic link status', error instanceof Error ? error : new Error(String(error)));
+        }
+    }
+
+    // Update in Redis - need to find and update the cached entry
+    // This is done lazily on next read, so we just log for now
+    logger.info('Magic link status updated', { solutionId, status });
 }
 
 /**

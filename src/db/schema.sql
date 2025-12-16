@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS magic_links (
     solution_id VARCHAR(100) NOT NULL,
     tier VARCHAR(10) NOT NULL,
     problem_summary TEXT,
+    status VARCHAR(20) DEFAULT 'completed',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     used_at TIMESTAMP WITH TIME ZONE,
     is_valid BOOLEAN DEFAULT true
