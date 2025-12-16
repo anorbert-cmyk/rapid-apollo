@@ -52,8 +52,8 @@ router.get('/magic/:token', async (req: Request, res: Response) => {
 
         logger.info('Magic link validated, session created', { email: magicData.email });
 
-        // Redirect to dashboard with solution ID
-        return res.redirect(`/dashboard?solution=${magicData.solutionId}`);
+        // Redirect to main page output section with solution ID
+        return res.redirect(`/?magic=1&solution=${magicData.solutionId}#output`);
 
     } catch (error) {
         logger.error('Magic link validation error', error instanceof Error ? error : new Error(String(error)));
@@ -128,6 +128,52 @@ router.get('/solutions', async (req: Request, res: Response) => {
     } catch (error) {
         logger.error('Failed to get user solutions', error instanceof Error ? error : new Error(String(error)));
         return res.status(500).json({ error: 'Failed to load solutions' });
+    }
+});
+
+/**
+ * GET /auth/solution/:id
+ * Get a specific solution by ID (authenticated users only)
+ */
+router.get('/solution/:id', async (req: Request, res: Response) => {
+    const sessionId = req.cookies?.[SESSION_COOKIE];
+    const solutionId = req.params.id;
+
+    if (!sessionId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const session = sessions.get(sessionId);
+    if (!session) {
+        return res.status(401).json({ error: 'Session expired' });
+    }
+
+    try {
+        // Verify user owns this solution
+        const magicLinks = await getSolutionsByEmail(session.email);
+        const owned = magicLinks.find(link => link.solutionId === solutionId);
+
+        if (!owned) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Get the solution data
+        const stored = await resultStore.get(solutionId);
+        if (!stored) {
+            return res.status(404).json({ error: 'Solution not found' });
+        }
+
+        return res.json({
+            id: solutionId,
+            tier: owned.tier,
+            problem: owned.problemSummary,
+            createdAt: owned.createdAt,
+            solution: stored.data
+        });
+
+    } catch (error) {
+        logger.error('Failed to get solution', error instanceof Error ? error : new Error(String(error)));
+        return res.status(500).json({ error: 'Failed to load solution' });
     }
 });
 
