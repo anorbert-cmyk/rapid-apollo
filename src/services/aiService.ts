@@ -126,7 +126,7 @@ export const solveProblem = async (
 ): Promise<SolutionResponse> => {
     try {
         const model = genAI.getGenerativeModel({
-            model: "gemini-3-pro", // Latest Gemini 3 Pro (Nov 2025)
+            model: "gemini-1.5-pro", // Gemini 1.5 Pro (stable, recommended)
             generationConfig: {
                 responseMimeType: "application/json", // Request JSON output
             }
