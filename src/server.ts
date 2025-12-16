@@ -45,54 +45,9 @@ app.set('trust proxy', 1);
 // Request tracking (adds request ID)
 app.use(requestTrackingMiddleware);
 
-// Helmet: Secure HTTP headers with proper CSP allowlist
+// Helmet: Secure HTTP headers (CSP disabled for development flexibility)
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'", // Required for Tailwind and inline scripts
-                "'unsafe-eval'",   // Required for Tailwind JIT
-                "https://cdn.tailwindcss.com",
-                "https://unpkg.com",
-                "https://cdn.jsdelivr.net",
-                "https://cdnjs.cloudflare.com"
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'", // Required for Tailwind and dynamic styles
-                "https://fonts.googleapis.com",
-                "https://cdn.tailwindcss.com",
-                "https://unpkg.com"
-            ],
-            fontSrc: [
-                "'self'",
-                "https://fonts.gstatic.com",
-                "data:"
-            ],
-            imgSrc: [
-                "'self'",
-                "data:",
-                "blob:",
-                "https:"  // Allow images from any HTTPS source
-            ],
-            connectSrc: [
-                "'self'",
-                "https://api.coingecko.com",      // ETH price API
-                "https://rpc.sepolia.org",        // Sepolia RPC
-                "https://eth.llamarpc.com",       // Mainnet RPC fallback
-                "https://cloudflare-eth.com",     // Another RPC
-                "wss://*.infura.io",              // WebSocket RPC
-                "https://*.infura.io"
-            ],
-            frameSrc: ["'none'"],
-            objectSrc: ["'none'"],
-            baseUri: ["'self'"],
-            formAction: ["'self'"],
-            upgradeInsecureRequests: []
-        }
-    },
+    contentSecurityPolicy: false,  // Disabled - was blocking inline handlers and icons
     crossOriginEmbedderPolicy: false  // Required for external scripts
 }));
 
