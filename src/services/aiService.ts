@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 import { config } from '../config';
 import { logger } from '../utils/logger';
 import { getMasterPrompt } from '../prompts/masterPrompts';
@@ -10,7 +10,32 @@ import {
     FullSections
 } from '../types/solution';
 
-const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
+// Initialize OpenAI client
+const openai = new OpenAI({
+    apiKey: config.OPENAI_API_KEY,
+});
+
+// ===========================================
+// MODEL CONFIGURATION BY TIER
+// ===========================================
+
+/**
+ * Get the appropriate OpenAI model for each tier
+ * - Full: gpt-5.2 (latest flagship, Dec 2025)
+ * - Medium: gpt-5.2 (latest flagship)
+ * - Standard: o3-mini (fast reasoning model, Jan 2025)
+ */
+function getModelForTier(tier: string): string {
+    switch (tier) {
+        case 'full':
+            return 'gpt-5.2'; // OpenAI GPT-5.2 (Dec 2025)
+        case 'medium':
+            return 'gpt-5.2'; // OpenAI GPT-5.2 (Dec 2025)
+        case 'standard':
+        default:
+            return 'o3-mini'; // Fast reasoning model (Jan 2025)
+    }
+}
 
 // ===========================================
 // PROMPT INJECTION DEFENSE
@@ -116,7 +141,7 @@ function parseAndValidateResponse(jsonText: string, tier: string): SolutionSecti
 // ===========================================
 
 /**
- * Solve a problem using tier-specific master prompt
+ * Solve a problem using tier-specific model and prompt
  * Returns structured JSON response
  */
 export const solveProblem = async (
@@ -125,12 +150,7 @@ export const solveProblem = async (
     txHash?: string
 ): Promise<SolutionResponse> => {
     try {
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-pro", // Gemini 1.5 Pro (stable, recommended)
-            generationConfig: {
-                responseMimeType: "application/json", // Request JSON output
-            }
-        });
+        const model = getModelForTier(tier);
 
         // 1. Sanitize input
         const { sanitized, flags } = sanitizeInput(problemStatement);
@@ -145,10 +165,24 @@ export const solveProblem = async (
         // 2. Get tier-specific master prompt
         const prompt = getMasterPrompt(tier, sanitized);
 
-        // 3. Generate response
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        // 3. Generate response using OpenAI
+        logger.info('Calling OpenAI API', { model, tier });
+
+        const completion = await openai.chat.completions.create({
+            model: model,
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            // o1 models don't support response_format yet, so we rely on prompt instructions
+            ...(model === 'gpt-4o-mini' && {
+                response_format: { type: 'json_object' }
+            })
+        });
+
+        const text = completion.choices[0]?.message?.content || '';
 
         // 4. Extract and parse JSON
         const jsonText = extractJSON(text);
@@ -159,13 +193,19 @@ export const solveProblem = async (
             meta: {
                 originalProblem: problemStatement, // Keep original, not sanitized
                 tier: tier as 'standard' | 'medium' | 'full',
-                provider: 'gemini',
+                provider: model.startsWith('gpt-5') ? 'openai-gpt5' : 'openai-o3',
                 generatedAt: Date.now(),
                 txHash
             },
             sections,
             rawMarkdown: convertToMarkdown(sections, tier) // For backward compatibility
         };
+
+        logger.info('OpenAI response generated successfully', {
+            model,
+            tier,
+            tokens: completion.usage?.total_tokens
+        });
 
         return solutionResponse;
 
