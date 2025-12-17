@@ -85,7 +85,7 @@ test.describe('Responsive Design', () => {
 
         // On mobile, the nav button may be hidden in hamburger menu
         // Check page loads and main content is visible
-        await expect(page.locator('h1')).toBeVisible();
+        await expect(page.locator('h1').first()).toBeVisible();
         await expect(page.locator('#protocol')).toBeVisible();
     });
 
