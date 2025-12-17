@@ -54,7 +54,7 @@ export default defineConfig({
         timeout: 120000,
         env: {
             NODE_ENV: 'test',
-            GEMINI_API_KEY: 'test-key',
+            OPENAI_API_KEY: 'test-key',
             RECEIVER_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000',
             ADMIN_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000',
         },
