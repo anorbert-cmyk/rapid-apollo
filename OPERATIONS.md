@@ -27,6 +27,10 @@ ADMIN_WALLET_ADDRESS=0x...         # Admin wallet for dashboard access
 PORT=3000                          # Server port (default: 3000)
 NODE_ENV=production                # Environment mode
 
+# Security (REQUIRED in production)
+MAGIC_LINK_SECRET=...              # 32+ random chars for magic link tokens
+COOKIE_SECRET=...                  # 32+ random chars for cookie signing
+
 # Optional: Database (Recommended for production)
 DATABASE_URL=postgresql://user:pass@host:5432/rapid_apollo
 
@@ -213,6 +217,8 @@ Adjust based on load testing results.
 
 - [ ] `NODE_ENV=production` is set
 - [ ] `ALLOWED_ORIGIN` is set to production domain
+- [ ] `MAGIC_LINK_SECRET` is set (32+ random chars)
+- [ ] `COOKIE_SECRET` is set (32+ random chars)
 - [ ] All API keys are production keys (not test/sandbox)
 - [ ] `SENTRY_DSN` is configured
 - [ ] Database has SSL enabled
