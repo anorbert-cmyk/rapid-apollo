@@ -1508,8 +1508,7 @@
                             </svg>
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
-                        <a href="#"
-                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('standard'); return false;"
+                        <a href="#" onclick="window.payAndSolve('standard'); return false;"
                             class="block text-center text-xs mt-3 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -1555,8 +1554,7 @@
                             </svg>
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
-                        <a href="#"
-                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('medium'); return false;"
+                        <a href="#" onclick="window.payAndSolve('medium'); return false;"
                             class="block text-center text-xs mt-3 mb-4 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -1599,8 +1597,7 @@
                             </svg>
                         </button>
                         <!-- CRYPTO PAYMENT LINK -->
-                        <a href="#"
-                            onclick="if(window.CoinbasePaymentModule) window.CoinbasePaymentModule.handlePayment('full'); return false;"
+                        <a href="#" onclick="window.payAndSolve('full'); return false;"
                             class="block text-center text-xs mt-3 transition-colors duration-200"
                             style="color: var(--text-primary);">
                             Pay with Crypto →
@@ -1615,7 +1612,7 @@
             class="fixed inset-0 bg-black/90 backdrop-blur-xl z-[100] hidden items-center justify-center p-4">
             <!-- CONNECT WALLET MODAL -->
             <div id="connectWalletModal"
-                class="hud-card p-1 bg-gradient-to-br from-indigo-500/20 to-purple-900/20 rounded-3xl max-w-sm w-full text-center hidden relative overflow-hidden">
+                class="hud-card p-1 bg-gradient-to-br from-indigo-500/20 to-purple-900/20 rounded-3xl max-w-md w-full text-center hidden relative overflow-hidden">
                 <div class="bg-[#0b0c16] rounded-[22px] p-8 md:p-10 relative">
                     <!-- Icon -->
                     <div
@@ -1623,15 +1620,27 @@
                         <i class="ph-duotone ph-wallet text-3xl"></i>
                     </div>
 
-                    <h3 class="text-xl font-bold text-white mb-3">Identity Verification</h3>
-                    <p class="text-gray-400 text-xs mb-8 font-mono leading-relaxed">
-                        Accessing the Logic Engine requires a cryptographic handshake. Connect your wallet to establish
-                        a secure payment channel.
+                    <h3 class="text-xl font-bold text-white mb-3">Access & Identity</h3>
+                    <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+                        To activate this tier, please connect your Ethereum wallet.
                     </p>
 
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10 mb-6 text-left">
+                        <div class="flex items-start gap-3 mb-3">
+                            <i class="ph-bold ph-shield-check text-green-400 mt-0.5 text-lg"></i>
+                            <span class="text-sm text-gray-300"><strong class="text-white">Secure Login:</strong> Your
+                                wallet acts as your password-less credential for future dashboard access.</span>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="ph-bold ph-lightning text-yellow-400 mt-0.5 text-lg"></i>
+                            <span class="text-sm text-gray-300"><strong class="text-white">Direct Payment:</strong>
+                                Seamlessly pay via MetaMask without third-party redirects.</span>
+                        </div>
+                    </div>
+
                     <button id="btn-modal-connect"
-                        class="w-full py-4 bg-white text-black rounded-xl font-bold hover:bg-indigo-50 transition shadow-lg font-mono text-xs uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
-                        <i class="ph-bold ph-plug"></i> Initialize Session
+                        class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl font-bold hover:from-indigo-400 hover:to-purple-400 transition shadow-lg font-mono text-xs uppercase tracking-widest mb-3 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-plug"></i> Connect & Pay
                     </button>
 
                     <button onclick="hideConnectModal()"
