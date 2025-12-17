@@ -94,8 +94,8 @@ const useRedisRateLimiter = config.NODE_ENV === 'production' && process.env.REDI
 app.use('/api/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRateLimiter);
 
-// Cookie parser for session management
-app.use(cookieParser());
+// Cookie parser for session management (with signing secret if available)
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // Health check routes (no rate limiting, no auth)
 app.use('/health', healthRoutes);
@@ -109,9 +109,16 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 
 // Deprecation middleware for legacy routes
+// Sunset date: 6 months from current date
+const getSunsetDate = () => {
+    const date = new Date();
+    date.setMonth(date.getMonth() + 6);
+    return date.toUTCString();
+};
+
 const deprecationMiddleware = (_req: any, res: any, next: any) => {
     res.setHeader('Deprecation', 'true');
-    res.setHeader('Sunset', 'Sat, 01 Mar 2025 00:00:00 GMT');
+    res.setHeader('Sunset', getSunsetDate());
     res.setHeader('Link', '</api/v1>; rel="successor-version"');
     next();
 };

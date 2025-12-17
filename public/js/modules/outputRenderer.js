@@ -303,9 +303,15 @@ window.copyToClipboard = function (elementId) {
 
 // Auto-init when DOM ready
 document.addEventListener('DOMContentLoaded', function () {
-    setTimeout(() => {
-        if (window.OutputRenderer) {
+    // Use requestAnimationFrame for more reliable DOM readiness than magic timeout
+    const initWhenReady = () => {
+        const container = document.getElementById('output-layer-tabs');
+        if (container && window.OutputRenderer) {
             window.OutputRenderer.init();
+        } else {
+            // Retry on next frame if not ready yet
+            requestAnimationFrame(initWhenReady);
         }
-    }, 500);
+    };
+    requestAnimationFrame(initWhenReady);
 });
