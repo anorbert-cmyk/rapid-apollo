@@ -13,8 +13,8 @@ test.describe('Admin Dashboard', () => {
             }
         });
 
-        // Should fail without valid signature (403) or be rate limited (429)
-        expect([403, 429]).toContain(response.status());
+        // Should fail without valid signature (401/403) or be rate limited (429)
+        expect([401, 403, 429]).toContain(response.status());
     });
 
     test('admin transactions endpoint should require authentication', async ({ request }) => {
@@ -25,8 +25,8 @@ test.describe('Admin Dashboard', () => {
                 timestamp: Date.now()
             }
         });
-
-        expect([403, 429]).toContain(response.status());
+        // Should fail without valid signature (401/403) or be rate limited (429)
+        expect([401, 403, 429]).toContain(response.status());
     });
 });
 
