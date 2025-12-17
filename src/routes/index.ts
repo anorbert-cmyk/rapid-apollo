@@ -9,7 +9,7 @@ import { resultStore, usedTxHashes, userHistoryStore, statsStore, shareStore, tr
 import { solveRequestSchema, txHashSchema } from '../utils/validators';
 import { ZodError } from 'zod';
 import { verifyMessage } from 'ethers';
-import { checkAndMarkSignature } from '../utils/signatureStore';
+import { checkAndMarkSignatureAsync } from '../utils/signatureStore';
 import * as solutionRepo from '../db/solutionRepository';
 import { isDatabaseAvailable } from '../db';
 
@@ -85,8 +85,9 @@ router.post('/share/create', async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Invalid signature' });
         }
 
-        // Prevent signature replay attacks
-        if (!checkAndMarkSignature(signature, address)) {
+        // Prevent signature replay attacks (async for Redis support)
+        const isValidSignature = await checkAndMarkSignatureAsync(signature, address);
+        if (!isValidSignature) {
             logger.warn('Signature replay attempt on share/create', { wallet: address });
             return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }
@@ -170,7 +171,8 @@ router.post('/solve', async (req: Request, res: Response) => {
 
         if (!payment.valid) {
             logger.warn('Payment invalid', { txHash, message: payment.message });
-            await usedTxHashes.delete(txHash);
+            // SECURITY: Keep lock for 5 minutes on failure to prevent rapid retry attacks
+            await usedTxHashes.set(txHash, { status: 'failed', at: Date.now() } as any);
             return res.status(402).json({ error: payment.message });
         }
 
@@ -274,8 +276,9 @@ router.post('/history', async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Invalid signature' });
         }
 
-        // 3. Prevent signature replay attacks
-        if (!checkAndMarkSignature(signature, walletAddress)) {
+        // 3. Prevent signature replay attacks (async for Redis support)
+        const isValid = await checkAndMarkSignatureAsync(signature, walletAddress);
+        if (!isValid) {
             logger.warn('Signature replay attempt on history', { wallet: walletAddress });
             return res.status(403).json({ error: 'Signature already used. Please sign again.' });
         }

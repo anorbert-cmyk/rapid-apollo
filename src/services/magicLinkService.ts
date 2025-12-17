@@ -35,8 +35,15 @@ export function generateToken(): string {
  * Hash token for storage (security best practice)
  */
 function hashToken(token: string): string {
-    const secret = process.env.MAGIC_LINK_SECRET || 'default-secret-change-me';
-    return createHash('sha256').update(token + secret).digest('hex');
+    const secret = process.env.MAGIC_LINK_SECRET;
+
+    // Require secret in production
+    if (!secret && process.env.NODE_ENV === 'production') {
+        throw new Error('MAGIC_LINK_SECRET environment variable is required in production');
+    }
+
+    const finalSecret = secret || 'dev-secret-not-for-production';
+    return createHash('sha256').update(token + finalSecret).digest('hex');
 }
 
 /**

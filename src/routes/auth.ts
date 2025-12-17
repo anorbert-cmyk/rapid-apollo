@@ -6,15 +6,49 @@ import { Router, Request, Response } from 'express';
 import { validateMagicToken, getSolutionsByEmail } from '../services/magicLinkService';
 import { resultStore } from '../store';
 import { logger } from '../utils/logger';
+import * as redisStore from '../utils/redisStore';
 
 const router = Router();
 
 // Session cookie name
 const SESSION_COOKIE = 'aether_session';
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60; // 30 days in seconds
+const SESSION_PREFIX = 'session:';
 
-// In-memory session store (use Redis in production)
-const sessions = new Map<string, { email: string; createdAt: number }>();
+// In-memory fallback for when Redis is unavailable
+const memorySessionStore = new Map<string, { email: string; createdAt: number }>();
+
+// Session store functions (Redis-backed with memory fallback)
+async function getSession(sessionId: string): Promise<{ email: string; createdAt: number } | null> {
+    try {
+        const data = await redisStore.get(SESSION_PREFIX + sessionId);
+        if (data) {
+            return JSON.parse(data);
+        }
+    } catch (e) {
+        logger.warn('Redis session get failed, using memory fallback');
+    }
+    return memorySessionStore.get(sessionId) || null;
+}
+
+async function setSession(sessionId: string, data: { email: string; createdAt: number }): Promise<void> {
+    try {
+        await redisStore.set(SESSION_PREFIX + sessionId, JSON.stringify(data), SESSION_TTL_SECONDS);
+    } catch (e) {
+        logger.warn('Redis session set failed, using memory fallback');
+    }
+    memorySessionStore.set(sessionId, data);
+}
+
+async function deleteSession(sessionId: string): Promise<void> {
+    try {
+        await redisStore.del(SESSION_PREFIX + sessionId);
+    } catch (e) {
+        logger.warn('Redis session delete failed');
+    }
+    memorySessionStore.delete(sessionId);
+}
 
 /**
  * GET /auth/magic/:token
@@ -37,7 +71,7 @@ router.get('/magic/:token', async (req: Request, res: Response) => {
 
         // Create session
         const sessionId = generateSessionId();
-        sessions.set(sessionId, {
+        await setSession(sessionId, {
             email: magicData.email,
             createdAt: Date.now()
         });
@@ -65,21 +99,21 @@ router.get('/magic/:token', async (req: Request, res: Response) => {
  * GET /auth/session
  * Get current session info
  */
-router.get('/session', (req: Request, res: Response) => {
+router.get('/session', async (req: Request, res: Response) => {
     const sessionId = req.cookies?.[SESSION_COOKIE];
 
     if (!sessionId) {
         return res.json({ authenticated: false });
     }
 
-    const session = sessions.get(sessionId);
+    const session = await getSession(sessionId);
     if (!session) {
         return res.json({ authenticated: false });
     }
 
     // Check session expiry
     if (Date.now() - session.createdAt > SESSION_MAX_AGE) {
-        sessions.delete(sessionId);
+        await deleteSession(sessionId);
         return res.json({ authenticated: false });
     }
 
@@ -100,7 +134,7 @@ router.get('/solutions', async (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const session = sessions.get(sessionId);
+    const session = await getSession(sessionId);
     if (!session) {
         return res.status(401).json({ error: 'Session expired' });
     }
@@ -143,7 +177,7 @@ router.get('/solution/:id', async (req: Request, res: Response) => {
         return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const session = sessions.get(sessionId);
+    const session = await getSession(sessionId);
     if (!session) {
         return res.status(401).json({ error: 'Session expired' });
     }
@@ -194,11 +228,11 @@ router.get('/solution/:id', async (req: Request, res: Response) => {
  * POST /auth/logout
  * Clear session
  */
-router.post('/logout', (req: Request, res: Response) => {
+router.post('/logout', async (req: Request, res: Response) => {
     const sessionId = req.cookies?.[SESSION_COOKIE];
 
     if (sessionId) {
-        sessions.delete(sessionId);
+        await deleteSession(sessionId);
     }
 
     res.clearCookie(SESSION_COOKIE);
