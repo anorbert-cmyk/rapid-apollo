@@ -147,12 +147,10 @@ export async function setIfNotExists(key: string, value: string, ttlSeconds: num
         }
     }
 
-    // Fallback to memory
-    if (memoryStore.has(key)) {
-        const entry = memoryStore.get(key)!;
-        if (!entry.expiresAt || Date.now() < entry.expiresAt) {
-            return false; // Already exists and not expired
-        }
+    // Fallback to memory (fixed race condition: use get instead of has+set)
+    const existing = memoryStore.get(key);
+    if (existing && (!existing.expiresAt || Date.now() < existing.expiresAt)) {
+        return false; // Already exists and not expired
     }
 
     memoryStore.set(key, {

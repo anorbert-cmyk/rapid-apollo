@@ -184,7 +184,5 @@ export async function executeAtomic(
     });
 }
 
-// Initialize on import if DATABASE_URL is set
-if (process.env.DATABASE_URL) {
-    initDatabase();
-}
+// NOTE: Database initialization is now done explicitly in server.ts
+// to prevent connections during test imports or module resolution.

@@ -140,7 +140,11 @@ if (swaggerDocument) {
 async function gracefulShutdown(signal: string): Promise<void> {
     logger.info('Shutdown signal received', { signal });
 
-    // Close Redis connection
+    // Flush Sentry errors before shutdown
+    await flushSentry();
+
+    // Close Redis connections (both rate limiter and store)
+    await closeRedisStore();
     await closeRedis();
 
     logger.info('Graceful shutdown complete');

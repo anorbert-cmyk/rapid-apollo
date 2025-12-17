@@ -181,7 +181,7 @@ export async function logTransaction(
 }
 
 /**
- * Update stats
+ * Update stats (atomic transaction)
  */
 export async function updateStats(tier: string, ethAmount: number): Promise<void> {
     if (!isDatabaseAvailable()) {
@@ -189,21 +189,14 @@ export async function updateStats(tier: string, ethAmount: number): Promise<void
     }
 
     try {
-        // Increment total solves
+        // Use raw SQL transaction for atomicity (single query)
         await query(
-            `UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = 'total_solves'`
-        );
-
-        // Increment tier count
-        await query(
-            `UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = $1`,
-            [`count_${tier}`]
-        );
-
-        // Add revenue
-        await query(
-            `UPDATE stats SET value = value + $1, updated_at = NOW() WHERE key = 'total_revenue_eth'`,
-            [ethAmount]
+            `BEGIN;
+             UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = 'total_solves';
+             UPDATE stats SET value = value + 1, updated_at = NOW() WHERE key = $1;
+             UPDATE stats SET value = value + $2, updated_at = NOW() WHERE key = 'total_revenue_eth';
+             COMMIT;`,
+            [`count_${tier}`, ethAmount]
         );
 
     } catch (error) {

@@ -55,6 +55,11 @@ export const getTierPriceETH = async (tier: Tier): Promise<string> => {
     const priceUSD = getTierPriceUSD(tier);
     const ethRate = await getEthPrice();
 
+    // Validate ETH rate to prevent division by zero/NaN
+    if (!ethRate || ethRate <= 0 || !Number.isFinite(ethRate)) {
+        throw new Error('Invalid ETH price received from API');
+    }
+
     // Convert USD to ETH (with 6 decimal places for precision/rounding safety in display)
     const ethAmount = (priceUSD / ethRate).toFixed(6);
     return ethAmount;
