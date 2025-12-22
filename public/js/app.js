@@ -280,13 +280,29 @@ window.toggleInputView = (showHistory) => {
 // Admin Module Delegations
 window.refreshAdminStats = async () => {
     if (window.AdminModule) {
-        await window.AdminModule.refreshStats(signer, userAddress);
+        // Use WalletModule directly to ensure signer/address are always current
+        const currentSigner = window.WalletModule?.signer || signer;
+        const currentAddress = window.WalletModule?.address || userAddress;
+
+        if (!currentSigner || !currentAddress) {
+            window.ToastModule?.warning('Connect Wallet', 'Please connect your wallet first.');
+            return;
+        }
+
+        await window.AdminModule.refreshStats(currentSigner, currentAddress);
     }
 };
 
 window.loadTransactionHistory = async () => {
     if (window.AdminModule) {
-        await window.AdminModule.loadTransactionHistory(signer, userAddress);
+        const currentSigner = window.WalletModule?.signer || signer;
+        const currentAddress = window.WalletModule?.address || userAddress;
+
+        if (!currentSigner || !currentAddress) {
+            return;
+        }
+
+        await window.AdminModule.loadTransactionHistory(currentSigner, currentAddress);
     }
 };
 
