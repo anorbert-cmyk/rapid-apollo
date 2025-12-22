@@ -12,7 +12,8 @@ import { tryMarkWebhookProcessed } from '../utils/webhookIdempotency';
 import * as redisStore from '../utils/redisStore';
 import { ZodError } from 'zod';
 import { createMagicLink, getMagicLinkUrl } from '../services/magicLinkService';
-import { sendMagicLinkEmail, isEmailConfigured } from '../services/emailService';
+import { sendMagicLinkEmail, isEmailConfigured, sendRapidApolloEmail } from '../services/emailService';
+import { config } from '../config';
 
 const router = Router();
 
@@ -430,11 +431,22 @@ async function processSuccessfulPayment(
                 );
                 const magicLinkUrl = getMagicLinkUrl(magicToken);
 
-                await sendMagicLinkEmail({
+                // Determine amount based on tier for the receipt
+                const prices: Record<string, string> = {
+                    'standard': String(config.TIER_STANDARD_USD),
+                    'medium': String(config.TIER_MEDIUM_USD),
+                    'full': String(config.TIER_FULL_USD),
+                    'premium': String(config.TIER_PREMIUM_USD)
+                };
+                const amount = prices[actualTier] || '0';
+
+                await sendRapidApolloEmail({
                     to: customerIdentifier,
-                    magicLink: magicLinkUrl,
-                    tier: actualTier,
-                    problemSummary: actualProblem
+                    userName: customerIdentifier.split('@')[0], // Extract name part from email
+                    magicLinkUrl: magicLinkUrl,
+                    transactionId: txId,
+                    amount: amount,
+                    currency: 'USD'
                 });
 
                 logger.info('Magic link email sent', { email: customerIdentifier.substring(0, 5) + '***' });
