@@ -6,7 +6,7 @@ dotenv.config();
 const envSchema = z.object({
     PORT: z.string().default('3000'),
     NODE_ENV: z.string().default('development'),
-    OPENAI_API_KEY: z.string().min(1, "OpenAI API Key is required"),
+    OPENAI_API_KEY: z.string().optional(), // Optional - Perplexity is now the primary provider
     // Ethereum Mainnet RPC (Public Ankr Node)
     RPC_URL: z.string().default('https://rpc.ankr.com/eth'),
     // My receiving wallet address (hardcoded for the demo or env)
