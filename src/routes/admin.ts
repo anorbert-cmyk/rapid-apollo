@@ -136,4 +136,40 @@ router.post('/transactions', verifyAdmin, async (req: Request, res: Response) =>
     }
 });
 
+// POST /api/admin/test-email - Send test Premium report email
+router.post('/test-email', verifyAdmin, async (req: Request, res: Response) => {
+    try {
+        const { email } = req.body;
+
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Valid email required' });
+        }
+
+        const { sendPremiumReportEmail, isEmailConfigured } = await import('../services/emailService');
+
+        if (!isEmailConfigured()) {
+            return res.status(503).json({ error: 'Email service not configured (RESEND_API_KEY missing)' });
+        }
+
+        const result = await sendPremiumReportEmail({
+            to: email,
+            magicLink: 'https://aetherlogic.io/auth/magic/test-token-12345',
+            reportPackage: 'premium',
+            problemSummary: 'TEST EMAIL: I want to build an AI-powered product validation platform that helps entrepreneurs validate their startup ideas before investing significant time and money.'
+        });
+
+        if (result) {
+            logger.info('Test email sent via admin', { to: email });
+            return res.json({ success: true, message: `Test email sent to ${email}` });
+        } else {
+            return res.status(500).json({ error: 'Failed to send email' });
+        }
+
+    } catch (error) {
+        logger.error('Admin test email error', error instanceof Error ? error : new Error(String(error)));
+        return res.status(500).json({ error: 'Failed to send test email' });
+    }
+});
+
 export default router;
+
