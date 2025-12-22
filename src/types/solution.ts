@@ -12,7 +12,7 @@ export interface SolutionMeta {
     /** Tier level: standard, medium, full */
     tier: 'standard' | 'medium' | 'full';
     /** AI provider used */
-    provider: 'gemini' | 'openai' | 'openai-o1' | 'openai-gpt4o' | 'openai-gpt5' | 'openai-o3';
+    provider: 'gemini' | 'openai' | 'openai-o1' | 'openai-gpt4o' | 'openai-gpt5' | 'openai-o3' | 'perplexity-sonar';
     /** Timestamp of generation */
     generatedAt: number;
     /** Transaction hash for verification */

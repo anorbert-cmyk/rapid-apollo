@@ -10,12 +10,13 @@ import {
     FullSections
 } from '../types/solution';
 
-// Initialize OpenAI client only if API key is provided
-// NOTE: Perplexity is now the primary provider, OpenAI is optional fallback
-let openai: OpenAI | null = null;
-if (config.OPENAI_API_KEY) {
-    openai = new OpenAI({
-        apiKey: config.OPENAI_API_KEY,
+// Initialize Perplexity client (OpenAI-compatible)
+// NOTE: Perplexity is the exclusive AI provider for Rapid Apollo
+let aiClient: OpenAI | null = null;
+if (config.PERPLEXITY_API_KEY) {
+    aiClient = new OpenAI({
+        apiKey: config.PERPLEXITY_API_KEY,
+        baseURL: 'https://api.perplexity.ai'
     });
 }
 
@@ -24,20 +25,20 @@ if (config.OPENAI_API_KEY) {
 // ===========================================
 
 /**
- * Get the appropriate OpenAI model for each tier
- * - Full: gpt-5.2 (latest flagship, Dec 2025)
- * - Medium: gpt-5.2 (latest flagship)
- * - Standard: o3-mini (fast reasoning model, Jan 2025)
+ * Get the appropriate Perplexity model for each tier
+ * - Full: sonar-pro (Deep reasoning, high capacity)
+ * - Medium: sonar-pro (Deep reasoning)
+ * - Standard: sonar (Fast, efficient)
  */
 function getModelForTier(tier: string): string {
     switch (tier) {
         case 'full':
-            return 'gpt-5.2'; // OpenAI GPT-5.2 (Dec 2025)
+            return 'sonar-pro';
         case 'medium':
-            return 'gpt-5.2'; // OpenAI GPT-5.2 (Dec 2025)
+            return 'sonar-pro';
         case 'standard':
         default:
-            return 'o3-mini'; // Fast reasoning model (Jan 2025)
+            return 'sonar';
     }
 }
 
@@ -169,26 +170,22 @@ export const solveProblem = async (
         // 2. Get tier-specific master prompt
         const prompt = getMasterPrompt(tier, sanitized);
 
-        // 3. Check if OpenAI is configured
-        if (!openai) {
-            throw new Error('OpenAI API key not configured. Please use Perplexity for Premium reports or set OPENAI_API_KEY.');
+        // 3. Check if AI client is configured
+        if (!aiClient) {
+            throw new Error('Perplexity API key not configured. System relies exclusively on Perplexity Sonar.');
         }
 
-        // 4. Generate response using OpenAI
-        logger.info('Calling OpenAI API', { model, tier });
+        // 4. Generate response
+        logger.info('Calling Perplexity API', { model, tier });
 
-        const completion = await openai.chat.completions.create({
+        const completion = await aiClient.chat.completions.create({
             model: model,
             messages: [
                 {
                     role: 'user',
                     content: prompt
                 }
-            ],
-            // o1 models don't support response_format yet, so we rely on prompt instructions
-            ...(model === 'gpt-4o-mini' && {
-                response_format: { type: 'json_object' }
-            })
+            ]
         });
 
         const text = completion.choices[0]?.message?.content || '';
@@ -202,7 +199,7 @@ export const solveProblem = async (
             meta: {
                 originalProblem: problemStatement, // Keep original, not sanitized
                 tier: tier as 'standard' | 'medium' | 'full',
-                provider: model.startsWith('gpt-5') ? 'openai-gpt5' : 'openai-o3',
+                provider: 'perplexity-sonar',
                 generatedAt: Date.now(),
                 txHash
             },
