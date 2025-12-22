@@ -18,11 +18,13 @@ import adminRoutes from './routes/admin';
 import paymentRoutes from './routes/payment';
 import healthRoutes from './routes/health';
 import authRoutes from './routes/auth';
+import reportRoutes from './routes/reports';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 import { initSentry, sentryErrorHandler, flushSentry } from './utils/sentry';
 import { initRedisStore, closeRedisStore } from './utils/redisStore';
+import { closeQueue } from './lib/queue';
 
 // Load OpenAPI Spec
 let swaggerDocument: any;
@@ -107,6 +109,7 @@ app.use('/auth', authRoutes);
 app.use('/api/v1', apiRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/reports', reportRoutes);
 
 // Deprecation middleware for legacy routes
 // Sunset date: 6 months from current date
@@ -153,6 +156,9 @@ async function gracefulShutdown(signal: string): Promise<void> {
     // Close Redis connections (both rate limiter and store)
     await closeRedisStore();
     await closeRedis();
+
+    // Close BullMQ queue connections
+    await closeQueue();
 
     logger.info('Graceful shutdown complete');
     process.exit(0);

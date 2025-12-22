@@ -40,6 +40,12 @@ const envSchema = z.object({
     COINBASE_WEBHOOK_SECRET: z.string().optional(),
     COINBASE_SUCCESS_URL: z.string().optional(),
     COINBASE_CANCEL_URL: z.string().optional(),
+
+    // Perplexity Integration (for Premium tier)
+    PERPLEXITY_API_KEY: z.string().optional(),
+    PERPLEXITY_MODEL: z.string().default('sonar-pro'),
+    PERPLEXITY_MAX_TOKENS: z.coerce.number().default(60000),
+    TIER_PREMIUM_USD: z.coerce.number().default(299),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
