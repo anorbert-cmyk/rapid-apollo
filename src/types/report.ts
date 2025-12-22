@@ -26,6 +26,7 @@ export interface ReportJobData {
     walletAddress: string;
     problemStatement: string;
     package: ReportPackage;
+    email?: string;  // For magic link sending after completion
     userContext?: {
         location?: string;
         language?: string;

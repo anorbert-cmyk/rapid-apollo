@@ -14,6 +14,8 @@ import {
     getPerplexityHealth
 } from '../services/perplexityService';
 import * as reportRepo from '../db/reportRepository';
+import { createMagicLink, getMagicLinkUrl } from '../services/magicLinkService';
+import { sendPremiumReportEmail, isEmailConfigured } from '../services/emailService';
 
 // ===========================================
 // WORKER CONFIGURATION
@@ -98,7 +100,7 @@ export async function stopReportWorker(): Promise<void> {
  * Implements stepped generation with crash recovery
  */
 async function processReportJob(job: Job<ReportJobData>): Promise<{ success: boolean; reportId: string }> {
-    const { reportId, problemStatement, package: reportPackage, userContext, walletAddress } = job.data;
+    const { reportId, problemStatement, package: reportPackage, userContext, walletAddress, email } = job.data;
 
     logger.info('Processing report job', {
         jobId: job.id,
@@ -208,6 +210,37 @@ async function processReportJob(job: Job<ReportJobData>): Promise<{ success: boo
             processingTimeMs: analysisResult.usage.processingTimeMs,
             package: reportPackage
         });
+
+        // ===========================================
+        // STEP 6: SEND MAGIC LINK EMAIL (if email provided)
+        // ===========================================
+        if (email && isEmailConfigured()) {
+            try {
+                const magicToken = await createMagicLink(
+                    email,
+                    reportId,
+                    'premium',
+                    problemStatement.substring(0, 200),
+                    'completed'
+                );
+                const magicLinkUrl = getMagicLinkUrl(magicToken);
+
+                await sendPremiumReportEmail({
+                    to: email,
+                    magicLink: magicLinkUrl,
+                    reportPackage,
+                    problemSummary: problemStatement
+                });
+
+                logger.info('Premium report email sent', {
+                    reportId,
+                    email: email.substring(0, 3) + '***'
+                });
+            } catch (emailError: any) {
+                logger.error('Failed to send premium report email', new Error(emailError.message));
+                // Don't fail the job if email fails
+            }
+        }
 
         return { success: true, reportId };
 

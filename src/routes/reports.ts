@@ -74,6 +74,7 @@ const generateReportSchema = z.object({
     walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid wallet address'),
     signature: z.string().min(1, 'Signature is required'),
     timestamp: z.number().int().positive(),
+    email: z.string().email('Invalid email address').optional(),
     txHash: z.string().regex(/^0x[a-fA-F0-9]{64}$/).optional(),
     stripeSessionId: z.string().optional()
 });
@@ -101,6 +102,7 @@ router.post('/generate', async (req: Request, res: Response) => {
             walletAddress,
             signature,
             timestamp,
+            email,
             txHash,
             stripeSessionId
         } = parseResult.data;
@@ -221,10 +223,10 @@ router.post('/generate', async (req: Request, res: Response) => {
             await queueReportGeneration({
                 reportId: report.id,
                 walletAddress,
-                problemStatement,
+                problemStatement: sanitizedProblem,
                 package: reportPackage as ReportPackage,
+                email,  // Pass email for magic link sending after completion
                 userContext: {
-                    // Could extract from user profile or request headers
                     language: req.headers['accept-language']?.split(',')[0] || 'en'
                 }
             });
