@@ -10,10 +10,14 @@ import {
     FullSections
 } from '../types/solution';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: config.OPENAI_API_KEY,
-});
+// Initialize OpenAI client only if API key is provided
+// NOTE: Perplexity is now the primary provider, OpenAI is optional fallback
+let openai: OpenAI | null = null;
+if (config.OPENAI_API_KEY) {
+    openai = new OpenAI({
+        apiKey: config.OPENAI_API_KEY,
+    });
+}
 
 // ===========================================
 // MODEL CONFIGURATION BY TIER
@@ -165,7 +169,12 @@ export const solveProblem = async (
         // 2. Get tier-specific master prompt
         const prompt = getMasterPrompt(tier, sanitized);
 
-        // 3. Generate response using OpenAI
+        // 3. Check if OpenAI is configured
+        if (!openai) {
+            throw new Error('OpenAI API key not configured. Please use Perplexity for Premium reports or set OPENAI_API_KEY.');
+        }
+
+        // 4. Generate response using OpenAI
         logger.info('Calling OpenAI API', { model, tier });
 
         const completion = await openai.chat.completions.create({
