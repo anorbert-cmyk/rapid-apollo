@@ -50,6 +50,16 @@ router.post('/stripe/create-session', async (req: Request, res: Response) => {
         }
 
         const { tier, problemStatement } = validated.data;
+        const recaptchaToken = req.body.recaptchaToken;
+
+        // Verify reCAPTCHA (if configured)
+        const { verifyRecaptcha } = await import('../utils/recaptcha');
+        const captchaResult = await verifyRecaptcha(recaptchaToken, 'stripe_payment');
+
+        if (!captchaResult.success) {
+            logger.warn('reCAPTCHA failed for Stripe session', { score: captchaResult.score, reason: captchaResult.reason });
+            return res.status(403).json({ error: 'Security verification failed. Please try again.' });
+        }
 
         const result = await createCheckoutSession(tier as Tier, problemStatement);
 

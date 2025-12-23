@@ -28,11 +28,25 @@ const StripePaymentModule = (function () {
         try {
             // Show loading state
             if (window.PaymentModule) {
-                window.PaymentModule.showLoading('Creating Checkout Session...');
-                window.PaymentModule.updateLoading('Connecting to Stripe...');
+                window.PaymentModule.showLoading('Verifying...');
+                window.PaymentModule.updateLoading('Security check in progress...');
             }
 
-            // Create checkout session
+            // Get reCAPTCHA token (invisible v3)
+            let recaptchaToken = null;
+            if (typeof grecaptcha !== 'undefined') {
+                try {
+                    recaptchaToken = await grecaptcha.execute('6LeG0DQsAAAAAHEW9PnIXkWLz6MRhVKQEWx7om7S', { action: 'stripe_payment' });
+                } catch (captchaError) {
+                    console.warn('reCAPTCHA failed, proceeding without token:', captchaError);
+                }
+            }
+
+            if (window.PaymentModule) {
+                window.PaymentModule.updateLoading('Creating Checkout Session...');
+            }
+
+            // Create checkout session with reCAPTCHA token
             const response = await fetch('/api/payments/stripe/create-session', {
                 method: 'POST',
                 headers: {
@@ -40,7 +54,8 @@ const StripePaymentModule = (function () {
                 },
                 body: JSON.stringify({
                     tier: tier,
-                    problemStatement: problemStatement
+                    problemStatement: problemStatement,
+                    recaptchaToken: recaptchaToken
                 })
             });
 
