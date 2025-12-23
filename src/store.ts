@@ -21,8 +21,24 @@ if (process.env.REDIS_URL) {
     logger.info('Connecting to Redis');
     redisClient = new Redis(process.env.REDIS_URL);
     redisClient.on('error', (err) => logger.error('Redis client error', err instanceof Error ? err : new Error(String(err))));
+    redisClient.on('connect', () => logger.info('Redis store connected'));
 } else {
     logger.warn('No REDIS_URL found - using in-memory storage (data lost on restart)');
+}
+
+/**
+ * Get Redis connection status for health checks
+ */
+export function getStoreRedisStatus(): { connected: boolean; type: 'redis' | 'memory' } {
+    if (!redisClient) {
+        return { connected: false, type: 'memory' };
+    }
+    // ioredis status: 'connecting' | 'connect' | 'ready' | 'close' | 'end'
+    const isConnected = redisClient.status === 'ready' || redisClient.status === 'connect';
+    return {
+        connected: isConnected,
+        type: isConnected ? 'redis' : 'memory'
+    };
 }
 
 // --- implementations ---

@@ -191,6 +191,9 @@ if (require.main === module) {
             }
         }
 
+        // Initialize Redis store for health checks
+        await initRedisStore();
+
         // Start the server
         const server = app.listen(config.PORT, () => {
             const redisStatus = getRedisStatus();
