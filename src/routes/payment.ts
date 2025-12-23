@@ -401,14 +401,35 @@ async function processSuccessfulPayment(
         }
 
         // Store in database if available
-        if (isDatabaseAvailable() && customerIdentifier) {
-            await solutionRepo.saveSolution(
+        if (isDatabaseAvailable()) {
+            // Save solution
+            if (customerIdentifier) {
+                await solutionRepo.saveSolution(
+                    txId,
+                    customerIdentifier,
+                    actualTier,
+                    actualProblem,
+                    solutionResponse
+                );
+            }
+
+            // Log transaction for admin stats (PostgreSQL)
+            await solutionRepo.logTransaction(
                 txId,
-                customerIdentifier,
-                actualTier,
-                actualProblem,
-                solutionResponse
+                customerIdentifier || 'fiat_payment',
+                actualTier
             );
+
+            // Update aggregate stats (PostgreSQL)
+            const tierPrices: Record<string, number> = {
+                'standard': 0.005,
+                'medium': 0.013,
+                'full': 0.052
+            };
+            const ethAmount = tierPrices[actualTier] || 0;
+            await solutionRepo.updateStats(actualTier, ethAmount);
+
+            logger.info('Transaction logged to PostgreSQL', { txId, tier: actualTier });
         }
 
         // Add to user history if we have customer identifier
@@ -419,7 +440,7 @@ async function processSuccessfulPayment(
             await userHistoryStore.set(customerIdentifier.toLowerCase(), history);
         }
 
-        // Log transaction
+        // Log transaction to Redis (fallback/legacy)
         const txLog = (await transactionLogStore.get('all')) || [];
         txLog.unshift({
             wallet: customerIdentifier || 'fiat_payment',
