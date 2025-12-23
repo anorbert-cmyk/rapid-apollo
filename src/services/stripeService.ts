@@ -64,6 +64,8 @@ export async function createCheckoutSession(
                 },
             ],
             mode: 'payment',
+            // CRITICAL: Collect customer email for magic link delivery
+            customer_creation: 'always',
             success_url: config.STRIPE_SUCCESS_URL || `${config.ALLOWED_ORIGIN}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: config.STRIPE_CANCEL_URL || `${config.ALLOWED_ORIGIN}/cancel`,
             metadata: {
