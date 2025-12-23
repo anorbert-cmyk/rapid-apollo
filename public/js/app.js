@@ -374,6 +374,76 @@ window.addEventListener('error', (event) => {
 });
 
 // ===========================================
+// PAYMENT SUCCESS POPUP
+// ===========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for payment success redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+
+    if (paymentStatus === 'success') {
+        // Show success popup
+        showPaymentSuccessModal();
+
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Clean up localStorage
+        localStorage.removeItem('paymentSuccess');
+    }
+});
+
+function showPaymentSuccessModal() {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.id = 'payment-success-modal';
+    modal.innerHTML = `
+        <div class="psm-overlay"></div>
+        <div class="psm-content">
+            <div class="psm-icon">🎉</div>
+            <h2>Fizetés Sikeres!</h2>
+            <p>Köszönjük a vásárlást!</p>
+            <div class="psm-email-notice">
+                <strong>📧 Email értesítés küldve!</strong><br>
+                Hamarosan kapsz egy emailt a fizetési visszaigazolásról, benne egy <strong>belépési linkkel</strong> az elemzésedhez.
+            </div>
+            <p class="psm-check">Ellenőrizd az email fiókodat (és a spam mappát is)!</p>
+            <button class="psm-btn" onclick="closePaymentSuccessModal()">Rendben!</button>
+        </div>
+    `;
+
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        #payment-success-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; animation: psmFadeIn 0.3s ease; }
+        @keyframes psmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .psm-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
+        .psm-content { position: relative; background: linear-gradient(135deg, #1a1a3e 0%, #0f0f23 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 24px; padding: 2.5rem; max-width: 450px; text-align: center; box-shadow: 0 25px 50px rgba(99, 102, 241, 0.3); animation: psmSlideUp 0.4s ease; }
+        @keyframes psmSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .psm-icon { font-size: 4rem; margin-bottom: 1rem; animation: psmBounce 0.6s ease; }
+        @keyframes psmBounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+        .psm-content h2 { font-size: 1.75rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .psm-content p { color: rgba(255,255,255,0.7); margin-bottom: 1rem; }
+        .psm-email-notice { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 1rem; margin: 1.5rem 0; text-align: left; }
+        .psm-email-notice strong { color: #818cf8; }
+        .psm-check { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+        .psm-btn { margin-top: 1.5rem; padding: 1rem 2.5rem; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .psm-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+}
+
+function closePaymentSuccessModal() {
+    const modal = document.getElementById('payment-success-modal');
+    if (modal) {
+        modal.style.animation = 'psmFadeIn 0.2s ease reverse';
+        setTimeout(() => modal.remove(), 200);
+    }
+}
+
+// ===========================================
 // END OF REFACTORED APP.JS
 // ===========================================
 console.log("App v5.0 loaded - All modules delegated");
