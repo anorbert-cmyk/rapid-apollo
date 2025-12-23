@@ -82,8 +82,8 @@ const AdminModule = (function () {
             // Render Chart
             _renderChart(tries);
 
-            // Render Recent Transactions
-            _renderRecentTransactions(totalSolves);
+            // Render Recent Transactions (uses allTransactions after loadTransactionHistory)
+            _renderRecentTransactions();
 
             window.ToastModule?.success('Stats Updated', 'Analytics refreshed successfully.');
 
@@ -200,12 +200,12 @@ const AdminModule = (function () {
             };
         }
 
-        // Show Dashboard Button for Admin Preview
-        const navDashboardBtn = document.getElementById('nav-dashboard-btn');
-        if (navDashboardBtn) {
-            navDashboardBtn.classList.remove('hidden');
-            navDashboardBtn.onclick = () => window.enterDashboard?.();
-        }
+        // Dashboard button disabled - Admin Stats is the primary admin view
+        // const navDashboardBtn = document.getElementById('nav-dashboard-btn');
+        // if (navDashboardBtn) {
+        //     navDashboardBtn.classList.remove('hidden');
+        //     navDashboardBtn.onclick = () => window.enterDashboard?.();
+        // }
 
         // Unlock Analytics Tab
         const navAnalytics = document.getElementById('nav-analytics');
@@ -251,35 +251,39 @@ const AdminModule = (function () {
         });
     }
 
-    function _renderRecentTransactions(totalSolves) {
+    function _renderRecentTransactions() {
         const recentTxDiv = document.getElementById('recent-transactions');
         if (!recentTxDiv) return;
 
-        if (totalSolves === 0) {
+        // Use real transactions from allTransactions array
+        if (allTransactions.length === 0) {
             recentTxDiv.innerHTML = '<div class="text-xs text-gray-500 italic">No transactions yet.</div>';
             return;
         }
 
-        const tiers = ['standard', 'medium', 'full'];
         const prices = { standard: '0.0050', medium: '0.0130', full: '0.0520' };
         let html = '';
 
-        for (let i = 0; i < Math.min(5, totalSolves); i++) {
-            const tier = tiers[Math.floor(Math.random() * 3)];
-            const time = new Date(Date.now() - (i * 3600000 * Math.random() * 24)).toLocaleString();
+        // Show last 5 real transactions
+        const recentTx = allTransactions.slice(0, 5);
+        recentTx.forEach(tx => {
+            const tier = tx.tier || 'standard';
+            const time = new Date(tx.timestamp).toLocaleString();
+            const shortWallet = tx.wallet ? tx.wallet.substring(0, 6) + '...' : 'N/A';
             html += `
                 <div class="flex items-center justify-between text-xs py-2 border-b border-white/5 last:border-0">
                     <div class="flex items-center gap-3">
                         <span class="w-2 h-2 rounded-full ${tier === 'full' ? 'bg-purple-400' : tier === 'medium' ? 'bg-indigo-400' : 'bg-gray-400'}"></span>
                         <span class="text-white font-mono">${tier.toUpperCase()}</span>
+                        <span class="text-gray-500 font-mono text-[10px]">${shortWallet}</span>
                     </div>
                     <div class="text-right">
-                        <div class="text-green-400">${prices[tier]} ETH</div>
+                        <div class="text-green-400">${prices[tier] || '0.0000'} ETH</div>
                         <div class="text-gray-500 text-[10px]">${time}</div>
                     </div>
                 </div>
             `;
-        }
+        });
         recentTxDiv.innerHTML = html;
     }
 
