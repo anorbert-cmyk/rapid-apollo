@@ -81,10 +81,14 @@ if (config.NODE_ENV !== 'test') {
 app.use(cors({
     origin: config.ALLOWED_ORIGIN,
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
+    allowedHeaders: ['Content-Type', 'stripe-signature', 'x-cc-webhook-signature']
 }));
 
-// Body parsing
+// Webhook routes need raw body for signature verification
+// MUST be before express.json() middleware
+app.use('/api/payments/webhooks', express.raw({ type: 'application/json' }));
+
+// Body parsing for all other routes
 app.use(express.json({ limit: '100kb' })); // Limit body size to prevent large payload attacks
 
 // ===== ROUTES =====
