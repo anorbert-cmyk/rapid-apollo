@@ -103,6 +103,15 @@ app.use('/api/v1/solve', useRedisRateLimiter ? redisWalletRateLimiter : walletRa
 // Cookie parser for session management (with signing secret if available)
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
+// Static page routes (success/cancel pages for Stripe redirect)
+app.get('/success', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/success.html'));
+});
+
+app.get('/cancel', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/cancel.html'));
+});
+
 // Health check routes (no rate limiting, no auth)
 app.use('/health', healthRoutes);
 
