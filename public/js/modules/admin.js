@@ -200,13 +200,6 @@ const AdminModule = (function () {
             };
         }
 
-        // Dashboard button disabled - Admin Stats is the primary admin view
-        // const navDashboardBtn = document.getElementById('nav-dashboard-btn');
-        // if (navDashboardBtn) {
-        //     navDashboardBtn.classList.remove('hidden');
-        //     navDashboardBtn.onclick = () => window.enterDashboard?.();
-        // }
-
         // Unlock Analytics Tab
         const navAnalytics = document.getElementById('nav-analytics');
         if (navAnalytics) {
