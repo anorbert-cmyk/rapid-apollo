@@ -146,17 +146,6 @@ const ApiModule = (function () {
     }
 
     /**
-     * Get user session data
-     */
-    async function getSession(address, signature, timestamp) {
-        return safeFetch(`${BASE_URL}/session`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address, signature, timestamp })
-        });
-    }
-
-    /**
      * Get admin stats
      */
     async function getAdminStats(address, signature, timestamp) {
@@ -173,7 +162,6 @@ const ApiModule = (function () {
         getConfig,
         verifyPayment,
         solve,
-        getSession,
         getAdminStats,
         authenticatedRequest
     };
