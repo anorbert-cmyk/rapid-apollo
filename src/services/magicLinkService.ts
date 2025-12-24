@@ -7,6 +7,7 @@ import { createHash } from 'crypto';
 import { query, queryOne, isDatabaseAvailable } from '../db';
 import { logger } from '../utils/logger';
 import * as redisStore from '../utils/redisStore';
+import { encrypt, decrypt } from '../utils/encryption';
 
 // Token length (32 chars = ~192 bits of entropy)
 const TOKEN_LENGTH = 32;
@@ -72,12 +73,19 @@ export async function createMagicLink(
     // Store in PostgreSQL if available
     if (isDatabaseAvailable()) {
         try {
+            // Encrypt sensitive fields
+            const encryptedEmail = encrypt(data.email);
+            const encryptedProblem = encrypt(problemSummary.substring(0, 500));
+            // Hash for searchable lookups
+            const { hash } = await import('../utils/encryption');
+            const emailHash = hash(data.email);
+
             await query(
-                `INSERT INTO magic_links (token, email, solution_id, tier, problem_summary, status)
-                 VALUES ($1, $2, $3, $4, $5, $6)`,
-                [tokenHash, data.email, solutionId, tier, problemSummary.substring(0, 500), status]
+                `INSERT INTO magic_links (token, email, email_hash, solution_id, tier, problem_summary, status)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [tokenHash, encryptedEmail, emailHash, solutionId, tier, encryptedProblem, status]
             );
-            logger.debug('Magic link stored in PostgreSQL', { email: data.email, status });
+            logger.debug('Magic link stored in PostgreSQL (encrypted)', { status });
         } catch (error) {
             logger.error('Failed to store magic link in DB', error instanceof Error ? error : new Error(String(error)));
             // Fall back to Redis
@@ -151,13 +159,17 @@ export async function validateMagicToken(token: string): Promise<MagicLinkData |
             );
 
             if (row) {
+                // Decrypt sensitive fields
+                const decryptedEmail = decrypt(row.email);
+                const decryptedProblem = decrypt(row.problem_summary);
+
                 const data: MagicLinkData = {
                     token: row.token,
-                    email: row.email,
+                    email: decryptedEmail,
                     solutionId: row.solution_id,
                     tier: row.tier,
                     createdAt: new Date(row.created_at).getTime(),
-                    problemSummary: row.problem_summary
+                    problemSummary: decryptedProblem
                 };
 
                 // Cache in Redis for future fast lookups
@@ -188,6 +200,11 @@ export async function getSolutionsByEmail(email: string): Promise<MagicLinkData[
 
     if (isDatabaseAvailable()) {
         try {
+            // Hash email for lookup (encryption-compatible)
+            const { hash } = await import('../utils/encryption');
+            const emailHash = hash(normalizedEmail);
+
+            // Search by email_hash (new encrypted records) OR by email (legacy unencrypted)
             const rows = await query<{
                 token: string;
                 email: string;
@@ -197,19 +214,23 @@ export async function getSolutionsByEmail(email: string): Promise<MagicLinkData[
                 problem_summary: string;
             }>(
                 `SELECT * FROM magic_links 
-                 WHERE email = $1 AND is_valid = true 
+                 WHERE (email_hash = $1 OR email = $2) AND is_valid = true 
                  ORDER BY created_at DESC`,
-                [normalizedEmail]
+                [emailHash, normalizedEmail]
             );
 
             for (const row of rows) {
+                // Decrypt sensitive fields (handles both encrypted and unencrypted)
+                const decryptedEmail = decrypt(row.email);
+                const decryptedProblem = decrypt(row.problem_summary);
+
                 solutions.push({
                     token: row.token,
-                    email: row.email,
+                    email: decryptedEmail,
                     solutionId: row.solution_id,
                     tier: row.tier,
                     createdAt: new Date(row.created_at).getTime(),
-                    problemSummary: row.problem_summary
+                    problemSummary: decryptedProblem
                 });
             }
         } catch (error) {

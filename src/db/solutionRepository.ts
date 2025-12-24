@@ -5,6 +5,7 @@
 import { query, queryOne, isDatabaseAvailable } from './index';
 import { SolutionResponse, SolutionSections } from '../types/solution';
 import { logger } from '../utils/logger';
+import { encrypt, decrypt, encryptJson, decryptJson, isEncryptionEnabled, hash } from '../utils/encryption';
 
 export interface StoredSolution {
     id: number;
@@ -34,18 +35,31 @@ export async function saveSolution(
     }
 
     try {
+        // Encrypt sensitive fields
+        const encryptedProblem = encrypt(problemStatement);
+        const encryptedSections = encryptJson(response.sections);
+        const encryptedMarkdown = response.rawMarkdown ? encrypt(response.rawMarkdown) : null;
+        const encryptedWallet = encrypt(walletAddress.toLowerCase());
+        // Hash for searchable lookups
+        const walletHash = hash(walletAddress.toLowerCase());
+
+        if (isEncryptionEnabled()) {
+            logger.debug('Saving solution with encryption enabled');
+        }
+
         const result = await queryOne<any>(
-            `INSERT INTO solutions (tx_hash, wallet_address, tier, problem_statement, sections, raw_markdown, provider)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `INSERT INTO solutions (tx_hash, wallet_address, wallet_hash, tier, problem_statement, sections, raw_markdown, provider)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
              ON CONFLICT (tx_hash) DO NOTHING
              RETURNING *`,
             [
                 txHash,
-                walletAddress.toLowerCase(),
+                encryptedWallet,
+                walletHash,
                 tier,
-                problemStatement,
-                JSON.stringify(response.sections),
-                response.rawMarkdown,
+                encryptedProblem,
+                encryptedSections,
+                encryptedMarkdown,
                 response.meta.provider
             ]
         );
@@ -75,12 +89,16 @@ export async function getSolutionsByWallet(
     }
 
     try {
+        // Hash for encryption-compatible lookup
+        const walletHash = hash(walletAddress.toLowerCase());
+
+        // Search by wallet_hash (new encrypted) OR by wallet_address (legacy)
         const rows = await query<any>(
             `SELECT * FROM solutions 
-             WHERE wallet_address = $1 
+             WHERE (wallet_hash = $1 OR wallet_address = $2)
              ORDER BY created_at DESC 
-             LIMIT $2`,
-            [walletAddress.toLowerCase(), limit]
+             LIMIT $3`,
+            [walletHash, walletAddress.toLowerCase(), limit]
         );
 
         return rows.map(mapToStoredSolution);
@@ -252,16 +270,40 @@ export async function getTransactionLog(
     }
 }
 
-// Helper to map DB rows to StoredSolution
+// Helper to map DB rows to StoredSolution (with decryption)
 function mapToStoredSolution(row: any): StoredSolution {
+    // Decrypt sensitive fields
+    const decryptedProblem = decrypt(row.problem_statement);
+    const decryptedWallet = decrypt(row.wallet_address);
+    const decryptedMarkdown = row.raw_markdown ? decrypt(row.raw_markdown) : null;
+
+    // Handle sections - could be encrypted string or already parsed JSONB
+    let decryptedSections: SolutionSections;
+    if (typeof row.sections === 'string') {
+        // Try to decrypt if it's an encrypted string
+        if (row.sections.startsWith('ENC:')) {
+            decryptedSections = decryptJson<SolutionSections>(row.sections) || {} as SolutionSections;
+        } else {
+            // Try parsing as JSON
+            try {
+                decryptedSections = JSON.parse(row.sections);
+            } catch {
+                decryptedSections = {} as SolutionSections;
+            }
+        }
+    } else {
+        // Already parsed by PostgreSQL JSONB
+        decryptedSections = row.sections || {};
+    }
+
     return {
         id: row.id,
         txHash: row.tx_hash,
-        walletAddress: row.wallet_address,
+        walletAddress: decryptedWallet,
         tier: row.tier,
-        problemStatement: row.problem_statement,
-        sections: typeof row.sections === 'string' ? JSON.parse(row.sections) : row.sections,
-        rawMarkdown: row.raw_markdown,
+        problemStatement: decryptedProblem,
+        sections: decryptedSections,
+        rawMarkdown: decryptedMarkdown,
         provider: row.provider,
         createdAt: new Date(row.created_at)
     };
