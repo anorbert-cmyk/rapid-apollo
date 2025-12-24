@@ -4,6 +4,8 @@ import { createCharge, verifyWebhookSignature as verifyCoinbaseSignature, isCoin
 import { Tier } from '../services/priceService';
 import { logger } from '../utils/logger';
 import { solveProblem } from '../services/aiService';
+import { generateMultiPartAnalysisSync, isMultiPartAvailable } from '../services/aiChainService';
+import { isSessionActive } from '../socket/analysisSocket';
 import { resultStore, usedTxHashes, userHistoryStore, transactionLogStore } from '../store';
 import { isDatabaseAvailable, withTransaction } from '../db';
 import * as solutionRepo from '../db/solutionRepository';
@@ -375,16 +377,74 @@ async function processSuccessfulPayment(
 
         logger.info('Processing successful payment', { sessionId, tier: actualTier, provider });
 
-        // Generate AI solution
-        const solutionResponse = await solveProblem(actualProblem, actualTier, txId);
+        // ===== SMART GENERATION ROUTING =====
+        // For full/premium tiers: Use multi-part streaming if no active socket
+        // For standard/medium tiers: Use simple one-shot generation
+
+        let solutionMarkdown: string;
+        let solutionSections: any;
+        let solutionMeta: any;
+
+        const isHighTier = actualTier === 'full';
+        const hasActiveSocket = isSessionActive(sessionId);
+
+        if (isHighTier && hasActiveSocket) {
+            // Socket will handle generation - just update session data for socket to pick up
+            logger.info('Active socket found, delegating to streaming handler', { sessionId, tier: actualTier });
+
+            // Store customer email in session for socket handler
+            if (pending && customerIdentifier) {
+                const updatedSession = { ...pending, customerEmail: customerIdentifier };
+                await redisStore.set(key, JSON.stringify(updatedSession), SESSION_TTL);
+            }
+
+            // Don't generate here - socket handler will do it
+            // But we still need to wait a bit and verify it completes
+            // For safety, we'll return and let the socket handle everything
+            return;
+
+        } else if (isHighTier && isMultiPartAvailable()) {
+            // No socket, but multi-part is available - use it as fallback
+            logger.info('No active socket, using multi-part generation fallback', { sessionId, tier: actualTier });
+
+            try {
+                const multiPartResult = await generateMultiPartAnalysisSync(actualProblem, actualTier);
+                solutionMarkdown = multiPartResult.fullMarkdown;
+                solutionSections = {
+                    executiveSummary: 'Multi-part analysis - see full report',
+                    keyInsight: 'Comprehensive 4-part UX analysis',
+                    nextStep: 'Review the analysis sections below'
+                };
+                solutionMeta = {
+                    originalProblem: actualProblem,
+                    tier: actualTier,
+                    provider: 'perplexity-sonar-multipart',
+                    generatedAt: multiPartResult.generatedAt
+                };
+            } catch (multiPartError) {
+                logger.error('Multi-part generation failed, falling back to simple generation',
+                    multiPartError instanceof Error ? multiPartError : new Error(String(multiPartError)));
+                // Fall through to simple generation
+                const fallbackResponse = await solveProblem(actualProblem, actualTier, txId);
+                solutionMarkdown = fallbackResponse.rawMarkdown || '';
+                solutionSections = fallbackResponse.sections;
+                solutionMeta = fallbackResponse.meta;
+            }
+        } else {
+            // Standard/medium tier or multi-part not available - use simple generation
+            const solutionResponse = await solveProblem(actualProblem, actualTier, txId);
+            solutionMarkdown = solutionResponse.rawMarkdown || '';
+            solutionSections = solutionResponse.sections;
+            solutionMeta = solutionResponse.meta;
+        }
 
         const resultData = {
             txHash: txId,
             tier: actualTier,
             problem: actualProblem,
-            solution: solutionResponse.rawMarkdown,
-            sections: solutionResponse.sections,
-            meta: solutionResponse.meta,
+            solution: solutionMarkdown,
+            sections: solutionSections,
+            meta: solutionMeta,
             timestamp: new Date().toISOString()
         };
 
@@ -409,7 +469,11 @@ async function processSuccessfulPayment(
                     customerIdentifier,
                     actualTier,
                     actualProblem,
-                    solutionResponse
+                    {
+                        rawMarkdown: solutionMarkdown,
+                        sections: solutionSections,
+                        meta: solutionMeta
+                    }
                 );
             }
 
