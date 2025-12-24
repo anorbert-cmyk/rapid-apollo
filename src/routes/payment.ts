@@ -25,6 +25,7 @@ interface PaymentSession {
     problemStatement: string;
     createdAt: number;
     status: 'pending' | 'completed' | 'failed';
+    customerEmail?: string; // Added after Stripe checkout completes
 }
 
 const SESSION_TTL = 24 * 60 * 60; // 24 hours in seconds

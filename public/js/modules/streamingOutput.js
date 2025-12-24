@@ -102,7 +102,9 @@ const StreamingOutputModule = (function () {
 
         // Extract content between headers
         headers.forEach((header, i) => {
-            const startIdx = header.index + header.title.length + 3; // +3 for "## \n"
+            // Find the end of the header line (after "## Title\n")
+            const headerLine = markdown.indexOf('\n', header.index);
+            const startIdx = headerLine !== -1 ? headerLine + 1 : header.index + header.title.length + 4;
             const endIdx = headers[i + 1]?.index || markdown.length;
             const content = markdown.slice(startIdx, endIdx).trim();
 

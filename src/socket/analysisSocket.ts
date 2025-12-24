@@ -129,11 +129,10 @@ async function handleStartAnalysis(socket: Socket, sessionId: string): Promise<v
             onChunk: (part, chunk) => {
                 const currentSocketId = sessionToSocket.get(sessionId);
                 if (currentSocketId) {
-                    socket.to(currentSocketId).emit('analysis-chunk', { part, chunk });
-                    // Also emit to the initiating socket
+                    // Emit directly to the connected socket
                     socket.emit('analysis-chunk', { part, chunk });
                 }
-                // Store chunk in session
+                // Store chunk in session for reconnection support
                 if (analysisSession.parts[part]) {
                     analysisSession.parts[part] += chunk;
                 } else {
