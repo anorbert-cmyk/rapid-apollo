@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 import { config } from './config';
 import { CONSTANTS } from './constants';
 import { logger } from './utils/logger';
@@ -25,6 +27,7 @@ import yaml from 'yamljs';
 import { initSentry, sentryErrorHandler, flushSentry } from './utils/sentry';
 import { initRedisStore, closeRedisStore } from './utils/redisStore';
 import { closeQueue } from './lib/queue';
+import { setupSocketHandlers } from './socket/analysisSocket';
 
 // Load OpenAPI Spec
 let swaggerDocument: any;
@@ -180,10 +183,25 @@ async function gracefulShutdown(signal: string): Promise<void> {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// ===== SERVER START =====
+// ===== HTTP SERVER & SOCKET.IO =====
 
-// Export app for testing
-export { app };
+// Create HTTP server from Express app
+const httpServer = http.createServer(app);
+
+// Initialize Socket.io with CORS configuration
+const io = new SocketIOServer(httpServer, {
+    cors: {
+        origin: config.ALLOWED_ORIGIN === '*' ? true : config.ALLOWED_ORIGIN,
+        methods: ['GET', 'POST']
+    },
+    transports: ['websocket', 'polling']
+});
+
+// Setup socket event handlers
+setupSocketHandlers(io);
+
+// Export for testing
+export { app, httpServer, io };
 
 // ===== SERVER START =====
 
@@ -207,14 +225,15 @@ if (require.main === module) {
         // Initialize Redis store for health checks
         await initRedisStore();
 
-        // Start the server
-        const server = app.listen(config.PORT, () => {
+        // Start the HTTP server (with Socket.io attached)
+        httpServer.listen(config.PORT, () => {
             const redisStatus = getRedisStatus();
 
             logger.info('Server started', {
                 port: config.PORT,
                 env: config.NODE_ENV,
-                apiVersion: CONSTANTS.API_VERSION
+                apiVersion: CONSTANTS.API_VERSION,
+                socketIO: true
             });
 
             logger.info('Security enabled', {
