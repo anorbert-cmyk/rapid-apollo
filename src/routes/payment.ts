@@ -413,13 +413,19 @@ async function processSuccessfulPayment(
                 solutionSections = {
                     executiveSummary: 'Multi-part analysis - see full report',
                     keyInsight: 'Comprehensive 4-part UX analysis',
-                    nextStep: 'Review the analysis sections below'
+                    nextStep: 'Review the analysis sections below',
+                    // Store individual parts for frontend rendering
+                    part1: multiPartResult.part1,
+                    part2: multiPartResult.part2,
+                    part3: multiPartResult.part3,
+                    part4: multiPartResult.part4
                 };
                 solutionMeta = {
                     originalProblem: actualProblem,
                     tier: actualTier,
                     provider: 'perplexity-sonar-multipart',
-                    generatedAt: multiPartResult.generatedAt
+                    generatedAt: multiPartResult.generatedAt,
+                    isMultiPart: true
                 };
             } catch (multiPartError) {
                 logger.error('Multi-part generation failed, falling back to simple generation',

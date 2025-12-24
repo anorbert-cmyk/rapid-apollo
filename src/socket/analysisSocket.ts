@@ -276,13 +276,19 @@ async function saveAnalysisResult(
                     sections: {
                         executiveSummary: 'See full report',
                         keyInsight: 'Multi-part analysis',
-                        nextStep: 'Review report sections'
+                        nextStep: 'Review report sections',
+                        // Store individual parts for frontend rendering
+                        part1: session.parts[1] || '',
+                        part2: session.parts[2] || '',
+                        part3: session.parts[3] || '',
+                        part4: session.parts[4] || ''
                     },
                     meta: {
                         originalProblem: session.problemStatement,
                         tier: session.tier as any,
                         provider: 'perplexity-sonar',
-                        generatedAt: Date.now()
+                        generatedAt: Date.now(),
+                        isMultiPart: true
                     }
                 }
             );

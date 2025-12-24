@@ -106,8 +106,30 @@ const MagicLinkModule = (function () {
             );
         }
 
-        // Render sections using OutputRenderer if available
-        if (window.OutputRenderer && sections) {
+        // Check if this is a multi-part analysis (full tier with parts)
+        const isMultiPart = tier === 'full' && (
+            sections.part1 || sections.part2 || sections.part3 || sections.part4 ||
+            solution.part1 || solution.part2 || solution.part3 || solution.part4
+        );
+
+        if (isMultiPart && window.StreamingOutputModule) {
+            // Extract parts from solution or sections
+            const parts = {
+                1: sections.part1 || solution.part1 || '',
+                2: sections.part2 || solution.part2 || '',
+                3: sections.part3 || solution.part3 || '',
+                4: sections.part4 || solution.part4 || ''
+            };
+
+            // Find or create the output container
+            const outputContainer = document.getElementById('output-layer-content') ||
+                document.getElementById('streaming-output-container');
+
+            if (outputContainer) {
+                window.StreamingOutputModule.renderFullAnalysis(parts, outputContainer);
+            }
+        } else if (window.OutputRenderer && sections) {
+            // Fallback to standard renderer for non-multi-part
             setTimeout(() => {
                 window.OutputRenderer.init();
             }, 100);
@@ -121,6 +143,7 @@ const MagicLinkModule = (function () {
             }, 300);
         }
     }
+
 
     /**
      * Display processing state message

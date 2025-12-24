@@ -12,11 +12,13 @@ export interface SolutionMeta {
     /** Tier level: standard, medium, full */
     tier: 'standard' | 'medium' | 'full';
     /** AI provider used */
-    provider: 'gemini' | 'openai' | 'openai-o1' | 'openai-gpt4o' | 'openai-gpt5' | 'openai-o3' | 'perplexity-sonar';
+    provider: 'gemini' | 'openai' | 'openai-o1' | 'openai-gpt4o' | 'openai-gpt5' | 'openai-o3' | 'perplexity-sonar' | 'perplexity-sonar-multipart';
     /** Timestamp of generation */
     generatedAt: number;
     /** Transaction hash for verification */
     txHash?: string;
+    /** Whether this is a multi-part analysis */
+    isMultiPart?: boolean;
 }
 
 /**
@@ -115,10 +117,25 @@ export interface FullSections extends MediumSections {
 }
 
 /**
+ * Multi-part sections (for 4-part streaming analysis)
+ * Used for full tier with sequential AI generation
+ */
+export interface MultiPartSections extends StandardSections {
+    /** Part 1: Discovery & Problem Analysis */
+    part1?: string;
+    /** Part 2: Strategic Design & Roadmap */
+    part2?: string;
+    /** Part 3: AI Toolkit & Figma Prompts */
+    part3?: string;
+    /** Part 4: Risk, Metrics & Rationale */
+    part4?: string;
+}
+
+/**
  * Complete solution response
  * Type varies by tier
  */
-export type SolutionSections = StandardSections | MediumSections | FullSections;
+export type SolutionSections = StandardSections | MediumSections | FullSections | MultiPartSections;
 
 export interface SolutionResponse {
     /** Response metadata */
