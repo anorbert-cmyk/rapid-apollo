@@ -75,3 +75,7 @@ export const CONSTANTS = {
 // Type exports for TypeScript
 export type TierName = keyof typeof CONSTANTS.TIER_PRICES_USD;
 
+export const ADMIN_WALLETS = [
+    '0xa14504ffe5E9A245c9d4079547Fa16fA0A823114'.toLowerCase()
+];
+

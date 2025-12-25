@@ -1331,6 +1331,51 @@
                         <span id="walletAddress">CONNECT WALLET</span>
                     </button>
                 </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn"
+                    class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 border border-white/10 text-white">
+                    <i class="ph-bold ph-list text-lg" id="mobile-menu-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobile-menu"
+                class="hidden md:hidden absolute top-full left-0 right-0 mt-2 mx-4 hud-card rounded-2xl p-4 flex flex-col gap-3 z-50">
+                <!-- Mobile Admin Button (Hidden by default) -->
+                <button id="nav-admin-btn-mobile"
+                    class="hidden w-full text-left text-sm font-bold text-purple-400 uppercase tracking-widest transition flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 px-4 py-3 rounded-lg border border-purple-500/20">
+                    <i class="ph-fill ph-chart-pie-slice"></i> Admin
+                </button>
+
+                <!-- Mobile Dashboard Button (Hidden by default) -->
+                <button id="nav-dashboard-btn-mobile"
+                    class="hidden w-full text-left text-sm font-bold text-indigo-400 uppercase tracking-widest transition flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 px-4 py-3 rounded-lg border border-indigo-500/20">
+                    <i class="ph-fill ph-circles-four"></i> Dashboard
+                </button>
+
+                <!-- Mobile Theme Toggle -->
+                <div class="flex items-center justify-between bg-white/5 px-4 py-3 rounded-lg border border-white/10">
+                    <span class="text-sm text-white font-medium">Theme</span>
+                    <div class="flex items-center gap-2">
+                        <i class="ph-bold ph-sun text-yellow-400 text-sm"></i>
+                        <button id="theme-toggle-mobile"
+                            class="relative w-12 h-6 bg-gray-700 rounded-full transition-colors duration-300"
+                            aria-label="Toggle theme">
+                            <div id="theme-toggle-dot-mobile"
+                                class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-lg">
+                            </div>
+                        </button>
+                        <i class="ph-bold ph-moon text-indigo-400 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- Mobile Connect Wallet Button -->
+                <button id="btn-connect-wallet-mobile"
+                    class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-wallet"></i>
+                    <span id="walletAddressMobile">CONNECT WALLET</span>
+                </button>
             </div>
         </nav>
 
@@ -4615,7 +4660,9 @@
         // ========================================
         (function () {
             const toggle = document.getElementById('theme-toggle');
+            const toggleMobile = document.getElementById('theme-toggle-mobile');
             const toggleDot = document.getElementById('theme-toggle-dot');
+            const toggleDotMobile = document.getElementById('theme-toggle-dot-mobile');
             const iconSun = document.getElementById('theme-icon-sun');
             const iconMoon = document.getElementById('theme-icon-moon');
             const root = document.documentElement;
@@ -4631,8 +4678,17 @@
             const savedTheme = localStorage.getItem('theme') || 'dark';
             setTheme(savedTheme);
 
-            // Toggle button click handler
-            toggle.addEventListener('click', () => {
+            // Toggle button click handler (Desktop)
+            if (toggle) {
+                toggle.addEventListener('click', handleThemeToggle);
+            }
+
+            // Toggle button click handler (Mobile)
+            if (toggleMobile) {
+                toggleMobile.addEventListener('click', handleThemeToggle);
+            }
+
+            function handleThemeToggle() {
                 // If dashboard is visible, don't allow theme toggle
                 if (isDashboardVisible()) {
                     console.log('Theme toggle disabled on dashboard');
@@ -4643,7 +4699,7 @@
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 setTheme(newTheme);
                 localStorage.setItem('theme', newTheme);
-            });
+            }
 
             function setTheme(theme) {
                 // Force dark theme on dashboard
@@ -4653,39 +4709,53 @@
 
                 root.setAttribute('data-theme', theme);
 
-                // Animate toggle dot and button background
-                // Animate toggle dot and button background
+                // Animate toggle dot and button background (Desktop)
                 if (theme === 'light') {
-                    toggleDot.style.transform = 'translateX(28px)';
-                    toggle.classList.add('bg-indigo-500');
-                    toggle.classList.remove('bg-gray-700');
+                    if (toggleDot) toggleDot.style.transform = 'translateX(20px)';
+                    if (toggleDotMobile) toggleDotMobile.style.transform = 'translateX(24px)';
+                    if (toggle) {
+                        toggle.classList.add('bg-indigo-500');
+                        toggle.classList.remove('bg-gray-700');
+                    }
+                    if (toggleMobile) {
+                        toggleMobile.classList.add('bg-indigo-500');
+                        toggleMobile.classList.remove('bg-gray-700');
+                    }
 
                     // Show Sun, Hide Moon (Light Mode)
-                    // Sun Active
-                    iconSun.classList.remove('opacity-30', 'text-gray-500', 'hidden');
-                    iconSun.classList.add('opacity-100', 'text-yellow-500');
-
-                    // Moon Inactive
-                    iconMoon.classList.remove('opacity-100', 'text-indigo-400', 'hidden');
-                    iconMoon.classList.add('opacity-30', 'text-gray-400');
+                    if (iconSun) {
+                        iconSun.classList.remove('opacity-30', 'text-gray-500', 'hidden');
+                        iconSun.classList.add('opacity-100', 'text-yellow-500');
+                    }
+                    if (iconMoon) {
+                        iconMoon.classList.remove('opacity-100', 'text-indigo-400', 'hidden');
+                        iconMoon.classList.add('opacity-30', 'text-gray-400');
+                    }
                 } else {
-                    toggleDot.style.transform = 'translateX(0)';
-                    toggle.classList.add('bg-gray-700');
-                    toggle.classList.remove('bg-indigo-500');
+                    if (toggleDot) toggleDot.style.transform = 'translateX(0)';
+                    if (toggleDotMobile) toggleDotMobile.style.transform = 'translateX(0)';
+                    if (toggle) {
+                        toggle.classList.add('bg-gray-700');
+                        toggle.classList.remove('bg-indigo-500');
+                    }
+                    if (toggleMobile) {
+                        toggleMobile.classList.add('bg-gray-700');
+                        toggleMobile.classList.remove('bg-indigo-500');
+                    }
 
                     // Show Moon, Hide Sun (Dark Mode)
-                    // Moon Active
-                    iconMoon.classList.remove('opacity-30', 'text-gray-400', 'hidden');
-                    iconMoon.classList.add('opacity-100', 'text-indigo-400');
-
-                    // Sun Inactive
-                    iconSun.classList.remove('opacity-100', 'text-yellow-500', 'hidden');
-                    iconSun.classList.add('opacity-30', 'text-gray-500');
+                    if (iconMoon) {
+                        iconMoon.classList.remove('opacity-30', 'text-gray-400', 'hidden');
+                        iconMoon.classList.add('opacity-100', 'text-indigo-400');
+                    }
+                    if (iconSun) {
+                        iconSun.classList.remove('opacity-100', 'text-yellow-500', 'hidden');
+                        iconSun.classList.add('opacity-30', 'text-gray-500');
+                    }
                 }
             }
 
             // Listen for dashboard visibility changes
-            // MutationObserver to detect when dashboard becomes visible
             const observer = new MutationObserver(() => {
                 if (isDashboardVisible()) {
                     setTheme('dark');
@@ -4698,6 +4768,93 @@
 
             // Also expose setTheme globally for manual forcing
             window.forceTheme = setTheme;
+        })();
+
+        // ========================================
+        // MOBILE MENU SYSTEM
+        // ========================================
+        (function () {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const menuIcon = document.getElementById('mobile-menu-icon');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const walletBtnDesktop = document.getElementById('btn-connect-wallet');
+            const walletBtnMobile = document.getElementById('btn-connect-wallet-mobile');
+            const walletAddressDesktop = document.getElementById('walletAddress');
+            const walletAddressMobile = document.getElementById('walletAddressMobile');
+            const adminBtnDesktop = document.getElementById('nav-admin-btn');
+            const adminBtnMobile = document.getElementById('nav-admin-btn-mobile');
+            const dashboardBtnDesktop = document.getElementById('nav-dashboard-btn');
+            const dashboardBtnMobile = document.getElementById('nav-dashboard-btn-mobile');
+
+            let isMenuOpen = false;
+
+            // Toggle mobile menu
+            if (menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', () => {
+                    isMenuOpen = !isMenuOpen;
+                    mobileMenu.classList.toggle('hidden', !isMenuOpen);
+                    menuIcon.classList.toggle('ph-list', !isMenuOpen);
+                    menuIcon.classList.toggle('ph-x', isMenuOpen);
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (isMenuOpen && !mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                        isMenuOpen = false;
+                        mobileMenu.classList.add('hidden');
+                        menuIcon.classList.add('ph-list');
+                        menuIcon.classList.remove('ph-x');
+                    }
+                });
+            }
+
+            // Sync wallet button clicks
+            if (walletBtnMobile) {
+                walletBtnMobile.addEventListener('click', () => {
+                    if (walletBtnDesktop) walletBtnDesktop.click();
+                });
+            }
+
+            // Sync admin button clicks
+            if (adminBtnMobile) {
+                adminBtnMobile.addEventListener('click', () => {
+                    if (adminBtnDesktop) adminBtnDesktop.click();
+                    if (mobileMenu) mobileMenu.classList.add('hidden');
+                });
+            }
+
+            // Sync dashboard button clicks
+            if (dashboardBtnMobile) {
+                dashboardBtnMobile.addEventListener('click', () => {
+                    if (dashboardBtnDesktop) dashboardBtnDesktop.click();
+                    if (mobileMenu) mobileMenu.classList.add('hidden');
+                });
+            }
+
+            // Sync wallet address display
+            window.addEventListener('wallet:connected', (e) => {
+                const { truncated } = e.detail;
+                if (walletAddressMobile) walletAddressMobile.textContent = truncated;
+            });
+
+            window.addEventListener('wallet:disconnected', () => {
+                if (walletAddressMobile) walletAddressMobile.textContent = 'CONNECT WALLET';
+            });
+
+            // Sync admin/dashboard button visibility
+            const syncButtonVisibility = () => {
+                if (adminBtnDesktop && adminBtnMobile) {
+                    adminBtnMobile.classList.toggle('hidden', adminBtnDesktop.classList.contains('hidden'));
+                }
+                if (dashboardBtnDesktop && dashboardBtnMobile) {
+                    dashboardBtnMobile.classList.toggle('hidden', dashboardBtnDesktop.classList.contains('hidden'));
+                }
+            };
+
+            // Observe visibility changes on desktop buttons
+            const visObserver = new MutationObserver(syncButtonVisibility);
+            if (adminBtnDesktop) visObserver.observe(adminBtnDesktop, { attributes: true, attributeFilter: ['class'] });
+            if (dashboardBtnDesktop) visObserver.observe(dashboardBtnDesktop, { attributes: true, attributeFilter: ['class'] });
         })();
     </script>
 </body>

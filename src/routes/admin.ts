@@ -2,13 +2,21 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { verifyMessage } from 'ethers';
 import { statsStore, transactionLogStore } from '../store';
 import { config } from '../config';
+import { ADMIN_WALLETS } from '../constants'; // Import shared constant
 import { checkAndMarkSignature } from '../utils/signatureStore';
 import { logger } from '../utils/logger';
 import { isDatabaseAvailable } from '../db';
 import * as solutionRepo from '../db/solutionRepository';
 
 const router = Router();
-const ADMIN_WALLET = config.ADMIN_WALLET_ADDRESS.toLowerCase();
+// const ADMIN_WALLET = config.ADMIN_WALLET_ADDRESS.toLowerCase(); // Deprecated in favor of list
+
+// Helper to check if address is admin
+const isAdminAddress = (addr: string): boolean => {
+    if (!addr) return false;
+    const lowerAddr = addr.toLowerCase();
+    return ADMIN_WALLETS.includes(lowerAddr) || lowerAddr === config.ADMIN_WALLET_ADDRESS.toLowerCase();
+};
 
 // POST /api/admin/check-status
 // Returns true if the provided address matches the admin wallet (verified on server)
@@ -16,8 +24,8 @@ router.post('/check-status', (req: Request, res: Response) => {
     const { address } = req.body;
     if (!address) return res.json({ isAdmin: false });
 
-    // Simple check: does the connected wallet match our env var?
-    const isAdmin = address.toLowerCase() === ADMIN_WALLET;
+    // Simple check: does the connected wallet match our allowlist?
+    const isAdmin = isAdminAddress(address);
     res.json({ isAdmin });
 });
 
@@ -26,7 +34,8 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { signature, timestamp, address } = req.body;
 
-        if (!address || address.toLowerCase() !== ADMIN_WALLET) {
+        // Check against allowlist
+        if (!isAdminAddress(address)) {
             return res.status(403).json({ error: 'Unauthorized: Not an admin wallet' });
         }
 
@@ -39,7 +48,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
         const message = `Authenticate to Rapid Apollo Admin: ${timestamp}`;
         const recovered = verifyMessage(message, signature);
 
-        if (recovered.toLowerCase() !== ADMIN_WALLET) {
+        if (!isAdminAddress(recovered)) {
             return res.status(403).json({ error: 'Invalid admin signature' });
         }
 
@@ -152,7 +161,7 @@ router.post('/test-email', async (req: Request, res: Response) => {
                 return res.status(403).json({ error: 'Unauthorized: provide secret or signature' });
             }
 
-            if (address.toLowerCase() !== ADMIN_WALLET) {
+            if (!isAdminAddress(address)) {
                 return res.status(403).json({ error: 'Unauthorized: Not an admin wallet' });
             }
 
@@ -164,7 +173,7 @@ router.post('/test-email', async (req: Request, res: Response) => {
             const message = `Authenticate to Rapid Apollo Admin: ${timestamp}`;
             const recovered = verifyMessage(message, signature);
 
-            if (recovered.toLowerCase() !== ADMIN_WALLET) {
+            if (!isAdminAddress(recovered)) {
                 return res.status(403).json({ error: 'Invalid admin signature' });
             }
         }
