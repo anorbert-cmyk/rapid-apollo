@@ -43,17 +43,16 @@ const WalletModule = (function () {
                 if (window.ToastModule) {
                     window.ToastModule.warning(
                         'No Wallet Detected',
-                        'For crypto payments on mobile, please use a Web3 browser like MetaMask Mobile or Trust Wallet, or use Stripe for card payments.'
+                        'For crypto payments on mobile, please open this page in your wallet\'s built-in browser (MetaMask, Trust Wallet, Coinbase, etc.) or use Stripe for card payments.'
                     );
                 }
             } else {
                 if (window.ToastModule) {
                     window.ToastModule.warning(
                         'No Wallet Detected',
-                        'Please install MetaMask or enable Brave Wallet to pay with crypto.'
+                        'Please install an EVM-compatible wallet (MetaMask, Coinbase Wallet, Brave Wallet, etc.) to pay with crypto.'
                     );
                 }
-                window.open('https://metamask.io/', '_blank');
             }
             return false;
         }
