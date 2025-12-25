@@ -1231,6 +1231,16 @@
         :root[data-theme="light"] .hud-card.p-6.rounded-2xl.border.border-white\/5.bg-white\/5 i {
             color: #4F46E5 !important;
         }
+
+        /* LOGIC BADGE - LIGHT MODE AA FIX */
+        :root[data-theme="light"] .logic-badge {
+            background-color: #EEF2FF !important;
+            /* Indigo-50 */
+            border-color: #E0E7FF !important;
+            /* Indigo-100 */
+            color: #4338CA !important;
+            /* Indigo-700 (High contrast) */
+        }
     </style>
 
 </head>
@@ -1270,11 +1280,11 @@
         </div>
 
         <!-- NAV -->
-        <nav class="sticky top-6 z-40 mx-auto max-w-7xl px-4">
+        <nav class="sticky top-6 z-40 mx-auto max-w-[95%] px-4">
             <div class="hud-card rounded-full px-5 py-2.5 flex justify-between items-center relative">
                 <a href="#" class="flex items-center gap-2 hover:opacity-80 transition" aria-label="Aether Logic Home">
-                    <img src="/logo.png" alt="Aether Logic" class="w-7 h-7 rounded-lg border border-indigo-500/20">
-                    <span class="font-bold text-base tracking-tight text-white font-mono">AETHER LOGIC</span>
+                    <img src="/logo.png" alt="Aether Logic" class="w-6 h-6 rounded-lg border border-indigo-500/20">
+                    <span class="font-bold text-sm tracking-tight text-white font-mono">AETHER LOGIC</span>
                 </a>
 
                 <!-- Desktop Menu -->
@@ -1321,7 +1331,7 @@
             <div class="max-w-4xl mx-auto px-4 text-center">
 
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] md:text-xs font-mono mb-10 tracking-wider uppercase">
+                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[10px] md:text-xs font-mono mb-10 tracking-wider uppercase logic-badge">
                     <i class="ph-fill ph-lightning"></i>
                     LOGIC_ENGINE_V8: READY FOR DEPLOYMENT
                 </div>
