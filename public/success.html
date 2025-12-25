@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="hu">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elemzés Készül - Rapid Apollo</title>
+    <title>Analysis in Progress - Aether Logic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
     <style>
@@ -339,8 +339,8 @@
         <div class="header"
             style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
             <div>
-                <h1>🚀 Rapid Apollo Elemzés</h1>
-                <p>A mesterséges intelligencia most dolgozik a problémád elemzésén...</p>
+                <h1>🚀 Aether Logic Analysis</h1>
+                <p>Our AI is now working on your problem analysis...</p>
             </div>
             <div style="display: flex; gap: 0.5rem;">
                 <!-- Admin Button (Hidden by default) -->
@@ -364,7 +364,7 @@
         <!-- Progress -->
         <div class="progress-container">
             <div class="progress-header">
-                <span class="progress-label" id="currentPartLabel">Előkészítés...</span>
+                <span class="progress-label" id="currentPartLabel">Initializing...</span>
                 <span class="progress-status" id="progressStatus">0%</span>
             </div>
             <div class="progress-bar">
@@ -400,39 +400,40 @@
             </div>
             <div class="output-content">
                 <div class="output-panel active" id="panel1">
-                    <span class="loading-text">Várakozás az elemzés indítására...</span>
+                    <span class="loading-text">Waiting for analysis to start...</span>
                 </div>
                 <div class="output-panel" id="panel2">
-                    <span class="loading-text">Hamarosan...</span>
+                    <span class="loading-text">Coming soon...</span>
                 </div>
                 <div class="output-panel" id="panel3">
-                    <span class="loading-text">Hamarosan...</span>
+                    <span class="loading-text">Coming soon...</span>
                 </div>
                 <div class="output-panel" id="panel4">
-                    <span class="loading-text">Hamarosan...</span>
+                    <span class="loading-text">Coming soon...</span>
                 </div>
             </div>
         </div>
 
         <!-- Email Notice -->
         <div class="email-notice">
-            📧 Az elemzés befejezésekor <strong>email értesítést</strong> is küldünk a magic linkkel.
-            <br>Nyugodtan bezárhatod az oldalt, az elemzés a háttérben folytatódik!
+            📧 Once complete, we'll send you an <strong>email notification</strong> with a magic link.
+            <br>Feel free to close this page — the analysis will continue in the background!
         </div>
+    </div>
 
-        <!-- Completion Notice -->
-        <div class="completion-notice" id="completionNotice">
-            <h3>✅ Elemzés Kész!</h3>
-            <p>A teljes 4 részes elemzés sikeresen elkészült.</p>
-            <a href="#" class="btn-primary" id="viewResultBtn">Eredmény Megtekintése</a>
-        </div>
+    <!-- Completion Notice -->
+    <div class="completion-notice" id="completionNotice">
+        <h3>✅ Analysis Complete!</h3>
+        <p>Your full 4-part analysis has been successfully generated.</p>
+        <a href="#" class="btn-primary" id="viewResultBtn">View Results</a>
+    </div>
 
-        <!-- Error -->
-        <div class="error-container" id="errorContainer">
-            <h3>⚠️ Hiba történt</h3>
-            <p id="errorMessage">Az elemzés nem indítható el.</p>
-            <a href="/" class="btn-primary">Vissza a Főoldalra</a>
-        </div>
+    <!-- Error -->
+    <div class="error-container" id="errorContainer">
+        <h3>⚠️ An Error Occurred</h3>
+        <p id="errorMessage">The analysis could not be started.</p>
+        <a href="/" class="btn-primary">Back to Home</a>
+    </div>
     </div>
 
     <script>
