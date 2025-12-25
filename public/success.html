@@ -335,10 +335,30 @@
 
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🚀 Rapid Apollo Elemzés</h1>
-            <p>A mesterséges intelligencia most dolgozik a problémád elemzésén...</p>
+        <!-- Header with Navigation -->
+        <div class="header"
+            style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+            <div>
+                <h1>🚀 Rapid Apollo Elemzés</h1>
+                <p>A mesterséges intelligencia most dolgozik a problémád elemzésén...</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <!-- Admin Button (Hidden by default) -->
+                <button id="nav-admin-btn" onclick="window.location.href='/admin.html'"
+                    style="display: none; font-size: 0.65rem; font-weight: bold; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border: 1px solid rgba(167, 139, 250, 0.2); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    📊 Admin
+                </button>
+                <!-- Dashboard Button -->
+                <button id="nav-dashboard-btn" onclick="window.location.href='/dashboard.html'"
+                    style="font-size: 0.65rem; font-weight: bold; color: #6366f1; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    📈 Dashboard
+                </button>
+                <!-- Home Button -->
+                <button onclick="window.location.href='/'"
+                    style="font-size: 0.65rem; font-weight: bold; color: rgba(255,255,255,0.6); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; transition: all 0.2s;">
+                    🏠 Home
+                </button>
+            </div>
         </div>
 
         <!-- Progress -->
@@ -606,6 +626,31 @@
             setTimeout(() => {
                 window.location.href = '/?payment=success';
             }, 1500);
+        }
+        // Admin wallet detection
+        const ADMIN_WALLETS = [
+            '0x742E09cD3E21e9B5656b37d0667F56b6Bb677A93'.toLowerCase(),
+            '0xYourSecondAdminWallet'.toLowerCase()
+        ];
+
+        function checkAdminAccess() {
+            try {
+                if (window.ethereum && window.ethereum.selectedAddress) {
+                    const wallet = window.ethereum.selectedAddress.toLowerCase();
+                    if (ADMIN_WALLETS.includes(wallet)) {
+                        const adminBtn = document.getElementById('nav-admin-btn');
+                        if (adminBtn) adminBtn.style.display = 'inline-block';
+                    }
+                }
+            } catch (e) {
+                console.log('Admin check skipped:', e);
+            }
+        }
+
+        // Check on load and on account change
+        checkAdminAccess();
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', checkAdminAccess);
         }
     </script>
 </body>
