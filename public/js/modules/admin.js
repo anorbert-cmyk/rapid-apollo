@@ -207,9 +207,10 @@ const AdminModule = (function () {
                 <i class="ph-fill ph-chart-pie-slice text-lg"></i>
                 <span class="text-xs font-bold tracking-widest uppercase">Admin Stats</span>
             `;
-            navAnalytics.onclick = () => window.refreshAdminStats?.();
+            // Just switch view - don't re-authenticate every time
+            navAnalytics.onclick = () => window.switchView?.('analytics');
             navAnalytics.classList.remove('opacity-50', 'cursor-not-allowed');
-            navAnalytics.classList.add('text-indigo-400');
+            navAnalytics.classList.add('text-indigo-400', 'cursor-pointer');
         }
     }
 
