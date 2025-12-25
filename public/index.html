@@ -1216,6 +1216,21 @@
         :root[data-theme="light"] .bg-indigo-500.animate-pulse {
             background: #9CA3AF;
         }
+
+        /* INFO BOX - LIGHT MODE AA FIX */
+        :root[data-theme="light"] .hud-card.p-6.rounded-2xl.border.border-white\/5.bg-white\/5 {
+            background: #F3F4F6 !important;
+            border-color: #E5E7EB !important;
+        }
+
+        :root[data-theme="light"] .hud-card.p-6.rounded-2xl.border.border-white\/5.bg-white\/5 p,
+        :root[data-theme="light"] .hud-card.p-6.rounded-2xl.border.border-white\/5.bg-white\/5 strong {
+            color: #1A1A1A !important;
+        }
+
+        :root[data-theme="light"] .hud-card.p-6.rounded-2xl.border.border-white\/5.bg-white\/5 i {
+            color: #4F46E5 !important;
+        }
     </style>
 
 </head>
@@ -1255,45 +1270,45 @@
         </div>
 
         <!-- NAV -->
-        <nav class="sticky top-6 z-40 mx-auto max-w-6xl px-4">
-            <div class="hud-card rounded-full px-6 py-3 flex justify-between items-center relative">
+        <nav class="sticky top-6 z-40 mx-auto max-w-7xl px-4">
+            <div class="hud-card rounded-full px-5 py-2.5 flex justify-between items-center relative">
                 <a href="#" class="flex items-center gap-2 hover:opacity-80 transition" aria-label="Aether Logic Home">
-                    <img src="/logo.png" alt="Aether Logic" class="w-8 h-8 rounded-lg border border-indigo-500/20">
-                    <span class="font-bold text-lg tracking-tight text-white font-mono">AETHER LOGIC</span>
+                    <img src="/logo.png" alt="Aether Logic" class="w-7 h-7 rounded-lg border border-indigo-500/20">
+                    <span class="font-bold text-base tracking-tight text-white font-mono">AETHER LOGIC</span>
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-3">
                     <!-- Admin Button (Hidden by default, shown for admin wallet) -->
                     <button id="nav-admin-btn"
-                        class="hidden text-xs font-bold text-purple-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2 bg-purple-500/10 hover:bg-purple-500/20 px-3 py-2 rounded-lg border border-purple-500/20">
+                        class="hidden text-[10px] font-bold text-purple-400 hover:text-white uppercase tracking-widest transition flex items-center gap-1.5 bg-purple-500/10 hover:bg-purple-500/20 px-2.5 py-1.5 rounded-lg border border-purple-500/20">
                         <i class="ph-fill ph-chart-pie-slice"></i> Admin
                     </button>
 
                     <!-- Dashboard Button (Hidden by default, shown after purchase) -->
                     <button id="nav-dashboard-btn"
-                        class="hidden text-xs font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg border border-indigo-500/20">
+                        class="hidden text-[10px] font-bold text-indigo-400 hover:text-white uppercase tracking-widest transition flex items-center gap-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-lg border border-indigo-500/20">
                         <i class="ph-fill ph-circles-four"></i> Dashboard
                     </button>
 
                     <!-- Theme Toggle Switch -->
-                    <div class="flex items-center gap-2 bg-white/5 px-2 py-2 rounded-full border border-white/10">
+                    <div class="flex items-center gap-2 bg-white/5 px-1.5 py-1.5 rounded-full border border-white/10">
                         <i id="theme-icon-sun"
-                            class="ph-bold ph-sun text-yellow-400 text-sm transition-opacity duration-300"></i>
+                            class="ph-bold ph-sun text-yellow-400 text-xs transition-opacity duration-300"></i>
                         <button id="theme-toggle"
-                            class="relative w-14 h-7 bg-gray-700 rounded-full transition-colors duration-300 hover:bg-gray-600"
+                            class="relative w-10 h-5 bg-gray-700 rounded-full transition-colors duration-300 hover:bg-gray-600"
                             aria-label="Toggle theme">
                             <div id="theme-toggle-dot"
-                                class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-lg">
+                                class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-300 shadow-lg">
                             </div>
                         </button>
                         <i id="theme-icon-moon"
-                            class="ph-bold ph-moon text-indigo-400 text-sm transition-opacity duration-300"></i>
+                            class="ph-bold ph-moon text-indigo-400 text-xs transition-opacity duration-300"></i>
                     </div>
 
                     <!-- Connect Wallet Button -->
                     <button id="btn-connect-wallet"
-                        class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2 px-4 rounded-lg transition border border-white/10 flex items-center gap-2">
+                        class="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold py-1.5 px-3 rounded-lg transition border border-white/10 flex items-center gap-2">
                         <i class="ph-bold ph-wallet"></i>
                         <span id="walletAddress">CONNECT WALLET</span>
                     </button>
