@@ -29,22 +29,71 @@ const WalletModule = (function () {
     }
 
     /**
-     * Connect to MetaMask wallet
+     * Connect to Web3 wallet (MetaMask, Brave Wallet, etc.)
      * @returns {Promise<boolean>} - Success status
      */
     async function connect() {
+        // Check for any injected Web3 provider
         if (!window.ethereum) {
-            alert("Please install MetaMask");
-            window.open('https://metamask.io/', '_blank');
+            // Mobile/Safari users - suggest alternatives
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+            if (isMobile || isSafari) {
+                if (window.ToastModule) {
+                    window.ToastModule.warning(
+                        'No Wallet Detected',
+                        'For crypto payments on mobile, please use a Web3 browser like MetaMask Mobile or Trust Wallet, or use Stripe for card payments.'
+                    );
+                }
+            } else {
+                if (window.ToastModule) {
+                    window.ToastModule.warning(
+                        'No Wallet Detected',
+                        'Please install MetaMask or enable Brave Wallet to pay with crypto.'
+                    );
+                }
+                window.open('https://metamask.io/', '_blank');
+            }
             return false;
         }
 
         try {
             if (window.ToastModule) {
-                window.ToastModule.info('Connecting', 'Opening MetaMask...');
+                window.ToastModule.info('Connecting', 'Opening wallet...');
             }
 
+            // Detect wallet type
+            const isBrave = navigator.brave && (await navigator.brave.isBrave());
+            const walletName = isBrave ? 'Brave Wallet' : 'MetaMask';
+
             provider = new ethers.BrowserProvider(window.ethereum);
+
+            // Request accounts first (this triggers the wallet popup)
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+            } catch (accountError) {
+                console.error('Account request error:', accountError);
+
+                // Handle Brave Wallet specific errors
+                if (accountError.code === -32603 || accountError.message?.includes('UNKNOWN_ERROR')) {
+                    if (window.ToastModule) {
+                        window.ToastModule.error(
+                            'Wallet Error',
+                            `${walletName} encountered an error. Please try refreshing the page or check your wallet settings.`
+                        );
+                    }
+                    return false;
+                }
+
+                // User rejected
+                if (accountError.code === 4001) {
+                    if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Connection cancelled by user.');
+                    return false;
+                }
+
+                throw accountError;
+            }
 
             // Network Check (Mainnet = 0x1)
             const network = await provider.getNetwork();
@@ -58,11 +107,11 @@ const WalletModule = (function () {
                     provider = new ethers.BrowserProvider(window.ethereum);
                 } catch (switchError) {
                     if (switchError.code === 4902) {
-                        if (window.ToastModule) window.ToastModule.error('Network Error', 'Ethereum Mainnet not found.');
+                        if (window.ToastModule) window.ToastModule.error('Network Error', 'Ethereum Mainnet not found in your wallet.');
                     } else if (switchError.code === 4001) {
                         if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Network switch cancelled. Mainnet is required.');
                     } else {
-                        if (window.ToastModule) window.ToastModule.error('Error', 'Failed to switch network.');
+                        if (window.ToastModule) window.ToastModule.error('Error', 'Failed to switch to Ethereum Mainnet.');
                     }
                     return false;
                 }
@@ -78,16 +127,20 @@ const WalletModule = (function () {
             }));
 
             if (window.ToastModule) {
-                window.ToastModule.success('Connected', 'Mainnet Wallet connected.');
+                window.ToastModule.success('Connected', `${walletName} connected to Mainnet.`);
             }
 
             return true;
         } catch (err) {
             console.error('Wallet connection error:', err);
+
+            // Provide helpful error messages
             if (err.code === 4001 || err.code === 'ACTION_REJECTED') {
                 if (window.ToastModule) window.ToastModule.warning('Cancelled', 'Connection cancelled by user.');
+            } else if (err.code === -32603) {
+                if (window.ToastModule) window.ToastModule.error('Wallet Error', 'Internal wallet error. Please try again or use a different browser.');
             } else {
-                if (window.ToastModule) window.ToastModule.error('Connection Failed', err.message || 'Could not connect wallet.');
+                if (window.ToastModule) window.ToastModule.error('Connection Failed', err.shortMessage || err.message || 'Could not connect wallet.');
             }
             return false;
         }
