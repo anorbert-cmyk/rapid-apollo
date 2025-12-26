@@ -19,7 +19,7 @@
 
 ```bash
 # Core (REQUIRED)
-OPENAI_API_KEY=sk-...              # OpenAI API key
+PERPLEXITY_API_KEY=pplx-...        # Perplexity API key (Sonar Pro)
 RECEIVER_WALLET_ADDRESS=0x...      # ETH wallet to receive payments
 ADMIN_WALLET_ADDRESS=0x...         # Admin wallet for dashboard access
 
@@ -165,10 +165,10 @@ Logs are JSON-formatted for easy parsing. Recommended tools:
 
 ### Common Issues
 
-#### "OPENAI_API_KEY is required"
+#### "PERPLEXITY_API_KEY is required"
 ```bash
 # Check if env var is set
-echo $OPENAI_API_KEY
+echo $PERPLEXITY_API_KEY
 
 # Verify in Railway dashboard -> Variables
 ```

@@ -2,13 +2,14 @@
 
 > **AI-powered problem solver with Ethereum payment gateway**
 
-A crypto-gated AI backend that provides tiered access to advanced problem-solving capabilities, powered by OpenAI GPT-5.2 and o3-mini.
+A crypto-gated AI backend that provides tiered access to advanced problem-solving capabilities, powered by **Perplexity Sonar Pro**.
 
 ## ✨ Features
 
 - **🔐 Ethereum Payment Verification** - Direct on-chain payment validation
+- **📱 Mobile Optimised** - Full mobile support with hamburger menu & deep-linking guidance
 - **💳 Stripe & Coinbase Commerce** - Alternative payment methods with webhooks
-- **🧠 Tiered AI Responses** - Standard (o3-mini), Medium & Full (GPT-5.2) solutions
+- **🧠 Tiered AI Responses** - Powered by Perplexity Sonar Pro with real-time web search
 - **📊 Admin Dashboard** - Real-time analytics and transaction history
 - **🔒 Security First** - Double-spend protection, signature replay prevention, rate limiting
 - **☁️ Redis Support** - Scalable session storage for production
@@ -20,7 +21,7 @@ A crypto-gated AI backend that provides tiered access to advanced problem-solvin
 | Layer | Technology |
 |-------|------------|
 | Backend | Express.js + TypeScript |
-| AI | OpenAI API (GPT-5.2, o3-mini) |
+| AI | Perplexity API (Sonar Pro) |
 | Blockchain | Ethereum Mainnet (ethers.js) |
 | Payments | Stripe, Coinbase Commerce |
 | Database | PostgreSQL (optional) |
@@ -35,7 +36,7 @@ A crypto-gated AI backend that provides tiered access to advanced problem-solvin
 - Node.js 20+
 - npm or yarn
 - Ethereum wallet (for receiving payments)
-- OpenAI API key
+- Perplexity API key
 
 ### Installation
 
@@ -60,11 +61,11 @@ npm run dev
 ```env
 PORT=3000
 NODE_ENV=development
-OPENAI_API_KEY=sk-your_openai_api_key
-RECEIVER_WALLET_ADDRESS=0xYourEthereumAddress
-ADMIN_WALLET_ADDRESS=0xAdminWallet
-REDIS_URL=redis://localhost:6379  # Optional
-DATABASE_URL=postgresql://...     # Optional
+PERPLEXITY_API_KEY=pplx-...        # Required for AI generation
+RECEIVER_WALLET_ADDRESS=0x...      # Your Ethereum Address
+ADMIN_WALLET_ADDRESS=0x...         # Admin Wallet Address
+REDIS_URL=redis://localhost:6379   # Optional
+DATABASE_URL=postgresql://...      # Optional
 ```
 
 ## 📦 Scripts
