@@ -39,7 +39,7 @@ jobs:
           NODE_ENV: test
           PERPLEXITY_API_KEY: test-key
           RECEIVER_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000'
-          ADMIN_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000'
+          ADMIN_WALLET_ADDRESS: '0xa14504ffe5E9A245c9d4079547Fa16fA0A823114'
       
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v3
@@ -128,7 +128,7 @@ jobs:
           NODE_ENV: test
           PERPLEXITY_API_KEY: test-key
           RECEIVER_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000'
-          ADMIN_WALLET_ADDRESS: '0x0000000000000000000000000000000000000000'
+          ADMIN_WALLET_ADDRESS: '0xa14504ffe5E9A245c9d4079547Fa16fA0A823114'
       
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
