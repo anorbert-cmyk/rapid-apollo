@@ -131,11 +131,14 @@ src/
 │   ├── payment.ts    # Stripe/Coinbase routes
 │   └── health.ts     # Health checks
 ├── services/
-│   ├── aiService.ts       # OpenAI integration
-│   ├── paymentService.ts  # Ethereum verification
-│   ├── stripeService.ts   # Stripe checkout
-│   ├── coinbaseService.ts # Coinbase Commerce
-│   └── priceService.ts    # ETH price fetching
+│   ├── perplexityService.ts # Core AI Engine (Sonar Pro)
+│   ├── aiChainService.ts    # Multi-turn Logic & Prompt Chaining
+│   ├── emailService.ts      # Resend integration (Magic Links)
+│   ├── magicLinkService.ts  # Auth token management
+│   ├── paymentService.ts    # Ethereum verification
+│   ├── stripeService.ts     # Stripe checkout
+│   ├── coinbaseService.ts   # Coinbase Commerce
+│   └── priceService.ts      # ETH price fetching
 ├── utils/
 │   ├── logger.ts             # Structured logging
 │   ├── sentry.ts             # Error tracking
