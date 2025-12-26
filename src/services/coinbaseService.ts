@@ -1,29 +1,10 @@
 import { config } from '../config';
 import { logger } from '../utils/logger';
 import { Tier, getTierPriceUSD } from './priceService';
+import crypto from 'crypto';
 
-// Dynamic import for coinbase-commerce-node (CommonJS module)
-let Client: any = null;
-let Charge: any = null;
-
-async function initCoinbase(): Promise<boolean> {
-    if (Client && Charge) return true;
-
-    if (!config.COINBASE_COMMERCE_API_KEY) {
-        return false;
-    }
-
-    try {
-        const coinbase = require('coinbase-commerce-node');
-        Client = coinbase.Client;
-        Charge = coinbase.resources.Charge;
-        Client.init(config.COINBASE_COMMERCE_API_KEY);
-        return true;
-    } catch (error) {
-        logger.error('Failed to initialize Coinbase Commerce client', error as Error);
-        return false;
-    }
-}
+// Coinbase Commerce REST API Base URL
+const COINBASE_COMMERCE_API = 'https://api.commerce.coinbase.com';
 
 export interface CoinbaseChargeResult {
     success: boolean;
@@ -47,6 +28,7 @@ function getTierDisplayName(tier: Tier): string {
 
 /**
  * Create a Coinbase Commerce Charge for crypto payment
+ * Uses direct REST API calls (no SDK required)
  */
 export async function createCharge(
     tier: Tier,
@@ -54,15 +36,14 @@ export async function createCharge(
     sessionId: string,
     walletAddress?: string
 ): Promise<CoinbaseChargeResult> {
-    try {
-        const initialized = await initCoinbase();
-        if (!initialized) {
-            return {
-                success: false,
-                error: 'Coinbase Commerce is not configured. Please set COINBASE_COMMERCE_API_KEY.'
-            };
-        }
+    if (!config.COINBASE_COMMERCE_API_KEY) {
+        return {
+            success: false,
+            error: 'Coinbase Commerce is not configured. Please set COINBASE_COMMERCE_API_KEY.'
+        };
+    }
 
+    try {
         const priceUSD = getTierPriceUSD(tier);
 
         const chargeData = {
@@ -76,14 +57,29 @@ export async function createCharge(
             metadata: {
                 tier,
                 sessionId,
-                problemStatement: problemStatement.substring(0, 200), // Metadata limit
+                problemStatement: problemStatement.substring(0, 200),
                 customerWallet: walletAddress || ''
             },
             redirect_url: config.COINBASE_SUCCESS_URL || `${config.ALLOWED_ORIGIN}/success`,
             cancel_url: config.COINBASE_CANCEL_URL || `${config.ALLOWED_ORIGIN}/cancel`
         };
 
-        const charge = await Charge.create(chargeData);
+        const response = await fetch(`${COINBASE_COMMERCE_API}/charges`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CC-Api-Key': config.COINBASE_COMMERCE_API_KEY,
+                'X-CC-Version': '2018-03-22'
+            },
+            body: JSON.stringify(chargeData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+        }
+
+        const { data: charge } = await response.json();
 
         logger.info('Coinbase Commerce charge created', {
             chargeId: charge.id,
@@ -119,7 +115,6 @@ export function verifyWebhookSignature(
     }
 
     try {
-        const crypto = require('crypto');
         const hash = crypto
             .createHmac('sha256', config.COINBASE_WEBHOOK_SECRET)
             .update(payload)
