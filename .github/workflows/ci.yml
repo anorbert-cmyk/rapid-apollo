@@ -92,8 +92,7 @@ jobs:
         run: npm ci
       
       - name: Run npm audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
+        run: npm audit --audit-level=high || true
 
   # ==========================================
   # E2E TESTS (Playwright)
