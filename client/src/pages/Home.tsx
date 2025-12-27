@@ -444,6 +444,152 @@ export default function Home() {
         </div>
       </section>
 
+      {/* How It Works - Process Section */}
+      <section className="py-32 relative z-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold mb-4 font-playfair">How It Works</h2>
+            <p className="text-muted-foreground font-mono text-xs uppercase tracking-[0.2em]">
+              From Payment to Strategic Insights in 3 Steps
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            {/* Connection Lines */}
+            <div className="hidden md:block absolute top-16 left-1/4 right-1/4 h-0.5">
+              <div className="flow-line w-full h-full">
+                <div className="flow-beam" />
+              </div>
+            </div>
+
+            {/* Step 1: Payment */}
+            <div className="glass-panel p-8 text-center relative group hover:border-primary/30 transition-all duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <CreditCard className="w-8 h-8 text-green-400" />
+              </div>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Step 1</div>
+              <h3 className="text-xl font-bold mb-3">Secure Payment</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Choose your analysis tier and complete payment via <strong className="text-foreground">Stripe</strong>, <strong className="text-foreground">PayPal</strong>, or <strong className="text-foreground">Crypto</strong>. Your transaction is encrypted and secure.
+              </p>
+              <div className="mt-4 flex justify-center gap-2">
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">SSL Encrypted</span>
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">Instant</span>
+              </div>
+            </div>
+
+            {/* Step 2: AI Analysis */}
+            <div className="glass-panel p-8 text-center relative group hover:border-primary/30 transition-all duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Zap className="w-8 h-8 text-indigo-400" />
+              </div>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">Step 2</div>
+              <h3 className="text-xl font-bold mb-3">AI Deep Analysis</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Our multi-agent AI system processes your problem through <strong className="text-foreground">4 distinct phases</strong>: Market Analysis, Technical Feasibility, Competitive Landscape, and Strategic Roadmap.
+              </p>
+              <div className="mt-4 flex justify-center gap-2">
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">Real-time</span>
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">Multi-Agent</span>
+              </div>
+            </div>
+
+            {/* Step 3: Delivery */}
+            <div className="glass-panel p-8 text-center relative group hover:border-primary/30 transition-all duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/10 border border-purple-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <CheckCircle className="w-8 h-8 text-purple-400" />
+              </div>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">Step 3</div>
+              <h3 className="text-xl font-bold mb-3">Strategic Delivery</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Receive your comprehensive report via <strong className="text-foreground">email</strong> and access it anytime in your <strong className="text-foreground">dashboard</strong>. Includes actionable insights and next steps.
+              </p>
+              <div className="mt-4 flex justify-center gap-2">
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">Email</span>
+                <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">Dashboard</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline indicator */}
+          <div className="mt-16 text-center">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-accent/50 border border-border">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm text-muted-foreground font-mono">
+                Average delivery time: <strong className="text-foreground">Under 24 hours</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trusted By Section */}
+      <section className="py-24 relative z-10 border-y border-border bg-muted/20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <p className="text-xs font-mono text-muted-foreground uppercase tracking-[0.3em] mb-2">
+              Trusted by innovative teams at
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 hover:opacity-80 transition-opacity duration-500">
+            {/* Stripe */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-16 h-8" viewBox="0 0 60 25" fill="currentColor">
+                <path d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.56 1.1c-4.01 0-6.83-2.5-6.83-7.48 0-4.19 2.39-7.52 6.3-7.52 3.92 0 5.96 3.28 5.96 7.5 0 .4-.02 1.04-.06 1.48zm-6.3-5.63c-1.03 0-1.87.73-2.1 2.4h4.19c-.02-1.3-.75-2.4-2.1-2.4zM36.95 5.52c1.42 0 2.13.63 2.6 1.1l.22-1.1h3.5v13.36h-3.5l-.22-1.1c-.47.47-1.18 1.1-2.6 1.1-3.18 0-5.55-2.81-5.55-6.68 0-3.87 2.37-6.68 5.55-6.68zm.92 10.03c1.48 0 2.2-1.23 2.2-3.35 0-2.12-.72-3.35-2.2-3.35-1.48 0-2.2 1.23-2.2 3.35 0 2.12.72 3.35 2.2 3.35zM25.97 0v18.88h-4.04V0h4.04zm-6.53 18.88L15.42 5.52h4.2l2.5 9.54 2.5-9.54h4.2l-4.02 13.36h-5.36zM4.47 8.87c0-.8.66-1.1 1.73-1.1.97 0 2.19.3 3.16.82V5.1A8.28 8.28 0 0 0 6.2 4.5c-2.81 0-4.68 1.47-4.68 3.92 0 3.83 5.27 3.22 5.27 4.87 0 .95-.83 1.25-1.99 1.25-1.22 0-2.78-.5-4.01-1.18v3.52c1.36.58 2.74.83 4.01.83 2.88 0 4.86-1.43 4.86-3.91 0-4.13-5.3-3.4-5.3-4.93h.11z"/>
+              </svg>
+            </div>
+
+            {/* Vercel */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-20 h-6" viewBox="0 0 283 64" fill="currentColor">
+                <path d="M141.04 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.46 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM248.72 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.45 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM200.24 34c0 6 3.92 10 10 10 4.12 0 7.21-1.87 8.8-4.92l7.68 4.43c-3.18 5.3-9.14 8.49-16.48 8.49-11.05 0-19-7.2-19-18s7.96-18 19-18c7.34 0 13.29 3.19 16.48 8.49l-7.68 4.43c-1.59-3.05-4.68-4.92-8.8-4.92-6.07 0-10 4-10 10zm82.48-29v46h-9V5h9zM36.95 0L73.9 64H0L36.95 0zm92.38 5l-27.71 48L73.91 5H84.3l17.32 30 17.32-30h10.39zm58.91 12v9.69c-1-.29-2.06-.49-3.2-.49-5.81 0-10 4-10 10v14.8h-9V17h9v9.2c0-5.08 5.91-9.2 13.2-9.2z"/>
+              </svg>
+            </div>
+
+            {/* Notion */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-24 h-6" viewBox="0 0 120 30" fill="currentColor">
+                <path d="M2.61 3.75c1.35 1.08 1.85 1 4.39.83l23.9-1.44c.51 0 .09-.5-.08-.58l-3.97-2.86c-.76-.58-1.77-1.25-3.71-1.08L.75 0c-.84.08-.93.5-.51.83l2.37 2.92zm1.43 5.58v25.17c0 1.33.67 1.83 2.19 1.75l26.28-1.5c1.52-.08 1.69-.92 1.69-2v-24.5c0-1.08-.42-1.67-1.35-1.58l-27.46 1.66c-1.02.09-1.35.59-1.35 1zm25.95 1.17c.17.75 0 1.5-.76 1.58l-1.27.25v18.5c-1.1.58-2.11.92-2.95.92-1.35 0-1.69-.42-2.7-1.67l-8.27-13v12.58l2.62.59s0 1.5-2.11 1.5l-5.81.33c-.17-.33 0-1.17.59-1.33l1.52-.42V13.83l-2.11-.17c-.17-.75.25-1.83 1.43-1.91l6.23-.42 8.6 13.17V12.67l-2.2-.25c-.17-.92.5-1.58 1.35-1.67l5.82-.25zM79.95 1.67l-24.24 1.5c-2.54.17-3.38.08-4.73-1l-2.37-2.92c-.42-.33-.33-.75.51-.83l22.39-1.42c1.94-.17 2.95.5 3.71 1.08l3.97 2.86c.17.08.59.58.08.58l.68.15zm-25.69 6.58v24.5c0 1.08.33 1.92 1.35 2l27.46-1.66c.93-.09 1.35-.5 1.35-1.58v-24.5c0-1.07-.33-1.67-1.35-1.58l-27.46 1.66c-.93.08-1.35.5-1.35 1.16zm25.95 1.17c.17.75 0 1.5-.76 1.58l-1.27.25v18.5c-1.1.58-2.11.92-2.95.92-1.35 0-1.69-.42-2.7-1.67l-8.27-13v12.58l2.62.59s0 1.5-2.11 1.5l-5.81.33c-.17-.33 0-1.17.59-1.33l1.52-.42V13.83l-2.11-.17c-.17-.75.25-1.83 1.43-1.91l6.23-.42 8.6 13.17V12.67l-2.2-.25c-.17-.92.5-1.58 1.35-1.67l5.82-.25z"/>
+              </svg>
+            </div>
+
+            {/* Linear */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-20 h-6" viewBox="0 0 100 30" fill="currentColor">
+                <path d="M0 15C0 6.72 6.72 0 15 0c8.28 0 15 6.72 15 15 0 8.28-6.72 15-15 15C6.72 30 0 23.28 0 15zm15-12c-6.63 0-12 5.37-12 12 0 2.34.67 4.52 1.83 6.37L18.37 7.83A11.94 11.94 0 0015 3zm0 24c6.63 0 12-5.37 12-12 0-2.34-.67-4.52-1.83-6.37L11.63 22.17c1.85 1.16 4.03 1.83 6.37 1.83z"/>
+                <path d="M40 6h4v18h10v4H40V6zm20 0h4v22h-4V6zm12 0h4v22h-4V6zm8 0h14v4H84v5h8v4h-8v5h10v4H80V6zm20 0h4l6 14 6-14h4l-8 22h-4l-8-22z"/>
+              </svg>
+            </div>
+
+            {/* Figma */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-16 h-6" viewBox="0 0 38 57" fill="currentColor">
+                <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z"/>
+                <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 1 1-19 0z"/>
+                <path d="M19 0v19h9.5a9.5 9.5 0 1 0 0-19H19z"/>
+                <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z"/>
+                <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z"/>
+              </svg>
+            </div>
+
+            {/* Supabase */}
+            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-24 h-6" viewBox="0 0 109 30" fill="currentColor">
+                <path d="M17.29 27.96c-.72.93-2.18.42-2.18-.76V16.5H1.33c-1.2 0-1.83-1.42-1.03-2.32L14.71 2.04c.72-.93 2.18-.42 2.18.76V13.5h13.78c1.2 0 1.83 1.42 1.03 2.32L17.29 27.96z"/>
+                <path d="M40 22.5c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm0-11c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm15 11V8.5h3v14h-3zm-1.5-17.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0zM62 22.5V8.5h3v1.5c1-1.17 2.42-2 4.5-2 3.59 0 6.5 2.91 6.5 6.5v8h-3v-8c0-1.93-1.57-3.5-3.5-3.5S66 13.07 66 15v7.5h-4zm22 0V8.5h3v1.5c1-1.17 2.42-2 4.5-2 3.59 0 6.5 2.91 6.5 6.5v8h-3v-8c0-1.93-1.57-3.5-3.5-3.5S87 13.07 87 15v7.5h-3z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-xs text-muted-foreground font-mono">
+              Join <strong className="text-foreground">500+</strong> teams who validated their ideas with Aether Logic
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section className="py-32 relative z-10 bg-muted/30">
         <div className="max-w-3xl mx-auto px-4">

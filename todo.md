@@ -120,3 +120,7 @@
 
 ## Dashboard Dizájn Frissítés
 - [x] Elemzések dashboard dizájn frissítése a GitHub repó stílusa alapján
+
+## Főoldal Kiegészítések
+- [x] Folyamat bemutató szekció (Payment → Analysis → Delivery)
+- [x] "Trusted By" szekció ismert cégek logóival
