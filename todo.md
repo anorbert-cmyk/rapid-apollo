@@ -111,3 +111,6 @@
 
 ## Hibajavítások
 - [x] MetaMask aláírás verifikáció javítása az admin oldalon (challenge-alapú hitelesítés)
+
+- [x] Pay with ETH Direct gomb eltávolítása a pricing kártyákról
+- [x] PayPal gomb hozzáadása minden pricing kártyához

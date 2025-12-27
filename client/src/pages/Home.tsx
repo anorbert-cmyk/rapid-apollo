@@ -315,7 +315,7 @@ export default function Home() {
                 </Button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
-                  Pay with ETH (Direct)
+                  Pay with PayPal
                 </button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
@@ -374,7 +374,7 @@ export default function Home() {
                 </Button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
-                  Pay with ETH (Direct)
+                  Pay with PayPal
                 </button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
@@ -432,7 +432,7 @@ export default function Home() {
                 </Button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
-                  Pay with ETH (Direct)
+                  Pay with PayPal
                 </button>
                 <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
                   <Wallet className="w-3.5 h-3.5" />
