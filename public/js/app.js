@@ -242,6 +242,71 @@ window.payAndSolve = async (tier) => {
 };
 
 // ===========================================
+// COINBASE COMMERCE PAYMENT FLOW
+// ===========================================
+window.payCoinbase = async (tier) => {
+    const problem = document.getElementById('problemInput')?.value;
+
+    // Validate Input
+    if (!problem || problem.trim() === "") {
+        window.ToastModule?.warning("Input Required", "Please describe your problem first!");
+        document.getElementById('problemInput')?.focus();
+        document.querySelector('.input-section')?.scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
+
+    // Get email for receipt
+    const email = prompt("Enter your email for order confirmation:");
+    if (!email || !email.includes('@')) {
+        window.ToastModule?.warning("Email Required", "Please provide a valid email address.");
+        return;
+    }
+
+    try {
+        // Show loading
+        window.PaymentModule?.showLoading('Creating Coinbase Charge');
+        window.PaymentModule?.updateLoading('🔄 Connecting to Coinbase Commerce...');
+
+        // Create Coinbase charge
+        const response = await fetch('/api/payments/coinbase/create-charge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tier: tier,
+                problemStatement: problem,
+                email: email,
+                walletAddress: userAddress || null
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.hostedUrl) {
+            window.PaymentModule?.updateLoading('✅ Redirecting to Coinbase...');
+
+            // Save pending session info for later
+            localStorage.setItem('pendingCoinbaseSession', JSON.stringify({
+                problem: problem,
+                tier: tier,
+                chargeId: result.chargeId,
+                timestamp: Date.now()
+            }));
+
+            // Redirect to Coinbase hosted checkout
+            window.location.href = result.hostedUrl;
+        } else {
+            window.PaymentModule?.hideLoading();
+            window.ToastModule?.error("Payment Error", result.error || "Failed to create Coinbase charge.");
+        }
+
+    } catch (error) {
+        console.error('Coinbase Payment Error:', error);
+        window.PaymentModule?.hideLoading();
+        window.ToastModule?.error("Connection Error", "Failed to connect to payment service.");
+    }
+};
+
+// ===========================================
 // GLOBAL FUNCTION DELEGATIONS TO MODULES
 // ===========================================
 
