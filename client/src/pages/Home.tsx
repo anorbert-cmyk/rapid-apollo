@@ -1,194 +1,260 @@
-import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 import { trpc } from "@/lib/trpc";
-import { useLocation } from "wouter";
-import { 
-  Zap, 
-  Shield, 
-  BarChart3, 
-  Sparkles, 
-  ArrowRight, 
-  Check, 
-  Loader2,
-  Brain,
-  Target,
-  Layers,
-  ChevronRight
+import {
+  ArrowRight,
+  CheckCircle,
+  ChevronDown,
+  CreditCard,
+  Crown,
+  Eye,
+  LayoutDashboard,
+  Lock,
+  Moon,
+  ShieldCheck,
+  Sun,
+  Users,
+  Wallet,
+  Zap,
 } from "lucide-react";
-
-const TIERS = [
-  {
-    id: "standard" as const,
-    name: "Observer",
-    price: 29,
-    description: "Essential UX insights for quick validation",
-    features: [
-      "Single-pass AI analysis",
-      "Problem statement evaluation",
-      "Basic UX recommendations",
-      "PDF export",
-    ],
-    badge: "STANDARD",
-    badgeClass: "tier-badge-standard",
-    popular: false,
-  },
-  {
-    id: "medium" as const,
-    name: "Insider",
-    price: 79,
-    description: "Comprehensive analysis with strategic insights",
-    features: [
-      "Enhanced AI analysis",
-      "Market positioning insights",
-      "Competitor landscape overview",
-      "Strategic recommendations",
-      "PDF export with visuals",
-    ],
-    badge: "MEDIUM",
-    badgeClass: "tier-badge-medium",
-    popular: true,
-  },
-  {
-    id: "full" as const,
-    name: "Syndicate",
-    price: 199,
-    description: "Full strategic analysis with 4-part deep dive",
-    features: [
-      "4-part sequential deep analysis",
-      "Real-time streaming results",
-      "Discovery & Problem Analysis",
-      "Strategic Design & Roadmap",
-      "AI Toolkit & Figma Prompts",
-      "Risk, Metrics & Rationale",
-      "Priority support",
-    ],
-    badge: "FULL",
-    badgeClass: "tier-badge-full",
-    popular: false,
-  },
-];
+import { useState } from "react";
+import { useLocation } from "wouter";
+import { TIER_CONFIGS, type Tier } from "@shared/pricing";
 
 export default function Home() {
-  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [, navigate] = useLocation();
   const [problemStatement, setProblemStatement] = useState("");
-  const [selectedTier, setSelectedTier] = useState<"standard" | "medium" | "full" | null>(null);
-  const [isCreatingSession, setIsCreatingSession] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
+  // Countdown timer state
+  const [countdown] = useState("03:58:54");
 
   const createSession = trpc.session.create.useMutation({
     onSuccess: (data) => {
-      navigate(`/checkout/${data.sessionId}`);
-    },
-    onError: (error) => {
-      toast.error("Failed to create session", { description: error.message });
-      setIsCreatingSession(false);
+      navigate(`/checkout/${data.sessionId}?tier=${selectedTier}`);
     },
   });
 
-  const handleGetStarted = async (tier: "standard" | "medium" | "full") => {
+  const handleStartAnalysis = (tier: Tier) => {
     if (!problemStatement.trim()) {
-      toast.error("Please enter your problem statement first");
       return;
     }
-
-    if (problemStatement.length < 10) {
-      toast.error("Problem statement must be at least 10 characters");
-      return;
-    }
-
-    if (!isAuthenticated) {
-      // Store intent and redirect to login
-      sessionStorage.setItem("pendingAnalysis", JSON.stringify({ tier, problemStatement }));
-      window.location.href = getLoginUrl();
-      return;
-    }
-
     setSelectedTier(tier);
-    setIsCreatingSession(true);
-    createSession.mutate({ problemStatement, tier });
+    createSession.mutate({
+      problemStatement: problemStatement.trim(),
+      tier,
+    });
   };
 
+  const faqs = [
+    {
+      question: "How does the validation process work?",
+      answer:
+        "Our multi-agent AI system analyzes your problem statement through 4 distinct phases: Market Analysis, Technical Feasibility, Competitive Landscape, and Strategic Roadmap. Each phase builds on the previous, creating a comprehensive validation report.",
+    },
+    {
+      question: "Is my idea kept private?",
+      answer:
+        "Absolutely. We use zero-knowledge architecture and never store your raw problem statements. All analysis is processed in isolated environments and results are encrypted end-to-end.",
+    },
+    {
+      question: "What do I get in the final report?",
+      answer:
+        "Depending on your tier, you receive: Executive Summary, Market Size Analysis, Competitor Matrix, Technical Architecture Recommendations, MVP Roadmap, Risk Assessment, and Actionable Next Steps.",
+    },
+    {
+      question: "Can I upgrade my tier later?",
+      answer:
+        "Yes! You can upgrade any existing analysis to a higher tier at any time. You'll only pay the difference and receive the additional insights immediately.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="fractal-blob fractal-blob-1 top-[10%] left-[10%]" />
-        <div className="fractal-blob fractal-blob-2 top-[50%] right-[10%]" />
-        <div className="fractal-blob fractal-blob-3 bottom-[10%] left-[30%]" />
+    <div className="min-h-screen relative">
+      {/* Noise Texture */}
+      <div className="bg-noise" />
+
+      {/* Fractal Blob Background */}
+      <div className="fractal-container">
+        <div className="fractal-blob blob-1" />
+        <div className="fractal-blob blob-2" />
+        <div className="fractal-blob blob-3" />
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-border/50 backdrop-blur-xl">
-        <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Brain className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-gradient-primary">Rapid Apollo</span>
-          </div>
-          <nav className="flex items-center gap-4">
-            {authLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : isAuthenticated ? (
-              <>
-                <Button variant="ghost" onClick={() => navigate("/dashboard")}>
-                  Dashboard
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  {user?.name || user?.email}
-                </span>
-              </>
-            ) : (
-              <Button variant="outline" onClick={() => window.location.href = getLoginUrl()}>
-                Sign In
+      {/* Alert Banner */}
+      <div className="relative z-50 bg-red-950/30 dark:bg-red-950/30 bg-red-50 backdrop-blur-md border-b border-red-500/20 dark:border-red-500/20 border-red-200 text-center py-3">
+        <div className="flex items-center justify-center gap-3 text-xs md:text-sm font-mono tracking-wide text-red-600 dark:text-red-200 px-4">
+          <span className="flex h-2 w-2 relative flex-shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+          </span>
+          <span className="truncate">
+            GATE CLOSING: PRICE SPIKE IN{" "}
+            <span className="text-foreground font-bold">{countdown}</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="sticky top-6 z-40 mx-auto max-w-[95%] px-4">
+        <div className="hud-card rounded-full px-5 py-2.5 flex justify-between items-center">
+          <a href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="font-bold text-sm tracking-tight font-mono">AETHER LOGIC</span>
+          </a>
+
+          <div className="flex items-center gap-3">
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/dashboard")}
+                className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5"
+              >
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                Dashboard
               </Button>
             )}
-          </nav>
+
+            {/* Theme Toggle */}
+            <div className="flex items-center gap-2 bg-muted/50 px-1.5 py-1.5 rounded-full border border-border">
+              <Sun className="w-3.5 h-3.5 text-yellow-500" />
+              <button
+                onClick={toggleTheme}
+                className="relative w-10 h-5 bg-muted rounded-full transition-colors duration-300 hover:bg-muted/80"
+                aria-label="Toggle theme"
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-4 h-4 bg-foreground rounded-full transition-transform duration-300 shadow-lg ${
+                    theme === "dark" ? "translate-x-0" : "translate-x-5"
+                  }`}
+                />
+              </button>
+              <Moon className="w-3.5 h-3.5 text-indigo-400" />
+            </div>
+
+            {/* Connect Wallet / User */}
+            {isAuthenticated ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-[10px] font-bold py-1.5 px-3 flex items-center gap-2"
+              >
+                <Wallet className="w-3.5 h-3.5" />
+                {user?.name || "Connected"}
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => window.location.href = "/api/oauth/login"}
+                className="text-[10px] font-bold py-1.5 px-3 flex items-center gap-2"
+              >
+                <Wallet className="w-3.5 h-3.5" />
+                CONNECT
+              </Button>
+            )}
+          </div>
         </div>
-      </header>
+      </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 py-20 lg:py-32">
-        <div className="container">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <Badge variant="secondary" className="px-4 py-1.5 text-sm">
-              <Sparkles className="h-4 w-4 mr-2" />
-              AI-Powered Strategic Analysis
-            </Badge>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              Transform Your{" "}
-              <span className="text-gradient-primary">Problem Statement</span>
-              {" "}Into Strategy
-            </h1>
-            
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Get VP-level UX strategy documents in minutes. Our AI analyzes your problem 
-              and delivers actionable insights powered by Perplexity's advanced reasoning.
-            </p>
+      <section className="pt-28 pb-24 relative z-10">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="logic-badge mb-10">
+            <Zap className="w-3.5 h-3.5" />
+            LOGIC_ENGINE_V8: READY FOR DEPLOYMENT
+          </div>
 
-            {/* Problem Statement Input */}
-            <div className="max-w-2xl mx-auto mt-12">
-              <div className="glass-panel rounded-2xl p-6 space-y-4">
-                <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Describe Your Challenge
-                </label>
-                <Textarea
-                  placeholder="Example: We're a B2B SaaS startup struggling with user onboarding. Our trial-to-paid conversion is 3% and we're not sure why users drop off after the first session..."
-                  className="min-h-[120px] bg-background/50 border-border/50 resize-none"
-                  value={problemStatement}
-                  onChange={(e) => setProblemStatement(e.target.value)}
-                  maxLength={5000}
-                />
-                <div className="flex justify-between items-center text-xs text-muted-foreground">
-                  <span>{problemStatement.length} / 5000 characters</span>
-                  <span>Minimum 10 characters required</span>
-                </div>
+          <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-8 leading-[0.95]">
+            Stop building in the dark.
+            <br />
+            <span className="text-gradient-primary">Validate your idea today.</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
+            Transform your raw problem statement into an executable strategy, market
+            analysis, and MVP roadmap in{" "}
+            <strong className="text-foreground font-medium">under 24 hours</strong>.
+          </p>
+
+          <div className="flex flex-col gap-4 justify-center items-center">
+            <Button
+              onClick={() =>
+                document.getElementById("protocol")?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="btn-primary px-8 py-4 text-lg flex items-center gap-3 group"
+            >
+              Start Analysis
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Zero-Knowledge Privacy</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Info Box */}
+      <div className="max-w-3xl mx-auto px-4 mb-24 relative z-10">
+        <div className="glass-panel p-6 text-center">
+          <p className="text-sm text-muted-foreground leading-relaxed font-light tracking-wide">
+            <ShieldCheck className="w-4 h-4 text-primary inline mr-2" />
+            <strong className="text-foreground font-medium">Why Aether Logic?</strong> Unlike
+            generic chat bots, our engine uses a rigorous, multi-agent validation protocol to
+            stress-test your ideas against real-world market constraints, giving you a
+            battle-tested roadmap, not just text.
+          </p>
+        </div>
+      </div>
+
+      {/* The Pipeline / Input Section */}
+      <section id="protocol" className="py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold mb-2 font-playfair tracking-tight">
+              The Logic Pipeline
+            </h2>
+            <p className="text-muted-foreground font-mono text-xs uppercase tracking-[0.2em]">
+              Transmuting Ambiguity into Strategy
+            </p>
+          </div>
+
+          {/* Input Section */}
+          <div className="max-w-2xl mx-auto mb-20 relative group">
+            {/* Decorative Glow */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-xl blur opacity-50 transition duration-1000 group-hover:opacity-75" />
+
+            <div className="relative glass-panel p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  Problem Input Terminal
+                </span>
+              </div>
+
+              <Textarea
+                id="problemInput"
+                value={problemStatement}
+                onChange={(e) => setProblemStatement(e.target.value)}
+                placeholder="// Enter your challenge here...&#10;> e.g. 'Automate my client reporting flow'&#10;> or 'Design a fintech onboarding UX'"
+                className="min-h-[150px] bg-background/50 border-border font-mono text-sm resize-none"
+              />
+
+              <div className="flex items-center justify-between mt-4 text-xs text-muted-foreground font-mono">
+                <span>{problemStatement.length} / 2000 characters</span>
+                <span className="flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  End-to-end encrypted
+                </span>
               </div>
             </div>
           </div>
@@ -196,173 +262,242 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="relative z-10 py-20 bg-background/50">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Choose Your Analysis Depth
+      <section id="mint" className="py-32 relative z-10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 font-playfair">
+              Choose Your Protocol
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Select the tier that matches your needs. Each tier provides increasingly 
-              comprehensive strategic insights.
+            <p className="text-muted-foreground font-mono text-xs uppercase tracking-[0.2em]">
+              Select your analysis depth
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {TIERS.map((tier) => (
-              <Card 
-                key={tier.id}
-                className={`relative analysis-card ${
-                  tier.popular ? "border-primary/50 shadow-lg shadow-primary/10" : ""
-                }`}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary text-primary-foreground">
-                      Most Popular
-                    </Badge>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-6 items-center">
+            {/* Tier 1: Observer */}
+            <div className="pricing-card pricing-card-muted">
+              <div className="flex items-center gap-2 mb-6">
+                <Eye className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  Observer
+                </h3>
+              </div>
+
+              <div className="mb-6">
+                <span className="text-4xl font-bold font-playfair">${TIER_CONFIGS.standard.priceUsd}</span>
+                <span className="text-muted-foreground ml-2">USD</span>
+              </div>
+
+              <ul className="space-y-3 mb-8 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                  Basic market analysis
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                  Executive summary
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                  Single API call
+                </li>
+              </ul>
+
+              <div className="space-y-3">
+                <Button
+                  onClick={() => handleStartAnalysis("standard")}
+                  disabled={!problemStatement.trim() || createSession.isPending}
+                  className="w-full btn-secondary"
+                  variant="outline"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  PAY WITH STRIPE
+                </Button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with ETH (Direct)
+                </button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with Any Crypto (Coinbase)
+                </button>
+              </div>
+            </div>
+
+            {/* Tier 2: Insider (Highlighted) */}
+            <div className="pricing-card-highlight">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-primary" />
+                  <h3 className="text-sm font-bold uppercase tracking-[0.1em]">Insider</h3>
+                </div>
+                <span className="urgency-badge">GENESIS MINT</span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-muted-foreground line-through text-lg mr-2">
+                  $149
+                </span>
+              </div>
+              <div className="mb-6">
+                <span className="text-6xl font-bold font-playfair">${TIER_CONFIGS.medium.priceUsd}</span>
+                <span className="text-muted-foreground ml-2">USD</span>
+              </div>
+
+              <ul className="space-y-3 mb-8 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary" />
+                  Everything in Observer
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary" />
+                  Competitive analysis
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary" />
+                  Technical feasibility
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary" />
+                  MVP roadmap
+                </li>
+              </ul>
+
+              <div className="space-y-3">
+                <Button
+                  onClick={() => handleStartAnalysis("medium")}
+                  disabled={!problemStatement.trim() || createSession.isPending}
+                  className="w-full btn-primary"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  PAY WITH STRIPE
+                </Button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with ETH (Direct)
+                </button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with Any Crypto (Coinbase)
+                </button>
+              </div>
+
+              <p className="text-xs text-destructive font-mono mt-4 text-center uppercase tracking-wider">
+                ⚠ ONLY 3 SPOTS LEFT AT THIS PRICE
+              </p>
+            </div>
+
+            {/* Tier 3: Syndicate */}
+            <div className="pricing-card">
+              <div className="flex items-center gap-2 mb-6">
+                <Crown className="w-5 h-5 text-purple-400" />
+                <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-purple-400">
+                  Syndicate
+                </h3>
+              </div>
+
+              <div className="mb-6">
+                <span className="text-4xl font-bold font-playfair">${TIER_CONFIGS.full.priceUsd}</span>
+                <span className="text-muted-foreground ml-2">USD</span>
+              </div>
+
+              <ul className="space-y-3 mb-8 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-purple-400" />
+                  Everything in Insider
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-purple-400" />
+                  4-part deep analysis
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-purple-400" />
+                  Real-time streaming
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-purple-400" />
+                  10 Wallet Licenses
+                </li>
+              </ul>
+
+              <div className="space-y-3">
+                <Button
+                  onClick={() => handleStartAnalysis("full")}
+                  disabled={!problemStatement.trim() || createSession.isPending}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  PAY WITH STRIPE
+                </Button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with ETH (Direct)
+                </button>
+                <button className="w-full text-xs text-muted-foreground hover:text-foreground transition flex items-center justify-center gap-2">
+                  <Wallet className="w-3.5 h-3.5" />
+                  Pay with Any Crypto (Coinbase)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-32 relative z-10 bg-muted/30">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 font-playfair">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground">Everything you need to know about the protocol.</p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div key={index} className="faq-item">
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left"
+                >
+                  <span className="font-medium">{faq.question}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-muted-foreground transition-transform ${
+                      expandedFaq === index ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {expandedFaq === index && (
+                  <div className="px-6 pb-4 text-muted-foreground text-sm">{faq.answer}</div>
                 )}
-                
-                <CardHeader className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className={`tier-badge ${tier.badgeClass}`}>
-                      {tier.badge}
-                    </span>
-                    {tier.id === "full" && (
-                      <Badge variant="outline" className="text-xs">
-                        <Layers className="h-3 w-3 mr-1" />
-                        4-Part
-                      </Badge>
-                    )}
-                  </div>
-                  <div>
-                    <CardTitle className="text-2xl">{tier.name}</CardTitle>
-                    <CardDescription className="mt-2">{tier.description}</CardDescription>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold">${tier.price}</span>
-                    <span className="text-muted-foreground">/ analysis</span>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="space-y-6">
-                  <ul className="space-y-3">
-                    {tier.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm">
-                        <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Button
-                    className={`w-full ${tier.popular ? "btn-primary" : ""}`}
-                    variant={tier.popular ? "default" : "outline"}
-                    size="lg"
-                    onClick={() => handleGetStarted(tier.id)}
-                    disabled={isCreatingSession && selectedTier === tier.id}
-                  >
-                    {isCreatingSession && selectedTier === tier.id ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        Get Started
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="relative z-10 py-20">
-        <div className="container">
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="glass-panel rounded-xl p-6 space-y-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold">Lightning Fast</h3>
-              <p className="text-sm text-muted-foreground">
-                Get comprehensive analysis in minutes, not days. Our AI processes 
-                your input and delivers actionable insights instantly.
-              </p>
-            </div>
-            
-            <div className="glass-panel rounded-xl p-6 space-y-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold">Secure Payments</h3>
-              <p className="text-sm text-muted-foreground">
-                Pay with credit card via Stripe or cryptocurrency via Coinbase Commerce. 
-                Your data is encrypted and never shared.
-              </p>
-            </div>
-            
-            <div className="glass-panel rounded-xl p-6 space-y-4">
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold">Data-Driven</h3>
-              <p className="text-sm text-muted-foreground">
-                Powered by Perplexity's advanced AI with real-time web access for 
-                current market insights and competitor analysis.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative z-10 py-20 border-t border-border/50">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Ready to Transform Your Strategy?
-            </h2>
-            <p className="text-muted-foreground">
-              Join thousands of product leaders who use Rapid Apollo to make 
-              data-driven decisions faster.
-            </p>
-            <Button 
-              size="lg" 
-              className="btn-primary"
-              onClick={() => {
-                document.querySelector("textarea")?.focus();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            >
-              Start Your Analysis
-              <ChevronRight className="h-5 w-5 ml-2" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="relative z-10 border-t border-border/50 py-8">
-        <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="py-12 relative z-10 border-t border-border">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                © 2024 Rapid Apollo. All rights reserved.
-              </span>
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-white" />
+              </div>
+              <span className="font-bold text-sm tracking-tight font-mono">AETHER LOGIC</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+
+            <div className="flex items-center gap-6 text-xs text-muted-foreground">
+              <a href="/terms" className="hover:text-foreground transition">
+                Terms of Service
+              </a>
+              <a href="/privacy" className="hover:text-foreground transition">
+                Privacy Policy
+              </a>
             </div>
+
+            <p className="text-xs text-muted-foreground">
+              © 2024 Aether Logic. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
