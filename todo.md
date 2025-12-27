@@ -117,3 +117,6 @@
 
 - [x] Admin token lejárati idő meghosszabbítása (5 perc -> 30 perc)
 - [x] Frontend automatikus újra-hitelesítés kezelése token lejáratkor
+
+## Dashboard Dizájn Frissítés
+- [x] Elemzések dashboard dizájn frissítése a GitHub repó stílusa alapján
