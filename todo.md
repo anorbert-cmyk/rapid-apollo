@@ -93,3 +93,18 @@
 - [x] PayPal UI gomb a Checkout oldalon
 - [x] Sandbox/Live mód támogatás
 - [x] Tesztek írása (7 teszt)
+
+## Email Template
+- [x] Email template átvétele a GitHub repóból (Hungarian + English)
+- [x] Stripe fizetés utáni email küldés implementálása
+- [x] Resend API integráció
+- [x] Email tesztek (9 teszt)
+
+## FAQ és Success oldal javítások
+- [x] FAQ design átvétele a Railway verzió alapján (glass-panel, details/summary)
+- [x] Success oldal implementálása (sikeres fizetés után)
+- [x] Elemzés készülésének real-time megjelenítése
+- [x] Progress indicator a 4 részes elemzéshez (Syndicate tier)
+- [x] Confetti animáció sikeres fizetésnél
+- [x] Email értesítés jelzése
+- [x] Direct ETH payment gombok eltávolítva (csak Stripe, PayPal, Coinbase)

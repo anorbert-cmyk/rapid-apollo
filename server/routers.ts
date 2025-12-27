@@ -32,6 +32,7 @@ import { createPaymentIntent, isStripeConfigured } from "./services/stripeServic
 import { createCharge, isCoinbaseConfigured } from "./services/coinbaseService";
 import { createOrder as createPayPalOrder, captureOrder as capturePayPalOrder, isPayPalConfigured } from "./services/paypalService";
 import { verifyAdminSignature, checkAdminStatus } from "./services/walletAuthService";
+import { sendRapidApolloEmail, isEmailConfigured } from "./services/emailService";
 
 // Zod schemas
 const tierSchema = z.enum(["standard", "medium", "full"]);
@@ -66,6 +67,7 @@ export const appRouter = router({
       .input(z.object({
         problemStatement: z.string().min(10).max(5000),
         tier: tierSchema,
+        email: z.string().email().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const sessionId = nanoid(16);
@@ -73,6 +75,7 @@ export const appRouter = router({
         await createAnalysisSession({
           sessionId,
           userId: ctx.user?.id,
+          email: input.email || ctx.user?.email,
           problemStatement: input.problemStatement,
           tier: input.tier,
           status: "pending_payment",
@@ -282,7 +285,7 @@ export const appRouter = router({
         });
 
         // Start analysis (async)
-        startAnalysisInBackground(input.sessionId, session.problemStatement, session.tier);
+        startAnalysisInBackground(input.sessionId, session.problemStatement, session.tier, session.email);
 
         // Notify owner of new purchase
         const tierConfig = getTierConfig(session.tier);
@@ -482,7 +485,7 @@ export const appRouter = router({
 });
 
 // Background analysis function
-async function startAnalysisInBackground(sessionId: string, problemStatement: string, tier: Tier) {
+async function startAnalysisInBackground(sessionId: string, problemStatement: string, tier: Tier, email?: string | null) {
   try {
     console.log(`[Analysis] Starting ${tier} analysis for session ${sessionId}`);
 
@@ -501,6 +504,20 @@ async function startAnalysisInBackground(sessionId: string, problemStatement: st
           });
           await updateAnalysisSessionStatus(sessionId, "completed");
           console.log(`[Analysis] Multi-part analysis complete for session ${sessionId}`);
+          
+          // Send email notification
+          if (email && isEmailConfigured()) {
+            const tierConfig = getTierConfig(tier);
+            await sendRapidApolloEmail({
+              to: email,
+              userName: email.split('@')[0],
+              magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,
+              transactionId: sessionId,
+              amount: String(getTierPrice(tier)),
+              currency: 'USD',
+              tier: tier,
+            });
+          }
         },
         onError: async (error) => {
           console.error(`[Analysis] Error for session ${sessionId}:`, error);
@@ -516,6 +533,20 @@ async function startAnalysisInBackground(sessionId: string, problemStatement: st
       });
       await updateAnalysisSessionStatus(sessionId, "completed");
       console.log(`[Analysis] Single analysis complete for session ${sessionId}`);
+      
+      // Send email notification
+      if (email && isEmailConfigured()) {
+        const tierConfig = getTierConfig(tier);
+        await sendRapidApolloEmail({
+          to: email,
+          userName: email.split('@')[0],
+          magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,
+          transactionId: sessionId,
+          amount: String(getTierPrice(tier)),
+          currency: 'USD',
+          tier: tier,
+        });
+      }
     }
   } catch (error) {
     console.error(`[Analysis] Failed for session ${sessionId}:`, error);

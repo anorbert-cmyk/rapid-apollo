@@ -41,6 +41,7 @@ export const analysisSessions = mysqlTable("analysis_sessions", {
   id: int("id").autoincrement().primaryKey(),
   sessionId: varchar("sessionId", { length: 64 }).notNull().unique(),
   userId: int("userId").references(() => users.id),
+  email: varchar("email", { length: 320 }),
   problemStatement: text("problemStatement").notNull(),
   tier: tierEnum.notNull(),
   status: mysqlEnum("status", ["pending_payment", "processing", "completed", "failed"]).default("pending_payment").notNull(),
