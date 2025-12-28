@@ -24,6 +24,8 @@ import {
   getTransactionHistory,
   addAdminWallet,
   getAdminWallets,
+  updateAnalysisPartProgress,
+  setEstimatedCompletion,
 } from "./db";
 
 import { Tier, getTierPrice, getTierConfig, TIER_CONFIGS, isMultiPartTier } from "../shared/pricing";
@@ -606,14 +608,22 @@ async function startApexAnalysisInBackground(sessionId: string, problemStatement
     console.log(`[APEX Analysis] Starting Perplexity-powered analysis for session ${sessionId}`);
     
     await updateAnalysisSessionStatus(sessionId, "processing");
+    
+    // Set estimated completion time (approximately 2-3 minutes for full APEX analysis)
+    const estimatedCompletion = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes from now
+    await setEstimatedCompletion(sessionId, estimatedCompletion);
 
     const result = await executeApexAnalysis(problemStatement, {
-      onPartStart: (partNum) => {
+      onPartStart: async (partNum) => {
         console.log(`[APEX Analysis] Starting Part ${partNum}/4 for session ${sessionId}`);
+        // Update progress: mark part as in_progress
+        await updateAnalysisPartProgress(sessionId, partNum as 1 | 2 | 3 | 4, "in_progress");
       },
       onPartComplete: async (partNum, content) => {
         console.log(`[APEX Analysis] Part ${partNum} complete for session ${sessionId}`);
         const partKey = `part${partNum}` as "part1" | "part2" | "part3" | "part4";
+        // Update progress: mark part as completed and save content
+        await updateAnalysisPartProgress(sessionId, partNum as 1 | 2 | 3 | 4, "completed");
         await updateAnalysisResult(sessionId, { [partKey]: content });
       },
       onError: async (error) => {

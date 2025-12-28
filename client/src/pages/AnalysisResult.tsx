@@ -3,11 +3,11 @@ import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Streamdown } from "streamdown";
+import { useEffect, useState } from "react";
 import { 
   ArrowLeft, 
   Download, 
@@ -19,7 +19,10 @@ import {
   Layers,
   AlertTriangle,
   TrendingUp,
-  FileText
+  FileText,
+  Clock,
+  Zap,
+  Globe
 } from "lucide-react";
 
 const TIER_INFO = {
@@ -29,15 +32,32 @@ const TIER_INFO = {
 };
 
 const PART_CONFIG = [
-  { number: 1, name: "Discovery & Problem Analysis", icon: Target, color: "text-blue-500", description: "Deep dive into the problem space and user needs" },
-  { number: 2, name: "Strategic Design & Roadmap", icon: Layers, color: "text-purple-500", description: "Design strategy and implementation roadmap" },
-  { number: 3, name: "AI Toolkit & Figma Prompts", icon: Lightbulb, color: "text-yellow-500", description: "Practical tools and 10 production-ready prompts" },
-  { number: 4, name: "Risk, Metrics & Rationale", icon: AlertTriangle, color: "text-red-500", description: "Risk assessment and success metrics" },
+  { number: 1, name: "Discovery & Problem Analysis", icon: Target, color: "text-blue-500", bgColor: "bg-blue-500", description: "Deep dive into the problem space and user needs" },
+  { number: 2, name: "Strategic Design & Roadmap", icon: Layers, color: "text-purple-500", bgColor: "bg-purple-500", description: "Design strategy and implementation roadmap" },
+  { number: 3, name: "AI Toolkit & Figma Prompts", icon: Lightbulb, color: "text-yellow-500", bgColor: "bg-yellow-500", description: "Practical tools and 10 production-ready prompts" },
+  { number: 4, name: "Risk, Metrics & Rationale", icon: AlertTriangle, color: "text-red-500", bgColor: "bg-red-500", description: "Risk assessment and success metrics" },
 ];
+
+// Helper to format time remaining
+function formatTimeRemaining(ms: number): string {
+  if (ms <= 0) return "Completing...";
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes > 0) {
+    return `~${minutes}m ${remainingSeconds}s remaining`;
+  }
+  return `~${remainingSeconds}s remaining`;
+}
+
+// Progress status type matching backend
+type ProgressStatus = "pending" | "in_progress" | "completed" | "failed";
 
 export default function AnalysisResult() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [, navigate] = useLocation();
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   const { data: session } = trpc.session.get.useQuery(
     { sessionId: sessionId || "" },
@@ -46,15 +66,56 @@ export default function AnalysisResult() {
 
   const { data: result, isLoading } = trpc.analysis.getResult.useQuery(
     { sessionId: sessionId || "" },
-    { enabled: !!sessionId, refetchInterval: session?.status === "processing" ? 3000 : false }
+    { enabled: !!sessionId, refetchInterval: session?.status === "processing" ? 2000 : false }
   );
 
   const tierInfo = session ? TIER_INFO[session.tier as keyof typeof TIER_INFO] : null;
   const isMultiPart = session?.tier === "full";
   
+  // Extract progress status from result
+  const part1Status = (result?.part1Status as ProgressStatus) || "pending";
+  const part2Status = (result?.part2Status as ProgressStatus) || "pending";
+  const part3Status = (result?.part3Status as ProgressStatus) || "pending";
+  const part4Status = (result?.part4Status as ProgressStatus) || "pending";
+  const currentPart = result?.currentPart || 0;
+  const estimatedCompletionAt = result?.estimatedCompletionAt;
+  
   // Calculate progress for multi-part analysis
-  const completedParts = result ? [result.part1, result.part2, result.part3, result.part4].filter(Boolean).length : 0;
+  const completedParts = [part1Status, part2Status, part3Status, part4Status].filter(s => s === "completed").length;
   const progressPercent = isMultiPart ? (completedParts / 4) * 100 : (result?.singleResult ? 100 : 0);
+
+  // Update time remaining countdown
+  useEffect(() => {
+    if (session?.status !== "processing" || !estimatedCompletionAt) {
+      setTimeRemaining(null);
+      return;
+    }
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const estimated = new Date(estimatedCompletionAt).getTime();
+      const remaining = estimated - now;
+      setTimeRemaining(remaining > 0 ? remaining : 0);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [session?.status, estimatedCompletionAt]);
+
+  // Track elapsed time
+  useEffect(() => {
+    if (session?.status !== "processing") {
+      return;
+    }
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [session?.status]);
 
   if (isLoading) {
     return (
@@ -66,6 +127,17 @@ export default function AnalysisResult() {
       </DashboardLayout>
     );
   }
+
+  // Get status for a specific part
+  const getPartStatus = (partNum: number): ProgressStatus => {
+    switch (partNum) {
+      case 1: return part1Status;
+      case 2: return part2Status;
+      case 3: return part3Status;
+      case 4: return part4Status;
+      default: return "pending";
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -124,8 +196,174 @@ export default function AnalysisResult() {
           </CardContent>
         </Card>
 
-        {/* Progress (for processing) */}
-        {session?.status === "processing" && (
+        {/* Enhanced Progress Indicator (for processing) */}
+        {session?.status === "processing" && isMultiPart && (
+          <Card className="glass-panel border-cyan-500/30 bg-gradient-to-br from-cyan-950/20 via-background to-purple-950/20 overflow-hidden">
+            <CardContent className="pt-6 relative">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: `linear-gradient(rgba(6, 182, 212, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.3) 1px, transparent 1px)`,
+                  backgroundSize: '20px 20px'
+                }} />
+              </div>
+              
+              <div className="relative space-y-6">
+                {/* Header with status */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center">
+                        <Zap className="h-6 w-6 text-cyan-400" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-500 animate-ping" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">APEX Analysis Running</h3>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Globe className="h-3 w-3 text-cyan-400" />
+                        <span>Perplexity sonar-pro • Real-time web research</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    {timeRemaining !== null && (
+                      <div className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-500/20 rounded-lg">
+                        <Clock className="h-4 w-4 text-cyan-400" />
+                        <span className="text-sm font-mono text-cyan-400">
+                          {formatTimeRemaining(timeRemaining)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-cyan-400">{completedParts}/4</p>
+                      <p className="text-xs text-muted-foreground">Parts Complete</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main progress bar */}
+                <div className="space-y-2">
+                  <div className="h-3 bg-muted/30 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-500 ease-out relative"
+                      style={{ width: `${progressPercent}%` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Elapsed: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}</span>
+                    <span>{Math.round(progressPercent)}% complete</span>
+                  </div>
+                </div>
+
+                {/* Part-by-part progress */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {PART_CONFIG.map((part) => {
+                    const status = getPartStatus(part.number);
+                    const isActive = status === "in_progress";
+                    const isComplete = status === "completed";
+                    const isPending = status === "pending";
+                    
+                    return (
+                      <div 
+                        key={part.number}
+                        className={`relative p-4 rounded-xl border transition-all duration-500 ${
+                          isComplete 
+                            ? "bg-green-500/10 border-green-500/30" 
+                            : isActive
+                              ? "bg-cyan-500/10 border-cyan-500/40 shadow-lg shadow-cyan-500/10"
+                              : "bg-muted/20 border-border/50"
+                        }`}
+                      >
+                        {/* Active indicator */}
+                        {isActive && (
+                          <div className="absolute top-2 right-2">
+                            <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+                            <div className="absolute inset-0 w-2 h-2 rounded-full bg-cyan-500" />
+                          </div>
+                        )}
+                        
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            isComplete 
+                              ? "bg-green-500/20" 
+                              : isActive 
+                                ? "bg-cyan-500/20" 
+                                : "bg-muted/30"
+                          }`}>
+                            {isComplete ? (
+                              <CheckCircle2 className="h-5 w-5 text-green-500" />
+                            ) : isActive ? (
+                              <Loader2 className="h-5 w-5 text-cyan-400 animate-spin" />
+                            ) : (
+                              <part.icon className={`h-5 w-5 ${isPending ? "text-muted-foreground" : part.color}`} />
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-mono ${
+                                isComplete ? "text-green-400" : isActive ? "text-cyan-400" : "text-muted-foreground"
+                              }`}>
+                                PART {part.number}
+                              </span>
+                              {isActive && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-bold bg-cyan-500/20 text-cyan-400 rounded">
+                                  LIVE
+                                </span>
+                              )}
+                            </div>
+                            <p className={`text-sm font-medium truncate ${
+                              isComplete ? "text-green-300" : isActive ? "text-foreground" : "text-muted-foreground"
+                            }`}>
+                              {part.name.split(" & ")[0]}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {isComplete ? "✓ Complete" : isActive ? "Researching..." : "Queued"}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Progress bar for active part */}
+                        {isActive && (
+                          <div className="mt-3 h-1 bg-muted/30 rounded-full overflow-hidden">
+                            <div className="h-full w-1/2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full animate-pulse" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Live log simulation */}
+                <div className="p-3 bg-black/30 rounded-lg border border-border/50 font-mono text-xs">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    <span>SYSTEM LOG</span>
+                  </div>
+                  <div className="space-y-1 text-muted-foreground">
+                    {completedParts >= 1 && <p><span className="text-green-400">[✓]</span> Part 1: Discovery complete</p>}
+                    {completedParts >= 2 && <p><span className="text-green-400">[✓]</span> Part 2: Strategy mapped</p>}
+                    {completedParts >= 3 && <p><span className="text-green-400">[✓]</span> Part 3: AI toolkit generated</p>}
+                    {completedParts >= 4 && <p><span className="text-green-400">[✓]</span> Part 4: Risk analysis complete</p>}
+                    {currentPart > 0 && currentPart <= 4 && getPartStatus(currentPart) === "in_progress" && (
+                      <p className="text-cyan-400 animate-pulse">
+                        [→] Processing Part {currentPart}: {PART_CONFIG[currentPart - 1]?.name}...
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Simple progress for non-APEX tiers */}
+        {session?.status === "processing" && !isMultiPart && (
           <Card className="glass-panel border-primary/30">
             <CardContent className="pt-6">
               <div className="space-y-4">
@@ -134,48 +372,9 @@ export default function AnalysisResult() {
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     <span className="font-medium">Analysis in Progress</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {isMultiPart ? `${completedParts}/4 parts completed` : "Processing..."}
-                  </span>
+                  <span className="text-sm text-muted-foreground">Processing...</span>
                 </div>
                 <Progress value={progressPercent} className="h-2" />
-                
-                {isMultiPart && (
-                  <div className="space-y-4 mt-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                      <span>Perplexity sonar-pro • Real-time web research enabled</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-2">
-                      {PART_CONFIG.map((part, i) => {
-                        const partKey = `part${part.number}` as "part1" | "part2" | "part3" | "part4";
-                        const isComplete = result?.[partKey];
-                        const isCurrent = completedParts === i;
-                        
-                        return (
-                          <div 
-                            key={part.number}
-                            className={`p-3 rounded-lg text-center transition-all duration-300 ${
-                              isComplete 
-                                ? "bg-green-500/10 border border-green-500/30" 
-                                : isCurrent
-                                  ? "bg-cyan-500/10 border border-cyan-500/30 animate-pulse"
-                                  : "bg-muted/30 border border-border"
-                            }`}
-                          >
-                            <part.icon className={`h-5 w-5 mx-auto mb-1 ${
-                              isComplete ? "text-green-500" : isCurrent ? "text-cyan-500" : "text-muted-foreground"
-                            }`} />
-                            <p className="text-xs font-medium truncate">{part.name.split(" ")[0]}</p>
-                            {isCurrent && !isComplete && (
-                              <p className="text-[10px] text-cyan-400 mt-1">Researching...</p>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
               </div>
             </CardContent>
           </Card>

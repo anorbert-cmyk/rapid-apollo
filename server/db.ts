@@ -200,6 +200,46 @@ export async function updateAnalysisResult(sessionId: string, data: Partial<Inse
   await db.update(analysisResults).set(data).where(eq(analysisResults.sessionId, sessionId));
 }
 
+// Progress tracking for APEX real-time updates
+export type ProgressStatus = "pending" | "in_progress" | "completed" | "failed";
+
+export interface PartProgress {
+  partNum: 1 | 2 | 3 | 4;
+  status: ProgressStatus;
+  startedAt?: Date;
+  completedAt?: Date;
+}
+
+export async function updateAnalysisPartProgress(
+  sessionId: string, 
+  partNum: 1 | 2 | 3 | 4, 
+  status: ProgressStatus,
+  timestamp?: Date
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = timestamp || new Date();
+  const updateData: Record<string, unknown> = {
+    currentPart: partNum,
+    [`part${partNum}Status`]: status,
+  };
+  
+  if (status === "in_progress") {
+    updateData[`part${partNum}StartedAt`] = now;
+  } else if (status === "completed" || status === "failed") {
+    updateData[`part${partNum}CompletedAt`] = now;
+  }
+  
+  await db.update(analysisResults).set(updateData).where(eq(analysisResults.sessionId, sessionId));
+}
+
+export async function setEstimatedCompletion(sessionId: string, estimatedAt: Date): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(analysisResults).set({ estimatedCompletionAt: estimatedAt }).where(eq(analysisResults.sessionId, sessionId));
+}
+
 export async function getAnalysisResultsByUserId(userId: number): Promise<AnalysisResult[]> {
   const db = await getDb();
   if (!db) return [];

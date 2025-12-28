@@ -79,6 +79,11 @@ export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = typeof purchases.$inferInsert;
 
 /**
+ * Analysis progress status enum for APEX real-time tracking
+ */
+export const progressStatusEnum = mysqlEnum("progressStatus", ["pending", "in_progress", "completed", "failed"]);
+
+/**
  * Analysis results - stores the AI-generated analysis
  */
 export const analysisResults = mysqlTable("analysis_results", {
@@ -96,6 +101,21 @@ export const analysisResults = mysqlTable("analysis_results", {
   part4: text("part4"),
   fullMarkdown: text("fullMarkdown"),
   totalTokens: int("totalTokens"),
+  // Progress tracking for APEX real-time updates
+  currentPart: int("currentPart").default(0), // 0 = not started, 1-4 = current part being processed
+  part1Status: progressStatusEnum.default("pending"),
+  part2Status: progressStatusEnum.default("pending"),
+  part3Status: progressStatusEnum.default("pending"),
+  part4Status: progressStatusEnum.default("pending"),
+  part1StartedAt: timestamp("part1StartedAt"),
+  part1CompletedAt: timestamp("part1CompletedAt"),
+  part2StartedAt: timestamp("part2StartedAt"),
+  part2CompletedAt: timestamp("part2CompletedAt"),
+  part3StartedAt: timestamp("part3StartedAt"),
+  part3CompletedAt: timestamp("part3CompletedAt"),
+  part4StartedAt: timestamp("part4StartedAt"),
+  part4CompletedAt: timestamp("part4CompletedAt"),
+  estimatedCompletionAt: timestamp("estimatedCompletionAt"),
   generatedAt: timestamp("generatedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

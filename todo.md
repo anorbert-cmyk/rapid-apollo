@@ -137,3 +137,10 @@
 - [x] Backend router az APEX elemzéshez (4 multi-turn API hívás)
 - [x] Frontend UI az APEX elemzés megjelenítéséhez (4 rész progresszív betöltése)
 - [x] Tesztek írása a Perplexity integrációhoz
+
+## Real-time APEX Progress Indicator
+- [x] Backend: Add progress field to analysis results table
+- [x] Backend: Update progress after each part completion
+- [x] Frontend: Create real-time progress UI with part status
+- [x] Frontend: Add polling/refetch for live updates
+- [x] Add estimated time remaining display
