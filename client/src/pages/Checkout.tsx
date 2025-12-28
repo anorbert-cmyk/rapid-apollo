@@ -244,16 +244,40 @@ export default function Checkout() {
                 </CardContent>
               </Card>
 
-              {/* Security badges */}
-              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Shield className="h-4 w-4" />
-                  <span>SSL Secured</span>
+              {/* Enhanced Trust Elements */}
+              <div className="space-y-4">
+                {/* Security badges */}
+                <div className="flex items-center justify-center gap-6 text-xs">
+                  <div className="flex items-center gap-1.5 text-emerald-500">
+                    <Shield className="h-4 w-4" />
+                    <span className="font-medium">SSL Secured</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-emerald-500">
+                    <Lock className="h-4 w-4" />
+                    <span className="font-medium">256-bit Encryption</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Lock className="h-4 w-4" />
-                  <span>256-bit Encryption</span>
+                
+                {/* Trust badges */}
+                <div className="flex items-center justify-center gap-4 p-3 bg-muted/30 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                      <rect width="24" height="24" rx="4" fill="#635BFF"/>
+                      <path d="M12 6.5c-2.5 0-4.5 1.5-4.5 3.5 0 2.5 3 3 4.5 3.5 1 .3 1.5.6 1.5 1 0 .5-.5 1-1.5 1s-2-.5-2.5-1l-1 2c1 .7 2 1 3.5 1 2.5 0 4.5-1.5 4.5-3.5 0-2.5-3-3-4.5-3.5-1-.3-1.5-.6-1.5-1 0-.5.5-1 1.5-1s2 .5 2.5 1l1-2c-1-.7-2-1-3.5-1z" fill="white"/>
+                    </svg>
+                    <span className="text-xs text-muted-foreground">Powered by Stripe</span>
+                  </div>
+                  <div className="h-4 w-px bg-border"></div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <span className="text-xs text-muted-foreground">PCI Compliant</span>
+                  </div>
                 </div>
+                
+                {/* Guarantee text */}
+                <p className="text-center text-xs text-muted-foreground">
+                  Your payment information is encrypted and secure. We never store your card details.
+                </p>
               </div>
             </div>
 
