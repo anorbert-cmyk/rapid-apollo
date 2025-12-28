@@ -21,10 +21,20 @@ import {
   Wallet,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { TIER_CONFIGS, type Tier } from "@shared/pricing";
-import { getLoginUrl } from "@/const";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
+// Admin wallet address from environment
+const ADMIN_WALLET = (import.meta.env.VITE_ADMIN_WALLET_ADDRESS || "").toLowerCase();
+
+// Helper to shorten wallet address
+const shortenAddress = (address: string) => {
+  if (!address) return "";
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
@@ -36,6 +46,110 @@ export default function Home() {
 
   // Countdown timer state
   const [countdown] = useState("03:58:54");
+  
+  // MetaMask wallet state
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
+  const hasMetaMask = typeof window !== "undefined" && typeof (window as any).ethereum !== "undefined";
+  
+  // Check for existing wallet connection on mount
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      if (hasMetaMask) {
+        try {
+          const accounts = await (window as any).ethereum.request({ method: "eth_accounts" });
+          if (accounts.length > 0) {
+            const address = accounts[0].toLowerCase();
+            setWalletAddress(address);
+            // If admin wallet, redirect to admin
+            if (address === ADMIN_WALLET && ADMIN_WALLET) {
+              navigate("/admin");
+            }
+          }
+        } catch (error) {
+          console.error("Error checking wallet connection:", error);
+        }
+      }
+    };
+    checkWalletConnection();
+  }, [hasMetaMask, navigate]);
+  
+  // Listen for account changes
+  useEffect(() => {
+    if (hasMetaMask) {
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (accounts.length === 0) {
+          setWalletAddress(null);
+        } else {
+          const address = accounts[0].toLowerCase();
+          setWalletAddress(address);
+          if (address === ADMIN_WALLET && ADMIN_WALLET) {
+            navigate("/admin");
+          }
+        }
+      };
+      
+      (window as any).ethereum.on("accountsChanged", handleAccountsChanged);
+      return () => {
+        (window as any).ethereum.removeListener("accountsChanged", handleAccountsChanged);
+      };
+    }
+  }, [hasMetaMask, navigate]);
+  
+  // Connect wallet function
+  const connectWallet = async () => {
+    if (!hasMetaMask) {
+      toast.error("MetaMask not found", { 
+        description: "Please install MetaMask to connect your wallet" 
+      });
+      window.open("https://metamask.io/download/", "_blank");
+      return;
+    }
+    
+    setIsConnectingWallet(true);
+    
+    try {
+      const accounts = await (window as any).ethereum.request({ 
+        method: "eth_requestAccounts" 
+      });
+      
+      if (accounts.length > 0) {
+        const address = accounts[0].toLowerCase();
+        setWalletAddress(address);
+        
+        // Check if admin wallet
+        if (address === ADMIN_WALLET && ADMIN_WALLET) {
+          toast.success("Admin wallet detected", { 
+            description: "Redirecting to admin dashboard..." 
+          });
+          navigate("/admin");
+        } else {
+          toast.success("Wallet connected", { 
+            description: shortenAddress(address) 
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error("Wallet connection error:", error);
+      if (error.code === 4001) {
+        toast.error("Connection rejected", { 
+          description: "You rejected the connection request" 
+        });
+      } else {
+        toast.error("Connection failed", { 
+          description: error.message || "Failed to connect wallet" 
+        });
+      }
+    } finally {
+      setIsConnectingWallet(false);
+    }
+  };
+  
+  // Disconnect wallet function
+  const disconnectWallet = () => {
+    setWalletAddress(null);
+    toast.info("Wallet disconnected");
+  };
 
   const createSession = trpc.session.create.useMutation({
     onSuccess: (data) => {
@@ -114,6 +228,17 @@ export default function Home() {
           </a>
 
           <div className="flex items-center gap-3">
+            {/* Test Output Link */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/analysis/test-apex-demo-LAIdJqey")}
+              className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Demo Output
+            </Button>
+            
             {isAuthenticated && (
               <Button
                 variant="ghost"
@@ -144,24 +269,35 @@ export default function Home() {
             </div>
 
             {/* Connect Wallet / User */}
-            {isAuthenticated ? (
+            {walletAddress ? (
               <Button
                 variant="outline"
                 size="sm"
-                className="text-[10px] font-bold py-1.5 px-3 flex items-center gap-2"
+                onClick={disconnectWallet}
+                className="text-[10px] font-bold py-1.5 px-3 flex items-center gap-2 font-mono"
               >
-                <Wallet className="w-3.5 h-3.5" />
-                {user?.name || "Connected"}
+                <Wallet className="w-3.5 h-3.5 text-green-500" />
+                {shortenAddress(walletAddress)}
               </Button>
             ) : (
               <Button
                 variant="default"
                 size="sm"
-                onClick={() => window.location.href = getLoginUrl()}
+                onClick={connectWallet}
+                disabled={isConnectingWallet}
                 className="text-[10px] font-bold py-1.5 px-3 flex items-center gap-2"
               >
-                <Wallet className="w-3.5 h-3.5" />
-                CONNECT
+                {isConnectingWallet ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    CONNECTING...
+                  </>
+                ) : (
+                  <>
+                    <Wallet className="w-3.5 h-3.5" />
+                    CONNECT
+                  </>
+                )}
               </Button>
             )}
           </div>

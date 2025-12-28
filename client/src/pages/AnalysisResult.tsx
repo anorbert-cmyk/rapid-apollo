@@ -50,6 +50,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
+import { NewAnalysisModal } from "@/components/NewAnalysisModal";
 
 const TIER_INFO = {
   standard: { name: "Observer", badge: "tier-badge-standard", isApex: false },
@@ -345,6 +347,7 @@ export default function AnalysisResult() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
   const [isExporting, setIsExporting] = useState(false);
+  const [showNewAnalysisModal, setShowNewAnalysisModal] = useState(false);
 
   const { data: session } = trpc.session.get.useQuery(
     { sessionId: sessionId || "" },
@@ -723,8 +726,25 @@ export default function AnalysisResult() {
                 </>
               )}
             </Button>
+            <Button 
+              className="bg-primary hover:bg-primary/90"
+              size="sm"
+              onClick={() => setShowNewAnalysisModal(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Analysis
+            </Button>
           </div>
         </div>
+        
+        {/* New Analysis Modal */}
+        <NewAnalysisModal 
+          open={showNewAnalysisModal} 
+          onOpenChange={setShowNewAnalysisModal}
+          onSuccess={(newSessionId) => {
+            navigate(`/analysis/${newSessionId}`);
+          }}
+        />
 
         {/* Problem Statement */}
         <Card className="glass-panel">

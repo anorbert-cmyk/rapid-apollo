@@ -206,3 +206,13 @@
 - [x] Error states for all forms and interactions
 - [x] Loading animations and skeleton states
 - [x] Keyboard navigation support (touch-friendly targets added)
+
+## Bug Fixes - Non-working Features
+- [x] Fix New Analysis buttons not working in Output page
+- [x] Create direct test link to Output page with sample data (Demo Output button in nav)
+- [x] Fix MetaMask wallet connection for admin login (improved error handling and debug info)
+
+## MetaMask Wallet on Homepage
+- [x] Replace OAuth login with MetaMask wallet connection on homepage
+- [x] Admin wallet detection → redirect to /admin
+- [x] User wallet → display shortened address (0x1234...5678) for crypto payments

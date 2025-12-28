@@ -61,7 +61,8 @@ export default function Admin() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   // Check if MetaMask is available
-  const hasMetaMask = typeof window !== "undefined" && (window as any).ethereum;
+  const hasMetaMask = typeof window !== "undefined" && typeof (window as any).ethereum !== "undefined";
+  const isMetaMaskInstalled = hasMetaMask && (window as any).ethereum.isMetaMask;
 
   const requestChallenge = trpc.admin.requestChallenge.useMutation();
   const verifySignature = trpc.admin.verifySignature.useMutation();
@@ -127,6 +128,12 @@ export default function Admin() {
       toast.error("MetaMask not found", { description: "Please install MetaMask to continue" });
       return;
     }
+    
+    // Debug log
+    console.log("MetaMask detected:", {
+      ethereum: !!(window as any).ethereum,
+      isMetaMask: (window as any).ethereum?.isMetaMask,
+    });
 
     setIsConnecting(true);
 
@@ -238,6 +245,21 @@ export default function Admin() {
                 <Button asChild>
                   <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">
                     Install MetaMask
+                  </a>
+                </Button>
+                <p className="text-xs text-muted-foreground mt-4">
+                  After installing, refresh this page
+                </p>
+              </div>
+            ) : !isMetaMaskInstalled ? (
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-4">
+                  A Web3 wallet was detected but it doesn't appear to be MetaMask.
+                  Please make sure MetaMask is your active wallet.
+                </p>
+                <Button asChild>
+                  <a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">
+                    Get MetaMask
                   </a>
                 </Button>
               </div>
