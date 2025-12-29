@@ -1,0 +1,18 @@
+{
+  "query": "SELECT * FROM email_subscribers ORDER BY subscribedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 269oH2rcit4kEnZ.root --database fiP8RUkhdLoJLqK2jRAup2 --execute SELECT * FROM email_subscribers ORDER BY subscribedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "marketing-test@aetherlogic.io",
+      "source": "demo_gate",
+      "subscribedAt": "2025-12-29 12:10:22",
+      "isActive": "1",
+      "unsubscribedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tsource\tsubscribedAt\tisActive\tunsubscribedAt\n1\tmarketing-test@aetherlogic.io\tdemo_gate\t2025-12-29 12:10:22\t1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 133
+}

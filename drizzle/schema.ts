@@ -168,3 +168,18 @@ export const platformStats = mysqlTable("platform_stats", {
 
 export type PlatformStats = typeof platformStats.$inferSelect;
 export type InsertPlatformStats = typeof platformStats.$inferInsert;
+
+/**
+ * Email subscribers - collected from soft gate modal for marketing
+ */
+export const emailSubscribers = mysqlTable("email_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  source: varchar("source", { length: 64 }).default("demo_gate").notNull(), // demo_gate, newsletter, etc.
+  subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  unsubscribedAt: timestamp("unsubscribedAt"),
+});
+
+export type EmailSubscriber = typeof emailSubscribers.$inferSelect;
+export type InsertEmailSubscriber = typeof emailSubscribers.$inferInsert;

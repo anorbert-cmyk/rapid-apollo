@@ -7,6 +7,7 @@ import {
   analysisResults, InsertAnalysisResult, AnalysisResult,
   adminWallets, InsertAdminWallet, AdminWallet,
   usedSignatures, InsertUsedSignature,
+  emailSubscribers, InsertEmailSubscriber, EmailSubscriber,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -348,4 +349,48 @@ export async function getTransactionHistory(limit = 100): Promise<Purchase[]> {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(purchases).orderBy(desc(purchases.createdAt)).limit(limit);
+}
+
+// ============ EMAIL SUBSCRIBER FUNCTIONS ============
+
+export async function saveEmailSubscriber(email: string, source: string = "demo_gate"): Promise<{ success: boolean; isNew: boolean }> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot save email subscriber: database not available");
+    return { success: false, isNew: false };
+  }
+
+  try {
+    // Check if email already exists
+    const existing = await db.select().from(emailSubscribers).where(eq(emailSubscribers.email, email)).limit(1);
+    
+    if (existing.length > 0) {
+      // Email already exists, just return success
+      return { success: true, isNew: false };
+    }
+
+    // Insert new subscriber
+    await db.insert(emailSubscribers).values({
+      email,
+      source,
+    });
+
+    return { success: true, isNew: true };
+  } catch (error) {
+    console.error("[Database] Error saving email subscriber:", error);
+    return { success: false, isNew: false };
+  }
+}
+
+export async function getAllEmailSubscribers(): Promise<EmailSubscriber[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(emailSubscribers).where(eq(emailSubscribers.isActive, true)).orderBy(desc(emailSubscribers.subscribedAt));
+}
+
+export async function getEmailSubscriberCount(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select().from(emailSubscribers).where(eq(emailSubscribers.isActive, true));
+  return result.length;
 }

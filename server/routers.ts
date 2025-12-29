@@ -26,6 +26,9 @@ import {
   getAdminWallets,
   updateAnalysisPartProgress,
   setEstimatedCompletion,
+  saveEmailSubscriber,
+  getAllEmailSubscribers,
+  getEmailSubscriberCount,
 } from "./db";
 
 import { Tier, getTierPrice, getTierConfig, TIER_CONFIGS, isMultiPartTier } from "../shared/pricing";
@@ -315,6 +318,29 @@ export const appRouter = router({
 
     getMyResults: protectedProcedure.query(async ({ ctx }) => {
       return await getAnalysisResultsByUserId(ctx.user.id);
+    }),
+  }),
+
+  // ============ EMAIL SUBSCRIBERS ============
+  emailSubscriber: router({
+    subscribe: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        source: z.string().optional().default("demo_gate"),
+      }))
+      .mutation(async ({ input }) => {
+        const result = await saveEmailSubscriber(input.email, input.source);
+        return result;
+      }),
+    
+    // Admin only - get all subscribers
+    getAll: protectedProcedure.query(async () => {
+      return await getAllEmailSubscribers();
+    }),
+    
+    // Admin only - get subscriber count
+    getCount: protectedProcedure.query(async () => {
+      return await getEmailSubscriberCount();
     }),
   }),
 

@@ -12,6 +12,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 interface SoftGateModalProps {
   isOpen: boolean;
@@ -34,6 +35,8 @@ export function SoftGateModal({ isOpen, onClose, onSubmit, onSkip }: SoftGateMod
     }
   }, [isOpen]);
 
+  const subscribeMutation = trpc.emailSubscriber.subscribe.useMutation();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !email.includes("@")) {
@@ -43,14 +46,34 @@ export function SoftGateModal({ isOpen, onClose, onSubmit, onSkip }: SoftGateMod
     
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    onSubmit(email);
-    setIsSubmitting(false);
-    toast.success("Welcome to the inner circle!", {
-      description: "You now have full access to the demo analysis."
-    });
+    try {
+      // Save email to database
+      const result = await subscribeMutation.mutateAsync({
+        email: email.trim(),
+        source: "demo_gate",
+      });
+      
+      onSubmit(email);
+      
+      if (result.isNew) {
+        toast.success("Welcome to the inner circle!", {
+          description: "You now have full access to the demo analysis."
+        });
+      } else {
+        toast.success("Welcome back!", {
+          description: "You already have full access to the demo."
+        });
+      }
+    } catch (error) {
+      console.error("Failed to save email:", error);
+      // Still allow access even if save fails
+      onSubmit(email);
+      toast.success("Welcome to the inner circle!", {
+        description: "You now have full access to the demo analysis."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSkip = () => {

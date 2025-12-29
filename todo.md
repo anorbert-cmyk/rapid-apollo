@@ -265,3 +265,11 @@
 - [x] Store email submission in localStorage to not show again
 - [x] Add skip option for users who don't want to register
 - [x] Ensure smooth UX and animations
+
+## Email Subscriber Storage - December 29
+
+### Save Demo Emails to Database
+- [x] Create email_subscribers table in database schema
+- [x] Add tRPC endpoint to save email subscriptions
+- [x] Update SoftGateModal to call backend API on submit
+- [ ] Add admin view to see collected emails in Dashboard
