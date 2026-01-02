@@ -404,10 +404,12 @@ export async function getEmailSubscriberCount(): Promise<number> {
 export async function getDemoAnalysisResult(): Promise<AnalysisResult | undefined> {
   const db = await getDb();
   if (!db) return undefined;
-  // Get the first analysis result which is the demo
-  const result = await db.select().from(analysisResults).where(eq(analysisResults.sessionId, 'demo-session')).limit(1);
+  // Get the demo analysis result by session ID
+  const result = await db.select().from(analysisResults).where(eq(analysisResults.sessionId, 'test-apex-demo-LAIdJqey')).limit(1);
   if (result.length > 0) return result[0];
-  // Fallback: get the first result by ID
-  const fallback = await db.select().from(analysisResults).orderBy(analysisResults.id).limit(1);
-  return fallback.length > 0 ? fallback[0] : undefined;
+  // Fallback: try demo-session or first result by ID
+  const fallback = await db.select().from(analysisResults).where(eq(analysisResults.sessionId, 'demo-session')).limit(1);
+  if (fallback.length > 0) return fallback[0];
+  const lastFallback = await db.select().from(analysisResults).orderBy(analysisResults.id).limit(1);
+  return lastFallback.length > 0 ? lastFallback[0] : undefined;
 }

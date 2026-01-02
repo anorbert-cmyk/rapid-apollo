@@ -384,3 +384,8 @@
 - [x] Fix Overview tab to show combined parts when fullMarkdown is empty
 - [x] Demo analysis content loads from database (test-apex-demo-LAIdJqey session)
 - [x] Part 1, 2, 3, 4 tabs all work correctly with database content
+
+## DemoAnalysis Database Integration - January 2, 2025
+- [x] Update DemoAnalysis.tsx to load content from database instead of hardcoded content
+- [x] Keep email gate with 50% scroll trigger
+- [x] Use same demo session (test-apex-demo-LAIdJqey) as AnalysisResult page

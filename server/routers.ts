@@ -383,7 +383,14 @@ export const appRouter = router({
       if (!result) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Demo analysis not found" });
       }
-      return result;
+      // Also get the session info for problem statement
+      const session = await getAnalysisSessionById(result.sessionId);
+      return {
+        ...result,
+        problemStatement: session?.problemStatement || "Demo analysis",
+        tier: session?.tier || result.tier,
+        status: session?.status || "completed",
+      };
     }),
   }),
 
