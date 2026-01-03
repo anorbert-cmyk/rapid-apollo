@@ -18,6 +18,7 @@ import {
   Wallet, 
   DollarSign, 
   TrendingUp, 
+  TrendingDown,
   Users,
   CreditCard,
   Bitcoin,
@@ -39,8 +40,27 @@ import {
   AlertTriangle,
   Activity,
   Zap,
-  RotateCcw
+  RotateCcw,
+  Play,
+  Pause,
+  Database,
+  Timer,
+  ListRestart
 } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  Legend
+} from "recharts";
 
 // Admin wallet address (should match server-side)
 const ADMIN_WALLET = "0xa14504ffe5E9A245c9d4079547Fa16fA0A823114".toLowerCase();
@@ -124,6 +144,49 @@ export default function Admin() {
     },
     onError: (error) => {
       toast.error("Failed to reset circuit breaker", { description: error.message });
+    }
+  });
+
+  // Historical metrics time range state
+  const [metricsTimeRange, setMetricsTimeRange] = useState<24 | 168 | 720>(24); // 24h, 7d, 30d in hours
+
+  // Historical metrics query
+  const { data: historicalMetrics, isLoading: metricsLoading, refetch: refetchMetrics } = trpc.admin.getHistoricalMetrics.useQuery(
+    adminAuth ? { ...adminAuth, hours: metricsTimeRange } : { signature: "", timestamp: 0, address: "", hours: 24 },
+    { enabled: isAuthenticated && !!adminAuth }
+  );
+
+  // Retry queue stats query
+  const { data: retryQueueStats, isLoading: queueLoading, refetch: refetchQueue } = trpc.admin.getRetryQueueStats.useQuery(
+    adminAuth || { signature: "", timestamp: 0, address: "" },
+    { enabled: isAuthenticated && !!adminAuth, refetchInterval: 10000 } // Auto-refresh every 10s
+  );
+
+  // Error summary query
+  const { data: errorSummary, isLoading: errorSummaryLoading } = trpc.admin.getErrorSummary.useQuery(
+    adminAuth ? { ...adminAuth, hours: metricsTimeRange } : { signature: "", timestamp: 0, address: "", hours: 24 },
+    { enabled: isAuthenticated && !!adminAuth }
+  );
+
+  // Toggle retry processor mutation
+  const toggleProcessor = trpc.admin.toggleRetryProcessor.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      refetchQueue();
+    },
+    onError: (error) => {
+      toast.error("Failed to toggle processor", { description: error.message });
+    }
+  });
+
+  // Trigger metrics aggregation mutation
+  const triggerAggregation = trpc.admin.triggerMetricsAggregation.useMutation({
+    onSuccess: () => {
+      toast.success("Metrics aggregation triggered");
+      refetchMetrics();
+    },
+    onError: (error) => {
+      toast.error("Failed to trigger aggregation", { description: error.message });
     }
   });
 
@@ -836,6 +899,453 @@ export default function Admin() {
             )}
           </CardContent>
         </Card>
+
+        {/* Historical Metrics & Analytics */}
+        <Card className="glass-panel">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+                <BarChart3 className="h-5 w-5" />
+                Historical Metrics & Analytics
+              </h2>
+              <div className="flex items-center gap-2">
+                <div className="flex rounded-md border border-border">
+                  <Button
+                    variant={metricsTimeRange === 24 ? "default" : "ghost"}
+                    size="sm"
+                    className="rounded-r-none"
+                    onClick={() => setMetricsTimeRange(24)}
+                  >
+                    24h
+                  </Button>
+                  <Button
+                    variant={metricsTimeRange === 168 ? "default" : "ghost"}
+                    size="sm"
+                    className="rounded-none border-x"
+                    onClick={() => setMetricsTimeRange(168)}
+                  >
+                    7d
+                  </Button>
+                  <Button
+                    variant={metricsTimeRange === 720 ? "default" : "ghost"}
+                    size="sm"
+                    className="rounded-l-none"
+                    onClick={() => setMetricsTimeRange(720)}
+                  >
+                    30d
+                  </Button>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => triggerAggregation.mutate(adminAuth!)}
+                  disabled={triggerAggregation.isPending || !adminAuth}
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  Aggregate
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetchMetrics()}
+                  disabled={metricsLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${metricsLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {metricsLoading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-[300px] w-full" />
+                <div className="grid grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-24" />
+                  ))}
+                </div>
+              </div>
+            ) : historicalMetrics ? (
+              <div className="space-y-6">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card className="p-4">
+                    <p className="text-xs text-muted-foreground">Total Requests</p>
+                    <p className="text-2xl font-bold">{historicalMetrics.totalRequests}</p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <Timer className="h-3 w-3" />
+                      Last {metricsTimeRange}h
+                    </div>
+                  </Card>
+                  <Card className="p-4">
+                    <p className="text-xs text-muted-foreground">Success Rate</p>
+                    <p className={`text-2xl font-bold ${historicalMetrics.successRate >= 90 ? 'text-green-500' : historicalMetrics.successRate >= 70 ? 'text-yellow-500' : 'text-red-500'}`}>
+                      {historicalMetrics.successRate.toFixed(1)}%
+                    </p>
+                    <div className="flex items-center gap-1 text-xs mt-1">
+                      {historicalMetrics.successRate >= 90 ? (
+                        <TrendingUp className="h-3 w-3 text-green-500" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3 text-red-500" />
+                      )}
+                      <span className={historicalMetrics.successRate >= 90 ? 'text-green-500' : 'text-red-500'}>
+                        {historicalMetrics.successRate >= 90 ? 'Healthy' : 'Needs attention'}
+                      </span>
+                    </div>
+                  </Card>
+                  <Card className="p-4">
+                    <p className="text-xs text-muted-foreground">Avg Duration</p>
+                    <p className="text-2xl font-bold">
+                      {historicalMetrics.avgDurationMs 
+                        ? `${(historicalMetrics.avgDurationMs / 1000).toFixed(1)}s`
+                        : 'N/A'
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      P95: {historicalMetrics.p95DurationMs 
+                        ? `${(historicalMetrics.p95DurationMs / 1000).toFixed(1)}s`
+                        : 'N/A'
+                      }
+                    </p>
+                  </Card>
+                  <Card className="p-4">
+                    <p className="text-xs text-muted-foreground">Current Failure Rate</p>
+                    <p className={`text-2xl font-bold ${(historicalMetrics.currentFailureRate?.failureRate || 0) < 10 ? 'text-green-500' : 'text-red-500'}`}>
+                      {(historicalMetrics.currentFailureRate?.failureRate || 0).toFixed(1)}%
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {historicalMetrics.currentFailureRate?.requests || 0} requests in window
+                    </p>
+                  </Card>
+                </div>
+
+                {/* Hourly Chart */}
+                {historicalMetrics.hourlyData && historicalMetrics.hourlyData.length > 0 && (
+                  <Card className="p-4">
+                    <h3 className="text-sm font-medium mb-4">Request Volume Over Time</h3>
+                    <div className="h-[250px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={historicalMetrics.hourlyData.map((h: any) => ({
+                          hour: new Date(h.hour).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                          requests: h.requests,
+                          successes: h.successes,
+                          failures: h.failures,
+                        }))}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis 
+                            dataKey="hour" 
+                            stroke="#888" 
+                            fontSize={12}
+                            tickLine={false}
+                          />
+                          <YAxis stroke="#888" fontSize={12} tickLine={false} />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Legend />
+                          <Area 
+                            type="monotone" 
+                            dataKey="successes" 
+                            stackId="1"
+                            stroke="#22c55e" 
+                            fill="#22c55e" 
+                            fillOpacity={0.6}
+                            name="Successful"
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="failures" 
+                            stackId="1"
+                            stroke="#ef4444" 
+                            fill="#ef4444" 
+                            fillOpacity={0.6}
+                            name="Failed"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Tier Distribution */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="p-4">
+                    <h3 className="text-sm font-medium mb-4">Requests by Tier</h3>
+                    <div className="h-[200px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={[
+                          { tier: 'Observer', count: historicalMetrics.byTier.standard, fill: '#3b82f6' },
+                          { tier: 'Insider', count: historicalMetrics.byTier.medium, fill: '#8b5cf6' },
+                          { tier: 'Syndicate', count: historicalMetrics.byTier.full, fill: '#f59e0b' },
+                        ]}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                          <XAxis dataKey="tier" stroke="#888" fontSize={12} />
+                          <YAxis stroke="#888" fontSize={12} />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: 'hsl(var(--card))', 
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                            {[
+                              { tier: 'Observer', fill: '#3b82f6' },
+                              { tier: 'Insider', fill: '#8b5cf6' },
+                              { tier: 'Syndicate', fill: '#f59e0b' },
+                            ].map((entry, index) => (
+                              <Bar key={index} dataKey="count" fill={entry.fill} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4">
+                    <h3 className="text-sm font-medium mb-4">Request Breakdown</h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Successful</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-green-500 rounded-full" 
+                              style={{ width: `${historicalMetrics.totalRequests > 0 ? (historicalMetrics.successfulRequests / historicalMetrics.totalRequests) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="font-medium text-green-500">{historicalMetrics.successfulRequests}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Failed</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-red-500 rounded-full" 
+                              style={{ width: `${historicalMetrics.totalRequests > 0 ? (historicalMetrics.failedRequests / historicalMetrics.totalRequests) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="font-medium text-red-500">{historicalMetrics.failedRequests}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Partial Success</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-yellow-500 rounded-full" 
+                              style={{ width: `${historicalMetrics.totalRequests > 0 ? (historicalMetrics.partialSuccesses / historicalMetrics.totalRequests) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="font-medium text-yellow-500">{historicalMetrics.partialSuccesses}</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground">Retried</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-blue-500 rounded-full" 
+                              style={{ width: `${historicalMetrics.totalRequests > 0 ? (historicalMetrics.retriedRequests / historicalMetrics.totalRequests) * 100 : 0}%` }}
+                            />
+                          </div>
+                          <span className="font-medium text-blue-500">{historicalMetrics.retriedRequests}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium">No historical data available</p>
+                <p className="text-sm">Metrics will appear here as analyses are processed</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Retry Queue Status */}
+        <Card className="glass-panel">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+                <ListRestart className="h-5 w-5" />
+                Retry Queue
+                {retryQueueStats && (
+                  <Badge variant={retryQueueStats.pending > 0 ? "secondary" : "outline"} className="ml-2">
+                    {retryQueueStats.pending} pending
+                  </Badge>
+                )}
+              </h2>
+              <div className="flex items-center gap-2">
+                {retryQueueStats && (
+                  <Badge variant={retryQueueStats.processorRunning ? "default" : "secondary"}>
+                    {retryQueueStats.processorRunning ? "Processor Running" : "Processor Stopped"}
+                  </Badge>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleProcessor.mutate({ 
+                    ...adminAuth!, 
+                    action: retryQueueStats?.processorRunning ? "stop" : "start" 
+                  })}
+                  disabled={toggleProcessor.isPending || !adminAuth}
+                >
+                  {retryQueueStats?.processorRunning ? (
+                    <><Pause className="h-4 w-4 mr-2" /> Stop</>
+                  ) : (
+                    <><Play className="h-4 w-4 mr-2" /> Start</>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetchQueue()}
+                  disabled={queueLoading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${queueLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {queueLoading ? (
+              <div className="grid grid-cols-5 gap-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-24" />
+                ))}
+              </div>
+            ) : retryQueueStats ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <Card className="p-4 border-yellow-500/30 bg-yellow-500/5">
+                    <p className="text-xs text-muted-foreground">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-500">{retryQueueStats.pending}</p>
+                    <p className="text-xs text-muted-foreground">awaiting retry</p>
+                  </Card>
+                  <Card className="p-4 border-blue-500/30 bg-blue-500/5">
+                    <p className="text-xs text-muted-foreground">Processing</p>
+                    <p className="text-2xl font-bold text-blue-500">{retryQueueStats.processing}</p>
+                    <p className="text-xs text-muted-foreground">in progress</p>
+                  </Card>
+                  <Card className="p-4 border-green-500/30 bg-green-500/5">
+                    <p className="text-xs text-muted-foreground">Completed</p>
+                    <p className="text-2xl font-bold text-green-500">{retryQueueStats.completed}</p>
+                    <p className="text-xs text-muted-foreground">successful</p>
+                  </Card>
+                  <Card className="p-4 border-red-500/30 bg-red-500/5">
+                    <p className="text-xs text-muted-foreground">Failed</p>
+                    <p className="text-2xl font-bold text-red-500">{retryQueueStats.failed}</p>
+                    <p className="text-xs text-muted-foreground">max retries</p>
+                  </Card>
+                  <Card className="p-4">
+                    <p className="text-xs text-muted-foreground">Total</p>
+                    <p className="text-2xl font-bold">{retryQueueStats.total}</p>
+                    <p className="text-xs text-muted-foreground">all time</p>
+                  </Card>
+                </div>
+
+                {/* Queue Health Indicator */}
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    {retryQueueStats.pending === 0 && retryQueueStats.processing === 0 ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : retryQueueStats.failed > retryQueueStats.completed ? (
+                      <AlertTriangle className="h-5 w-5 text-red-500" />
+                    ) : (
+                      <Clock className="h-5 w-5 text-yellow-500" />
+                    )}
+                    <div>
+                      <p className="font-medium">
+                        {retryQueueStats.pending === 0 && retryQueueStats.processing === 0 
+                          ? "Queue is empty"
+                          : retryQueueStats.failed > retryQueueStats.completed
+                          ? "High failure rate in queue"
+                          : "Queue is processing"
+                        }
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {retryQueueStats.processorRunning 
+                          ? "Background processor is actively processing items"
+                          : "Start the processor to begin processing pending items"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  {retryQueueStats.total > 0 && (
+                    <div className="text-right">
+                      <p className="text-sm font-medium">
+                        {((retryQueueStats.completed / retryQueueStats.total) * 100).toFixed(1)}% success rate
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {retryQueueStats.completed} of {retryQueueStats.total} completed
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <ListRestart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium">No queue data available</p>
+                <p className="text-sm">Failed analyses will appear here for retry</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Error Summary by Code */}
+        {errorSummary && errorSummary.errors && errorSummary.errors.length > 0 && (
+          <Card className="glass-panel">
+            <CardHeader>
+              <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+                <AlertTriangle className="h-5 w-5" />
+                Error Summary by Code
+                <Badge variant="destructive" className="ml-2">
+                  {errorSummary.errors.length} types
+                </Badge>
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Error Code</TableHead>
+                    <TableHead className="text-right">Count</TableHead>
+                    <TableHead className="text-right">Last Occurrence</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {errorSummary.errors.map((error: any) => (
+                    <TableRow key={error.errorCode}>
+                      <TableCell>
+                        <code className="text-red-500 bg-red-500/10 px-2 py-1 rounded">
+                          {error.errorCode}
+                        </code>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {error.count}
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {new Date(error.lastOccurrence).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Email Subscribers */}
         <Card className="glass-panel">
