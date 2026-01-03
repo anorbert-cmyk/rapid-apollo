@@ -296,7 +296,7 @@ const SECTION_ICONS: Record<string, React.ElementType> = {
   "Phase-by-Phase Roadmap": Rocket,
   "AI-Enhanced Execution Toolkit": Wrench,
   "Deliverables Framework": FileText,
-  "Figma AI Prompts": Palette,
+  "Design Prompts": Palette,
   "Team & Collaboration": Users,
   "Risk Mitigation": Shield,
   "Success Metrics": TrendingUp,
@@ -675,8 +675,8 @@ export default function AnalysisResult() {
                   <Palette className="h-6 w-6 text-yellow-500" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">10 Production-Ready Figma Prompts</h3>
-                  <p className="text-sm text-muted-foreground">Copy and paste directly into Figma AI</p>
+                  <h3 className="font-bold text-lg">10 Production-Ready Design Prompts</h3>
+                  <p className="text-sm text-muted-foreground">Copy and paste into any design tool</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">

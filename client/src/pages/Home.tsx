@@ -578,10 +578,6 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                  3 Competitor Quick Scan
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-muted-foreground" />
                   Top 5 User Pain Points
                 </li>
                 <li className="flex items-center gap-2">
@@ -594,7 +590,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                  24-Hour Delivery
+                  Within 24 Hours
                 </li>
               </ul>
 
@@ -659,7 +655,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-primary" />
-                  48-Hour Delivery
+                  1-2 Hours Delivery
                 </li>
               </ul>
 
@@ -679,7 +675,7 @@ export default function Home() {
             {/* Tier 3: Syndicate - APEX */}
             <div className="pricing-card relative overflow-hidden">
               {/* APEX Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-purple-500/5 pointer-events-none" />
               
               <div className="relative">
                 <div className="flex items-center justify-between mb-4">
@@ -689,18 +685,18 @@ export default function Home() {
                       Syndicate
                     </h3>
                   </div>
-                  <span className="px-2 py-1 text-[10px] font-bold bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/40 rounded-full text-cyan-400 tracking-wider">
-                    APEX • STATE-OF-THE-ART AI
+                  <span className="px-2 py-1 text-[10px] font-bold bg-purple-500/20 border border-purple-500/40 rounded-full text-purple-400 tracking-wider">
+                    APEX
                   </span>
                 </div>
 
-                <h4 className="text-xl font-bold mb-2 font-playfair text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Complete UX Strategy</h4>
-                <p className="text-xs text-muted-foreground mb-4">Enterprise-grade 4-part analysis with 10 production-ready Figma prompts you can build from today.</p>
+                <h4 className="text-xl font-bold mb-2 font-playfair text-purple-400">Complete UX Strategy</h4>
+                <p className="text-xs text-muted-foreground mb-4">Enterprise-grade 4-part analysis with 10 production-ready design prompts you can build from today.</p>
                 
                 {/* State-of-the-Art AI Badge */}
-                <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-gradient-to-r from-cyan-950/50 to-blue-950/50 rounded-lg border border-cyan-500/20">
-                  <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
-                  <span className="text-[10px] font-mono text-cyan-400">Powered by State-of-the-Art AI Models</span>
+                <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-purple-950/50 rounded-lg border border-purple-500/20">
+                  <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                  <span className="text-[10px] font-mono text-purple-400">Powered by State-of-the-Art AI</span>
                 </div>
 
                 <div className="mb-6">
@@ -714,16 +710,16 @@ export default function Home() {
                     Everything in Insider, plus:
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-cyan-400" />
-                    <span className="text-cyan-300">AI-Enhanced Execution Toolkit</span>
+                    <CheckCircle className="w-4 h-4 text-purple-400" />
+                    AI-Enhanced Execution Toolkit
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-cyan-400" />
-                    <span className="text-cyan-300 font-semibold">10 Production-Ready Figma Prompts</span>
+                    <CheckCircle className="w-4 h-4 text-purple-400" />
+                    <span className="font-semibold">10 Production-Ready Design Prompts</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-cyan-400" />
-                    <span className="text-cyan-300">Copy-Paste Directly into Figma AI</span>
+                    <CheckCircle className="w-4 h-4 text-purple-400" />
+                    Copy-Paste into Any Design Tool
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-purple-400" />
@@ -735,7 +731,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 text-purple-400" />
-                    72-Hour Delivery
+                    Priority Delivery
                   </li>
                 </ul>
 
@@ -743,20 +739,13 @@ export default function Home() {
                   <Button
                     onClick={() => handleStartAnalysis("full")}
                     disabled={!problemStatement.trim() || createSession.isPending}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 border-0"
+                    className="w-full bg-purple-600 hover:bg-purple-500 border-0"
                   >
                     Get Full APEX Analysis
                   </Button>
                 </div>
                 
                 <p className="text-[10px] text-muted-foreground text-center mt-4">For teams building production-ready products</p>
-                
-                {/* Figma Prompts Highlight */}
-                <div className="mt-4 p-3 bg-gradient-to-r from-cyan-950/30 to-purple-950/30 rounded-lg border border-cyan-500/20">
-                  <p className="text-[10px] text-cyan-400 text-center">
-                    🎨 <span className="font-semibold">Exclusive:</span> 10 Figma prompts with real microcopy, accessibility specs, and all interaction states included.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

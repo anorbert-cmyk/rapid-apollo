@@ -58,7 +58,7 @@ const TIERS = [
     bgColor: "bg-amber-500/20",
     borderColor: "border-amber-500/30",
     badge: "APEX",
-    features: ["4-Part Deep Analysis", "Figma Prompts", "Risk Assessment", "Perplexity Powered"],
+    features: ["4-Part Deep Analysis", "Design Prompts", "Risk Assessment", "Perplexity Powered"],
   },
 ];
 

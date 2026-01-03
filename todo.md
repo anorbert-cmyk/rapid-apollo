@@ -487,3 +487,14 @@
 - [x] Update Syndicate card: "Complete UX Strategy" - $199, 72h delivery, 10 Figma prompts
 - [x] Update shared/pricing.ts with new features, headlines, taglines
 - [ ] Add feature comparison grid below cards (optional)
+
+
+## Pricing Cards & Masterprompts Update - January 3, 2026
+- [x] Remove Exclusive highlight box from Syndicate card
+- [x] Fix Syndicate card colors (unified purple theme)
+- [x] Remove "3 Competitor Quick Scan" from Observer
+- [x] Update delivery times: Observer "Within 24 Hours", Insider "1-2 Hours", Syndicate "Priority"
+- [x] Change "Figma AI" to "Any Design Tool" (all references updated)
+- [x] Create Observer masterprompt (prompts/observer_masterprompt.md)
+- [x] Create Insider masterprompt (prompts/insider_masterprompt.md)
+- [x] Update Syndicate masterprompt (prompts/syndicate_masterprompt.md)
