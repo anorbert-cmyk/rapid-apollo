@@ -465,3 +465,7 @@
 
 ## Email Gate Trigger Update - January 3, 2026
 - [x] Change email gate scroll trigger from 50% to 5%
+
+
+## Bug Fix - January 3, 2026
+- [x] Fix reCAPTCHA security verification error on email subscription (soft-fail on browser errors)

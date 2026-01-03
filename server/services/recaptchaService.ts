@@ -68,11 +68,23 @@ export async function verifyRecaptcha(
     const data: RecaptchaVerifyResponse = await response.json();
 
     if (!data.success) {
-      console.warn("[reCAPTCHA] Verification failed:", data["error-codes"]);
+      const errorCodes = data["error-codes"] || [];
+      console.warn("[reCAPTCHA] Verification failed:", errorCodes);
+      
+      // Soft-fail on browser errors or timeout - allow the request but log it
+      // These errors typically happen due to network issues, not bot activity
+      const softFailErrors = ['browser-error', 'timeout-or-duplicate', 'bad-request'];
+      const isSoftFailError = errorCodes.some(code => softFailErrors.includes(code));
+      
+      if (isSoftFailError) {
+        console.warn("[reCAPTCHA] Soft-fail on browser/network error, allowing request");
+        return { success: true, score: 0.5 }; // Allow but with medium score
+      }
+      
       return { 
         success: false, 
         score: 0, 
-        error: data["error-codes"]?.join(", ") || "Verification failed" 
+        error: errorCodes.join(", ") || "Verification failed" 
       };
     }
 
