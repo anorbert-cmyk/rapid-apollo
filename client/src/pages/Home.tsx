@@ -440,7 +440,7 @@ export default function Home() {
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full">Step 2</div>
               <h3 className="text-xl font-bold mb-3">Secure Payment</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Choose your analysis tier and complete payment via <strong className="text-foreground">Stripe</strong> or <strong className="text-foreground">Crypto</strong>. Your transaction is encrypted and secure.
+                Choose your analysis tier and complete payment via <strong className="text-foreground">Crypto</strong>. Card payments coming soon. Your transaction is encrypted and secure.
               </p>
               <div className="mt-4 flex justify-center gap-2">
                 <span className="px-2 py-1 bg-accent rounded text-[10px] text-muted-foreground border border-border">SSL Encrypted</span>
