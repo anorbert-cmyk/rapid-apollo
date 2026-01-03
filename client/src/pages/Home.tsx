@@ -64,9 +64,7 @@ export default function Home() {
     }
   }, []);
 
-  // Countdown timer state
-  const [countdown] = useState("03:58:54");
-  
+
   // MetaMask wallet state
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnectingWallet, setIsConnectingWallet] = useState(false);
@@ -230,20 +228,6 @@ export default function Home() {
         <div className="fractal-blob blob-1" />
         <div className="fractal-blob blob-2" />
         <div className="fractal-blob blob-3" />
-      </div>
-
-      {/* Alert Banner */}
-      <div className="relative z-50 bg-red-950/30 dark:bg-red-950/30 bg-red-50 backdrop-blur-md border-b border-red-500/20 dark:border-red-500/20 border-red-200 text-center py-3">
-        <div className="flex items-center justify-center gap-3 text-xs md:text-sm font-mono tracking-wide text-red-600 dark:text-red-200 px-4">
-          <span className="flex h-2 w-2 relative flex-shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-          </span>
-          <span className="truncate">
-            GATE CLOSING: PRICE SPIKE IN{" "}
-            <span className="text-foreground font-bold">{countdown}</span>
-          </span>
-        </div>
       </div>
 
       {/* Navigation */}

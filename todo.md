@@ -690,3 +690,7 @@
 - [x] Verify Email 1 sends after demo verification
 - [x] Set up hourly cron job for emails 2-4 (runs every hour at :00)
 - [x] Cron endpoint enabled at /api/cron/process-emails
+
+## UI Cleanup - January 2025
+
+- [x] Remove gate closing banner from top of page
