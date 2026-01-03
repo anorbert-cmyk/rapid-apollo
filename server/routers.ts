@@ -669,6 +669,40 @@ export const appRouter = router({
 
         return await getAdminWallets();
       }),
+
+    // Get all email subscribers for admin dashboard
+    getEmailSubscribers: publicProcedure
+      .input(z.object({
+        signature: z.string(),
+        timestamp: z.number(),
+        address: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const authResult = await verifyAdminSignature(
+          input.signature,
+          input.timestamp,
+          input.address
+        );
+
+        if (!authResult.success) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: authResult.error });
+        }
+
+        const { getAllEmailSubscribers, getEmailSubscriberCount } = await import("./db");
+        const subscribers = await getAllEmailSubscribers();
+        const totalCount = await getEmailSubscriberCount();
+        const verifiedCount = subscribers.filter(s => s.isVerified).length;
+        
+        return { 
+          subscribers, 
+          stats: {
+            total: totalCount,
+            verified: verifiedCount,
+            unverified: totalCount - verifiedCount,
+            verificationRate: totalCount > 0 ? Math.round((verifiedCount / totalCount) * 100) : 0
+          }
+        };
+      }),
   }),
 
   // ============ CONFIG ============

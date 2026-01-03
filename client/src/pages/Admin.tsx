@@ -33,7 +33,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  ArrowUpDown
+  ArrowUpDown,
+  Mail,
+  Download
 } from "lucide-react";
 
 // Admin wallet address (should match server-side)
@@ -94,6 +96,39 @@ export default function Admin() {
   );
 
   const transactions = transactionsData?.transactions || [];
+
+  // Email subscribers query
+  const { data: emailData, isLoading: emailLoading, refetch: refetchEmails } = trpc.admin.getEmailSubscribers.useQuery(
+    adminAuth || { signature: "", timestamp: 0, address: "" },
+    { enabled: isAuthenticated && !!adminAuth }
+  );
+
+  const emailSubscribers = emailData?.subscribers || [];
+  const emailStats = emailData?.stats || { total: 0, verified: 0, unverified: 0, verificationRate: 0 };
+
+  // Export emails to CSV
+  const exportEmailsToCSV = () => {
+    const headers = ["Email", "Source", "Verified", "Subscribed At", "Verified At"];
+    const rows = emailSubscribers.map(sub => [
+      sub.email,
+      sub.source,
+      sub.isVerified ? "Yes" : "No",
+      new Date(sub.subscribedAt).toISOString(),
+      sub.verifiedAt ? new Date(sub.verifiedAt).toISOString() : ""
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `email-subscribers-${new Date().toISOString().split("T")[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Exported to CSV");
+  };
 
   // Filter and sort transactions
   const filteredTransactions = transactions
@@ -311,7 +346,7 @@ export default function Admin() {
               <Wallet className="h-3 w-3 mr-1" />
               {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
             </Badge>
-            <Button variant="ghost" size="sm" onClick={() => { refetchStats(); refetchTx(); }}>
+            <Button variant="ghost" size="sm" onClick={() => { refetchStats(); refetchTx(); refetchEmails(); }}>
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
@@ -587,6 +622,123 @@ export default function Admin() {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Email Subscribers */}
+        <Card className="glass-panel">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+                <Mail className="h-5 w-5" />
+                Email Subscribers
+                <Badge variant="secondary" className="ml-2">{emailStats.total}</Badge>
+              </h2>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-green-500">
+                    <CheckCircle className="h-4 w-4 inline mr-1" />
+                    {emailStats.verified} verified
+                  </span>
+                  <span className="text-yellow-500">
+                    <Clock className="h-4 w-4 inline mr-1" />
+                    {emailStats.unverified} pending
+                  </span>
+                  <span className="text-muted-foreground">
+                    {emailStats.verificationRate}% rate
+                  </span>
+                </div>
+                <Button variant="outline" size="sm" onClick={exportEmailsToCSV} disabled={emailSubscribers.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {emailLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-12 w-full" />
+                ))}
+              </div>
+            ) : emailSubscribers.length > 0 ? (
+              <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Subscribed</TableHead>
+                      <TableHead>Verified</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {emailSubscribers.map((sub) => (
+                      <TableRow key={sub.id} className="group">
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <code className="text-sm">{sub.email}</code>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                              onClick={() => copyToClipboard(sub.email)}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {sub.source}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {sub.isVerified ? (
+                            <Badge className="bg-green-500/10 text-green-500 border-green-500/30">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Verified
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/30">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pending
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {new Date(sub.subscribedAt).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {sub.verifiedAt 
+                            ? new Date(sub.verifiedAt).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : "—"
+                          }
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium">No subscribers yet</p>
+                <p className="text-sm">Email subscribers from the demo gate will appear here</p>
               </div>
             )}
           </CardContent>

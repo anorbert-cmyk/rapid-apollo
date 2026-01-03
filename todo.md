@@ -658,3 +658,24 @@
 ### Payment Webhook Race Condition
 - [x] Add idempotency checks to webhook handler
 - [x] Prevent double-spend of API credits on retries (webhook ID tracking)
+
+## New Features - January 2025
+
+### Email Verification System
+- [x] Create verification token generation
+- [x] Add verification endpoint /api/verify-email/:token
+- [x] Send verification email with unique link
+- [x] Update demo gate to show verification status
+- [x] Store verification status in database
+
+### Admin Email Dashboard
+- [x] Add email subscribers view in admin dashboard
+- [x] Show email, source, verification status, date
+- [x] Add export to CSV functionality
+- [x] Show total counts and conversion metrics (verified, pending, rate)
+
+### A/B Test Infrastructure
+- [ ] Create CTA variant system
+- [ ] Track which variant each user sees
+- [ ] Store conversion data per variant
+- [ ] Add admin view for A/B test results
