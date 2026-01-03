@@ -2,7 +2,7 @@
  * Analysis Processor
  * 
  * Handles the actual analysis generation for retry queue items.
- * This is a wrapper around the main analysis generation logic.
+ * Uses the full multi-part generation logic from perplexityService.
  */
 
 import { getDb } from "../db";
@@ -10,9 +10,18 @@ import { analysisSessions, analysisResults } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { Tier } from "../../shared/pricing";
 import { recordSuccessToDB, recordFailureToDB } from "./metricsPersistence";
+import { 
+  generateSingleAnalysis, 
+  generateInsiderAnalysis, 
+  generateMultiPartAnalysis 
+} from "./perplexityService";
 
 /**
- * Generate analysis for a session
+ * Generate analysis for a session using the appropriate tier-specific generation
+ * - Observer (standard): Single-part analysis
+ * - Insider (medium): 2-part sequential analysis
+ * - Syndicate (full): 6-part sequential analysis
+ * 
  * This is called by the retry queue processor
  */
 export async function generateAnalysisForSession(
@@ -35,42 +44,63 @@ export async function generateAnalysisForSession(
       .set({ status: "processing" })
       .where(eq(analysisSessions.sessionId, sessionId));
 
-    // Import the analysis generation function from routers
-    // This avoids circular dependencies by using dynamic import
-    const { invokeLLM } = await import("../_core/llm");
-    const { getTierPromptConfig, getObserverPrompt, getInsiderInitialPrompt, getSyndicateInitialPrompt, OBSERVER_SYSTEM_PROMPT, INSIDER_SYSTEM_PROMPT, SYNDICATE_SYSTEM_PROMPT } = await import("./tierPromptService");
+    console.log(`[AnalysisProcessor] Starting ${tier} tier analysis for session ${sessionId}`);
 
-    // Get the appropriate prompt for the tier
-    let systemPrompt: string;
-    let userPrompt: string;
-    
+    let fullMarkdown: string;
+    let part1: string | null = null;
+    let part2: string | null = null;
+    let part3: string | null = null;
+    let part4: string | null = null;
+    let part5: string | null = null;
+    let part6: string | null = null;
+
+    // Generate analysis based on tier
     if (tier === 'standard') {
-      systemPrompt = OBSERVER_SYSTEM_PROMPT;
-      userPrompt = getObserverPrompt(problemStatement);
+      // Observer tier: Single-part analysis
+      console.log(`[AnalysisProcessor] Generating Observer (single-part) analysis`);
+      const result = await generateSingleAnalysis(problemStatement, 'standard');
+      fullMarkdown = result.content; // SingleAnalysisResult has 'content', not 'fullMarkdown'
+      part1 = result.content;
+      
     } else if (tier === 'medium') {
-      systemPrompt = INSIDER_SYSTEM_PROMPT;
-      userPrompt = getInsiderInitialPrompt(problemStatement);
+      // Insider tier: 2-part sequential analysis
+      console.log(`[AnalysisProcessor] Generating Insider (2-part) analysis`);
+      const result = await generateInsiderAnalysis(problemStatement, {
+        onPartComplete: (partNum, content) => {
+          console.log(`[AnalysisProcessor] Insider Part ${partNum}/2 complete, length: ${content.length}`);
+        },
+        onError: (error) => {
+          console.error(`[AnalysisProcessor] Insider analysis error:`, error.message);
+        }
+      });
+      fullMarkdown = result.fullMarkdown;
+      part1 = result.part1;
+      part2 = result.part2;
+      
     } else {
-      systemPrompt = SYNDICATE_SYSTEM_PROMPT;
-      userPrompt = getSyndicateInitialPrompt(problemStatement);
+      // Syndicate tier: 6-part sequential analysis
+      console.log(`[AnalysisProcessor] Generating Syndicate (6-part) analysis`);
+      const result = await generateMultiPartAnalysis(problemStatement, {
+        onPartComplete: (partNum, content) => {
+          console.log(`[AnalysisProcessor] Syndicate Part ${partNum}/6 complete, length: ${content.length}`);
+        },
+        onError: (error) => {
+          console.error(`[AnalysisProcessor] Syndicate analysis error:`, error.message);
+        }
+      });
+      fullMarkdown = result.fullMarkdown;
+      part1 = result.part1;
+      part2 = result.part2;
+      part3 = result.part3;
+      part4 = result.part4;
+      part5 = result.part5;
+      part6 = result.part6;
     }
 
-    // Generate the analysis
-    const response = await invokeLLM({
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    });
-
-    const rawContent = response.choices?.[0]?.message?.content;
-    
-    if (!rawContent) {
-      throw new Error("No content in LLM response");
+    // Check if we got valid content
+    if (!fullMarkdown || fullMarkdown.length < 100) {
+      throw new Error("Generated content is too short or empty");
     }
-
-    // Ensure content is a string
-    const content = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
 
     // Save the result
     const existingResult = await db
@@ -84,7 +114,13 @@ export async function generateAnalysisForSession(
       await db
         .update(analysisResults)
         .set({
-          singleResult: content,
+          singleResult: fullMarkdown,
+          part1,
+          part2,
+          part3,
+          part4,
+          part5,
+          part6,
           generatedAt: new Date(),
         })
         .where(eq(analysisResults.sessionId, sessionId));
@@ -94,7 +130,13 @@ export async function generateAnalysisForSession(
         sessionId,
         tier,
         problemStatement,
-        singleResult: content,
+        singleResult: fullMarkdown,
+        part1,
+        part2,
+        part3,
+        part4,
+        part5,
+        part6,
         generatedAt: new Date(),
       }]);
     }
@@ -108,30 +150,46 @@ export async function generateAnalysisForSession(
     const duration = Date.now() - startTime;
     await recordSuccessToDB(sessionId, tier, duration);
 
-    console.log(`[AnalysisProcessor] Successfully generated analysis for session ${sessionId} in ${duration}ms`);
+    console.log(`[AnalysisProcessor] Successfully generated ${tier} analysis for session ${sessionId} in ${duration}ms`);
     return true;
+    
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
     
+    // Update session status to failed
+    try {
+      const db = await getDb();
+      if (db) {
+        await db
+          .update(analysisSessions)
+          .set({ status: "failed" })
+          .where(eq(analysisSessions.sessionId, sessionId));
+      }
+    } catch (dbError) {
+      console.error("[AnalysisProcessor] Failed to update session status:", dbError);
+    }
+    
     await recordFailureToDB(sessionId, tier, duration, "GENERATION_ERROR", errorMessage);
     
-    console.error(`[AnalysisProcessor] Failed to generate analysis for session ${sessionId}:`, errorMessage);
+    console.error(`[AnalysisProcessor] Failed to generate ${tier} analysis for session ${sessionId}:`, errorMessage);
     return false;
   }
 }
 
 /**
- * Get prompt configuration for a tier
- * This is a simplified version - the actual prompts are in tierPrompts.ts
+ * Resume a partially completed analysis
+ * This is useful when an analysis was interrupted mid-way
  */
-function getPromptForTierFallback(tier: Tier, problemStatement: string): { systemPrompt: string; userPrompt: string } {
-  const systemPrompt = `You are a strategic business analyst providing ${tier} tier analysis.
-Your task is to analyze the given problem statement and provide actionable insights.`;
-
-  const userPrompt = `Please analyze the following problem statement and provide strategic recommendations:
-
-${problemStatement}`;
-
-  return { systemPrompt, userPrompt };
+export async function resumePartialAnalysis(
+  sessionId: string,
+  tier: Tier,
+  problemStatement: string,
+  completedParts: number
+): Promise<boolean> {
+  // For now, we restart from scratch
+  // In the future, we could implement true resume functionality
+  // by storing conversation history and continuing from where we left off
+  console.log(`[AnalysisProcessor] Resuming analysis from part ${completedParts + 1} for session ${sessionId}`);
+  return generateAnalysisForSession(sessionId, tier, problemStatement);
 }

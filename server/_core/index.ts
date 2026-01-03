@@ -133,8 +133,37 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Auto-start retry queue processor after server is ready
+    try {
+      const { startRetryQueueProcessor } = await import("../services/retryQueueProcessor");
+      startRetryQueueProcessor();
+      console.log("[Startup] Retry queue processor started automatically");
+    } catch (error) {
+      console.error("[Startup] Failed to start retry queue processor:", error);
+    }
+    
+    // Start periodic metrics aggregation (every hour)
+    try {
+      const { aggregateHourlyMetrics } = await import("../services/metricsPersistence");
+      setInterval(async () => {
+        try {
+          // Aggregate the previous hour's metrics
+          const hourStart = new Date();
+          hourStart.setMinutes(0, 0, 0);
+          hourStart.setHours(hourStart.getHours() - 1);
+          await aggregateHourlyMetrics(hourStart);
+          console.log("[Metrics] Hourly aggregation completed");
+        } catch (error) {
+          console.error("[Metrics] Hourly aggregation failed:", error);
+        }
+      }, 60 * 60 * 1000); // Every hour
+      console.log("[Startup] Metrics aggregation scheduler started");
+    } catch (error) {
+      console.error("[Startup] Failed to start metrics aggregation scheduler:", error);
+    }
   });
 }
 

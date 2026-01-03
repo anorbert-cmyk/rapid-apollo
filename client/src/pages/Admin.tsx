@@ -59,7 +59,8 @@ import {
   Area,
   BarChart,
   Bar,
-  Legend
+  Legend,
+  Cell
 } from "recharts";
 
 // Admin wallet address (should match server-side)
@@ -1099,7 +1100,7 @@ export default function Admin() {
                               { tier: 'Insider', fill: '#8b5cf6' },
                               { tier: 'Syndicate', fill: '#f59e0b' },
                             ].map((entry, index) => (
-                              <Bar key={index} dataKey="count" fill={entry.fill} />
+                              <Cell key={index} fill={entry.fill} />
                             ))}
                           </Bar>
                         </BarChart>
