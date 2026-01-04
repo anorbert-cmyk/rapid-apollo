@@ -76,7 +76,7 @@ export async function sendPaymentConfirmationEmail(params: PaymentConfirmationPa
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: `Aether Logic <${fromEmail}>`,
+        from: `ValidateStrategy <${fromEmail}>`,
         to: [params.to],
         subject: `✅ Payment Confirmed - Your ${tierInfo.name} Analysis Has Started!`,
         html: `<!DOCTYPE html>
@@ -95,7 +95,7 @@ export async function sendPaymentConfirmationEmail(params: PaymentConfirmationPa
                         <td>
                             <!-- HEADER -->
                             <div style="text-align: center; padding: 30px 0;">
-                                <span style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;">⚡ AETHER LOGIC</span>
+                                <span style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -1px;">⚡ VALIDATESTRATEGY</span>
                             </div>
 
                             <!-- MAIN CARD -->
@@ -174,10 +174,10 @@ export async function sendPaymentConfirmationEmail(params: PaymentConfirmationPa
                             <!-- FOOTER -->
                             <div style="text-align: center; padding: 30px 0;">
                                 <p style="color: #6b7280; font-size: 12px; margin: 0;">
-                                    Questions? Reply to this email or contact <a href="mailto:support@aetherlogic.ai" style="color: #818cf8;">support@aetherlogic.ai</a>
+                                    Questions? Reply to this email or contact <a href="mailto:support@validatestrategy.com" style="color: #818cf8;">support@validatestrategy.com</a>
                                 </p>
                                 <p style="color: #4b5563; font-size: 11px; margin: 15px 0 0;">
-                                    © ${new Date().getFullYear()} Aether Logic. All rights reserved.
+                                    © ${new Date().getFullYear()} ValidateStrategy. All rights reserved.
                                 </p>
                             </div>
 
@@ -208,9 +208,9 @@ Receipt:
 - Package: ${tierInfo.name}
 - Total Paid: ${params.amount} ${params.currency}
 
-Questions? Contact support@aetherlogic.ai
+Questions? Contact support@validatestrategy.com
 
-© ${new Date().getFullYear()} Aether Logic. All rights reserved.
+© ${new Date().getFullYear()} ValidateStrategy. All rights reserved.
 `
       })
     });
@@ -257,7 +257,7 @@ export async function sendProgressUpdateEmail(params: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: `Aether Logic <${fromEmail}>`,
+        from: `ValidateStrategy <${fromEmail}>`,
         to: [params.to],
         subject: `📊 Analysis Progress: ${progressPercent}% Complete`,
         html: `<!DOCTYPE html>

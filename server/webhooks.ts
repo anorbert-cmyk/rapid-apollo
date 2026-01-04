@@ -23,7 +23,7 @@ import { notifyOwner } from "./_core/notification";
 import { getTierConfig, getTierPrice, isMultiPartTier } from "../shared/pricing";
 import { generateSingleAnalysis, generateMultiPartAnalysis } from "./services/perplexityService";
 import { updateAnalysisResult, getUserById } from "./db";
-import { sendRapidApolloEmail, isEmailConfigured } from "./services/emailService";
+import { sendValidateStrategyEmail, isEmailConfigured } from "./services/emailService";
 import {
   trackAnalysisStart,
   trackPartComplete,
@@ -247,8 +247,8 @@ async function startAnalysisAfterPayment(sessionId: string) {
           
           // Send email notification with magic link
           if (userEmail && isEmailConfigured()) {
-            const appUrl = process.env.VITE_APP_URL || 'https://rapidapollo.com';
-            await sendRapidApolloEmail({
+            const appUrl = process.env.VITE_APP_URL || 'https://validatestrategy.com';
+            await sendValidateStrategyEmail({
               to: userEmail,
               userName: userEmail.split('@')[0],
               magicLinkUrl: `${appUrl}/analysis/${sessionId}`,
@@ -281,8 +281,8 @@ async function startAnalysisAfterPayment(sessionId: string) {
       
       // Send email notification with magic link
       if (userEmail && isEmailConfigured()) {
-        const appUrl = process.env.VITE_APP_URL || 'https://rapidapollo.com';
-        await sendRapidApolloEmail({
+        const appUrl = process.env.VITE_APP_URL || 'https://validatestrategy.com';
+        await sendValidateStrategyEmail({
           to: userEmail,
           userName: userEmail.split('@')[0],
           magicLinkUrl: `${appUrl}/analysis/${sessionId}`,

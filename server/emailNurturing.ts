@@ -15,7 +15,7 @@ interface EmailTemplate {
 
 // Base URL for links in emails
 const getBaseUrl = () => {
-  return 'https://aetherlogic.io';
+  return 'https://validatestrategy.com';
 };
 
 /**
@@ -45,7 +45,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Aether Logic</title>
+  <title>Welcome to ValidateStrategy</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0f; padding: 40px 20px;">
@@ -56,7 +56,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center;">
               <h1 style="margin: 0; font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Aether Logic
+                ValidateStrategy
               </h1>
               <p style="margin: 8px 0 0; color: #a1a1aa; font-size: 14px;">Strategic Analysis Platform</p>
             </td>
@@ -70,7 +70,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
               </h2>
               
               <p style="margin: 0 0 20px; color: #d1d5db; font-size: 16px; line-height: 1.6;">
-                Thank you for exploring the Aether Logic demo! You've just taken the first step toward building with confidence instead of assumptions.
+                Thank you for exploring the ValidateStrategy demo! You've just taken the first step toward building with confidence instead of assumptions.
               </p>
               
               <p style="margin: 0 0 20px; color: #d1d5db; font-size: 16px; line-height: 1.6;">
@@ -106,7 +106,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
                 <tr>
                   <td align="center">
                     <a href="${baseUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; border-radius: 8px;">
-                      Explore Aether Logic →
+                      Explore ValidateStrategy →
                     </a>
                   </td>
                 </tr>
@@ -114,7 +114,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
               
               <p style="margin: 30px 0 0; color: #9ca3af; font-size: 14px; line-height: 1.6;">
                 Talk soon,<br>
-                <strong style="color: #d1d5db;">The Aether Logic Team</strong>
+                <strong style="color: #d1d5db;">The ValidateStrategy Team</strong>
               </p>
               
               <p style="margin: 20px 0 0; color: #6b7280; font-size: 13px; font-style: italic;">
@@ -127,7 +127,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 20px 40px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(139, 92, 246, 0.1);">
               <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-                © 2024 Aether Logic. All rights reserved.<br>
+                © 2024 ValidateStrategy. All rights reserved.<br>
                 <a href="${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>
               </p>
             </td>
@@ -142,7 +142,7 @@ function getEmail1Template(email: string, subscriberId: number = 0): EmailTempla
     `,
     text: `Hi ${capitalizedName}!
 
-Thank you for exploring the Aether Logic demo! You've just taken the first step toward building with confidence instead of assumptions.
+Thank you for exploring the ValidateStrategy demo! You've just taken the first step toward building with confidence instead of assumptions.
 
 I noticed you spent time with our APEX strategic analysis framework. That tells me you're serious about validating your idea before investing months of development time.
 
@@ -151,10 +151,10 @@ Over the next two weeks, I'll share:
 • The hidden blind spots that trip up even experienced entrepreneurs
 • An exclusive offer reserved only for demo viewers like you
 
-Explore Aether Logic: ${baseUrl}
+Explore ValidateStrategy: ${baseUrl}
 
 Talk soon,
-The Aether Logic Team
+The ValidateStrategy Team
 
 P.S. Hit reply if you have any questions about what you saw in the demo. We read every email personally.
 
@@ -193,7 +193,7 @@ function getEmail2Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center;">
               <h1 style="margin: 0; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Aether Logic
+                ValidateStrategy
               </h1>
             </td>
           </tr>
@@ -282,7 +282,7 @@ function getEmail2Template(email: string, subscriberId: number = 0): EmailTempla
               
               <p style="margin: 30px 0 0; color: #9ca3af; font-size: 14px; line-height: 1.6;">
                 To your success,<br>
-                <strong style="color: #d1d5db;">The Aether Logic Team</strong>
+                <strong style="color: #d1d5db;">The ValidateStrategy Team</strong>
               </p>
             </td>
           </tr>
@@ -291,7 +291,7 @@ function getEmail2Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 20px 40px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(139, 92, 246, 0.1);">
               <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-                © 2024 Aether Logic. All rights reserved.<br>
+                © 2024 ValidateStrategy. All rights reserved.<br>
                 <a href="${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>
               </p>
             </td>
@@ -327,7 +327,7 @@ You saw the APEX framework in action during the demo. Imagine having that same c
 Get Your Analysis: ${baseUrl}/#pricing
 
 To your success,
-The Aether Logic Team
+The ValidateStrategy Team
 
 ---
 Unsubscribe: ${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}
@@ -364,7 +364,7 @@ function getEmail3Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center;">
               <h1 style="margin: 0; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Aether Logic
+                ValidateStrategy
               </h1>
             </td>
           </tr>
@@ -471,7 +471,7 @@ function getEmail3Template(email: string, subscriberId: number = 0): EmailTempla
               
               <p style="margin: 30px 0 0; color: #9ca3af; font-size: 14px; line-height: 1.6;">
                 Questions? Just hit reply.<br>
-                <strong style="color: #d1d5db;">The Aether Logic Team</strong>
+                <strong style="color: #d1d5db;">The ValidateStrategy Team</strong>
               </p>
             </td>
           </tr>
@@ -480,7 +480,7 @@ function getEmail3Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 20px 40px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(139, 92, 246, 0.1);">
               <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-                © 2024 Aether Logic. All rights reserved.<br>
+                © 2024 ValidateStrategy. All rights reserved.<br>
                 <a href="${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>
               </p>
             </td>
@@ -519,7 +519,7 @@ The full analysis shows you what it means for YOUR specific idea.
 Get Your Personalized Analysis: ${baseUrl}/#pricing
 
 Questions? Just hit reply.
-The Aether Logic Team
+The ValidateStrategy Team
 
 ---
 Unsubscribe: ${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}
@@ -559,7 +559,7 @@ function getEmail4Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center;">
               <h1 style="margin: 0; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                Aether Logic
+                ValidateStrategy
               </h1>
             </td>
           </tr>
@@ -687,7 +687,7 @@ function getEmail4Template(email: string, subscriberId: number = 0): EmailTempla
               
               <p style="margin: 30px 0 0; color: #9ca3af; font-size: 14px; line-height: 1.6;">
                 Or hit reply with any questions. I'm here to help.<br><br>
-                <strong style="color: #d1d5db;">The Aether Logic Team</strong>
+                <strong style="color: #d1d5db;">The ValidateStrategy Team</strong>
               </p>
               
               <p style="margin: 20px 0 0; color: #6b7280; font-size: 13px; font-style: italic;">
@@ -700,7 +700,7 @@ function getEmail4Template(email: string, subscriberId: number = 0): EmailTempla
           <tr>
             <td style="padding: 20px 40px; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(139, 92, 246, 0.1);">
               <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
-                © 2024 Aether Logic. All rights reserved.<br>
+                © 2024 ValidateStrategy. All rights reserved.<br>
                 <a href="${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>
               </p>
             </td>
@@ -752,7 +752,7 @@ Get Started Now: ${priorityLink}
 
 Or hit reply with any questions. I'm here to help.
 
-The Aether Logic Team
+The ValidateStrategy Team
 
 P.S. Even if you're not ready to commit, reply and tell me what's holding you back. I genuinely want to understand.
 
@@ -767,7 +767,7 @@ Unsubscribe: ${baseUrl}/unsubscribe?email=${encodeURIComponent(email)}
  */
 async function sendEmail(to: string, template: EmailTemplate): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL || "hello@aetherlogic.io";
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "hello@validatestrategy.com";
   
   if (!apiKey) {
     console.error("[EmailNurturing] RESEND_API_KEY not configured");
@@ -782,7 +782,7 @@ async function sendEmail(to: string, template: EmailTemplate): Promise<boolean> 
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `Aether Logic <${fromEmail}>`,
+        from: `ValidateStrategy <${fromEmail}>`,
         to: [to],
         subject: template.subject,
         html: template.html,

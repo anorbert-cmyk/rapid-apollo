@@ -56,7 +56,7 @@ While there's global rate limiting, there's no specific rate limit on analysis g
 **Severity: LOW**
 **Location:** Multiple files
 
-URLs like `'https://rapidapollo.com'` and `'https://rapid-apollo-manus.manus.space'` are hardcoded.
+URLs like `'https://validatestrategy.com'` and `'https://rapid-apollo-manus.manus.space'` are hardcoded.
 
 **Recommended Fix:** Use `process.env.VITE_APP_URL` consistently.
 

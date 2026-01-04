@@ -362,7 +362,7 @@ export default function Admin() {
       const { challenge, timestamp } = await requestChallenge.mutateAsync({ walletAddress: address });
 
       // Sign the challenge
-      const message = `Rapid Apollo Admin Login\n\nChallenge: ${challenge}\nTimestamp: ${timestamp}\n\nSign this message to authenticate.`;
+      const message = `ValidateStrategy Admin Login\n\nChallenge: ${challenge}\nTimestamp: ${timestamp}\n\nSign this message to authenticate.`;
       const signature = await ethereum.request({
         method: "personal_sign",
         params: [message, address],

@@ -1,7 +1,7 @@
-# Aether Logic Design Notes (Railway verzió alapján)
+# ValidateStrategy Design Notes (Railway verzió alapján)
 
 ## Branding
-- Név: AETHER LOGIC
+- Név: VALIDATESTRATEGY
 - Tagline: "Intelligence Strategy"
 - Logo: Zöld/cyan színű geometrikus ikon
 

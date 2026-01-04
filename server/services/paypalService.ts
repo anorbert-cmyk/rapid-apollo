@@ -105,7 +105,7 @@ export async function createOrder(
         },
       ],
       application_context: {
-        brand_name: "Aether Logic",
+        brand_name: "ValidateStrategy",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
         return_url: `${baseUrl}/payment/success?session=${sessionId}&provider=paypal`,

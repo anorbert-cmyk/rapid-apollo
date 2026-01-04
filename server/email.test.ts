@@ -38,8 +38,8 @@ describe("emailService", () => {
   describe("email template validation", () => {
     it("should have valid Hungarian email template structure", async () => {
       // Import the module to check template exists
-      const { sendRapidApolloEmail } = await import("./services/emailService");
-      expect(typeof sendRapidApolloEmail).toBe("function");
+      const { sendValidateStrategyEmail } = await import("./services/emailService");
+      expect(typeof sendValidateStrategyEmail).toBe("function");
     });
 
     it("should have valid English email template structure", async () => {

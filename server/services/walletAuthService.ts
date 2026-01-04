@@ -51,7 +51,7 @@ export async function generateChallenge(walletAddress: string): Promise<{ challe
  * Must match exactly what the frontend generates
  */
 export function generateAuthMessage(challenge: string, timestamp: number): string {
-  return `Rapid Apollo Admin Login\n\nChallenge: ${challenge}\nTimestamp: ${timestamp}\n\nSign this message to authenticate.`;
+  return `ValidateStrategy Admin Login\n\nChallenge: ${challenge}\nTimestamp: ${timestamp}\n\nSign this message to authenticate.`;
 }
 
 /**

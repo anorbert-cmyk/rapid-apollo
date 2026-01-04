@@ -23,10 +23,10 @@ function getResendApiKey(): string | null {
 }
 
 // ===========================================
-// RAPID APOLLO PAYMENT SUCCESS EMAIL
+// VALIDATESTRATEGY PAYMENT SUCCESS EMAIL
 // ===========================================
 
-interface RapidApolloEmailParams {
+interface ValidateStrategyEmailParams {
   to: string;
   userName: string;
   magicLinkUrl: string;
@@ -37,9 +37,9 @@ interface RapidApolloEmailParams {
 }
 
 /**
- * Send Rapid Apollo payment success email with Hungarian template
+ * Send ValidateStrategy payment success email with Hungarian template
  */
-export async function sendRapidApolloEmail(params: RapidApolloEmailParams): Promise<boolean> {
+export async function sendValidateStrategyEmail(params: ValidateStrategyEmailParams): Promise<boolean> {
   const apiKey = getResendApiKey();
 
   if (!apiKey) {
@@ -72,7 +72,7 @@ export async function sendRapidApolloEmail(params: RapidApolloEmailParams): Prom
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: `Rapid Apollo <${fromEmail}>`,
+        from: `ValidateStrategy <${fromEmail}>`,
         to: [params.to],
         subject: '🚀 Fizetés elfogadva - Elemzésed elkészült!',
         html: `<!DOCTYPE html>
@@ -105,7 +105,7 @@ export async function sendRapidApolloEmail(params: RapidApolloEmailParams): Prom
                                 <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 30px; text-align: center;">
                                     <a href="#" style="font-size: 28px; font-weight: 800; color: #ffffff; text-decoration: none; letter-spacing: -0.5px;">
                                         <img src="https://img.icons8.com/fluency-systems-filled/96/ffffff/rocket.png" width="32" height="32" style="vertical-align: middle; margin-right: 8px;" alt="Logo"/>
-                                        Rapid Apollo
+                                        ValidateStrategy
                                     </a>
                                 </div>
 
@@ -162,8 +162,8 @@ export async function sendRapidApolloEmail(params: RapidApolloEmailParams): Prom
                             <!-- FOOTER -->
                             <div style="margin-top: 30px; text-align: center;">
                                 <p style="color: #9ca3af; font-size: 13px;">
-                                    Rapid Apollo Inc. &bull; Budapest<br>
-                                    Ez egy automatikus üzenet. <a href="mailto:support@rapidapollo.com" style="color: #6b7280; text-decoration: underline;">Segítség</a>
+                                    ValidateStrategy Inc. &bull; Budapest<br>
+                                    Ez egy automatikus üzenet. <a href="mailto:support@validatestrategy.com" style="color: #6b7280; text-decoration: underline;">Segítség</a>
                                 </p>
                             </div>
 
@@ -189,7 +189,7 @@ Tranzakció Részletei:
 
 A link soha nem jár le.
 
-© Rapid Apollo Inc. - Budapest
+© ValidateStrategy Inc. - Budapest
 `
       })
     });
@@ -201,11 +201,11 @@ A link soha nem jár le.
     }
 
     const data = await response.json();
-    console.log('[Email] Rapid Apollo email sent successfully', { to: params.to, emailId: data?.id });
+    console.log('[Email] ValidateStrategy email sent successfully', { to: params.to, emailId: data?.id });
     return true;
 
   } catch (error) {
-    console.error('[Email] Rapid Apollo email sending failed', error);
+    console.error('[Email] ValidateStrategy email sending failed', error);
     return false;
   }
 }

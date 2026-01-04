@@ -397,7 +397,7 @@ function DemoLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-4">
             <a href="/" className="flex items-center gap-2 font-bold text-lg">
               <Zap className="h-5 w-5 text-primary" />
-              Rapid Apollo
+              ValidateStrategy
             </a>
             <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 rounded-full text-cyan-400">
               Demo Analysis

@@ -41,7 +41,7 @@ import { generateAnalysis, generateSingleAnalysis, generateMultiPartAnalysis, ge
 import { createInvoice, isNowPaymentsConfigured, getPaymentStatus } from "./services/nowPaymentsService";
 import { createOrder as createPayPalOrder, captureOrder as capturePayPalOrder, isPayPalConfigured } from "./services/paypalService";
 import { verifyAdminSignature, verifyAdminSignatureWithChallenge, checkAdminStatus, generateChallenge } from "./services/walletAuthService";
-import { sendRapidApolloEmail, isEmailConfigured } from "./services/emailService";
+import { sendValidateStrategyEmail, isEmailConfigured } from "./services/emailService";
 import { executeApexAnalysis, isPerplexityConfigured } from "./services/perplexityApiService";
 
 // Error handling imports
@@ -1564,7 +1564,7 @@ async function startAnalysisInBackground(sessionId: string, problemStatement: st
           
           // Send success email notification
           if (email && isEmailConfigured()) {
-            await sendRapidApolloEmail({
+            await sendValidateStrategyEmail({
               to: email,
               userName: email.split('@')[0],
               magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,
@@ -1662,7 +1662,7 @@ async function startAnalysisInBackground(sessionId: string, problemStatement: st
           
           // Send email notification
           if (email && isEmailConfigured()) {
-            await sendRapidApolloEmail({
+            await sendValidateStrategyEmail({
               to: email,
               userName: email.split('@')[0],
               magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,
@@ -1748,7 +1748,7 @@ async function startAnalysisInBackground(sessionId: string, problemStatement: st
       
       // Send email notification
       if (email && isEmailConfigured()) {
-        await sendRapidApolloEmail({
+        await sendValidateStrategyEmail({
           to: email,
           userName: email.split('@')[0],
           magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,
@@ -1874,7 +1874,7 @@ async function startApexAnalysisInBackground(sessionId: string, problemStatement
 
     // Send email notification
     if (email && isEmailConfigured()) {
-      await sendRapidApolloEmail({
+      await sendValidateStrategyEmail({
         to: email,
         userName: email.split('@')[0],
         magicLinkUrl: `${process.env.VITE_APP_URL || ''}/analysis/${sessionId}`,

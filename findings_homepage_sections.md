@@ -13,7 +13,7 @@
 - **Megjelenik**: Igen, a How It Works után
 - **Cím**: "TRUSTED BY INNOVATIVE TEAMS AT"
 - **Cég logók**: Stripe, Vercel, Notion, Linear, Figma, Supabase (SVG formátumban)
-- **Statisztika**: "Join 500+ teams who validated their ideas with Aether Logic"
+- **Statisztika**: "Join 500+ teams who validated their ideas with ValidateStrategy"
 
 ## Státusz
 Mindkét szekció sikeresen implementálva és megjelenik a főoldalon.
