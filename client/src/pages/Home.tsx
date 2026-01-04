@@ -573,9 +573,9 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 items-stretch">
+          <div className="grid md:grid-cols-3 gap-6 items-end">
             {/* Tier 1: Observer - Muted/Decoy */}
-            <div className="pricing-card pricing-card-muted opacity-90 scale-[0.97] hover:opacity-100 hover:scale-100 transition-all duration-300">
+            <div className="pricing-card pricing-card-muted opacity-90 hover:opacity-100 transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Eye className="w-5 h-5 text-muted-foreground" />
@@ -623,7 +623,7 @@ export default function Home() {
                 </li>
               </ul>
 
-              <div className="space-y-3">
+              <div className="space-y-3 mt-auto">
                 <Button
                   onClick={() => handleStartAnalysis("standard")}
                   disabled={!problemStatement.trim() || createSession.isPending}
@@ -632,13 +632,12 @@ export default function Home() {
                 >
                   Get Sanity Check →
                 </Button>
+                <p className="text-[10px] text-muted-foreground text-center">Perfect for early-stage validation</p>
               </div>
-              
-              <p className="text-[10px] text-muted-foreground text-center mt-4">Perfect for early-stage validation</p>
             </div>
 
             {/* Tier 2: Insider (Highlighted - 15% larger) */}
-            <div className="pricing-card-highlight scale-[1.03] md:scale-[1.05] shadow-2xl">
+            <div className="pricing-card-highlight shadow-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-primary" />
@@ -696,7 +695,7 @@ export default function Home() {
                 </li>
               </ul>
 
-              <div className="space-y-3">
+              <div className="space-y-3 mt-auto">
                 <Button
                   onClick={() => handleStartAnalysis("medium")}
                   disabled={!problemStatement.trim() || createSession.isPending}
@@ -704,9 +703,8 @@ export default function Home() {
                 >
                   Get My Blueprint →
                 </Button>
+                <p className="text-[10px] text-muted-foreground text-center">Ideal for founders ready to build</p>
               </div>
-              
-              <p className="text-[10px] text-muted-foreground text-center mt-4">Ideal for founders ready to build</p>
             </div>
 
             {/* Tier 3: Syndicate - APEX with Premium Glow */}
@@ -781,23 +779,7 @@ export default function Home() {
                   </li>
                 </ul>
 
-                {/* Unique Selling Point Boxes */}
-                <div className="grid grid-cols-3 gap-2 mb-6">
-                  <div className="text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                    <span className="text-lg">🔬</span>
-                    <p className="text-[9px] text-purple-400 mt-1">Research-Backed</p>
-                  </div>
-                  <div className="text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                    <span className="text-lg">📊</span>
-                    <p className="text-[9px] text-purple-400 mt-1">ROI Included</p>
-                  </div>
-                  <div className="text-center p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                    <span className="text-lg">✅</span>
-                    <p className="text-[9px] text-purple-400 mt-1">Verified Claims</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
+                <div className="space-y-3 mt-auto">
                   <Button
                     onClick={() => handleStartAnalysis("full")}
                     disabled={!problemStatement.trim() || createSession.isPending}
@@ -805,9 +787,8 @@ export default function Home() {
                   >
                     Start APEX Analysis →
                   </Button>
+                  <p className="text-[10px] text-muted-foreground text-center">For teams building production-ready products</p>
                 </div>
-                
-                <p className="text-[10px] text-muted-foreground text-center mt-4">For teams building production-ready products</p>
               </div>
             </div>
           </div>

@@ -894,3 +894,10 @@
 - [x] Update backend services, emails, and API responses
 - [x] Update config files, documentation, and comments
 - [x] Verify no old branding remains in the codebase (324 tests passing)
+
+
+## Pricing Cards UI Fix - January 4, 2026
+- [x] Make all pricing cards equal height
+- [x] Make middle (Insider) card slightly taller than others
+- [x] Remove ugly USP boxes (Research-Backed, ROI, Verified) from Syndicate card
+- [x] Ensure consistent styling across all cards
