@@ -1,0 +1,8 @@
+{
+  "query": "SELECT session_id, tier, part1 IS NOT NULL as has_part1, part2 IS NOT NULL as has_part2, part3 IS NOT NULL as has_part3, part4 IS NOT NULL as has_part4, part5 IS NOT NULL as has_part5, part6 IS NOT NULL as has_part6, LENGTH(part1) as part1_len, LENGTH(part2) as part2_len, LENGTH(part3) as part3_len, LENGTH(part4) as part4_len, LENGTH(part5) as part5_len, LENGTH(part6) as part6_len FROM analysis_results WHERE session_id = 'test-apex-demo-LAIdJqey' OR session_id = 'demo-session' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 269oH2rcit4kEnZ.root --database fiP8RUkhdLoJLqK2jRAup2 --execute SELECT session_id, tier, part1 IS NOT NULL as has_part1, part2 IS NOT NULL as has_part2, part3 IS NOT NULL as has_part3, part4 IS NOT NULL as has_part4, part5 IS NOT NULL as has_part5, part6 IS NOT NULL as has_part6, LENGTH(part1) as part1_len, LENGTH(part2) as part2_len, LENGTH(part3) as part3_len, LENGTH(part4) as part4_len, LENGTH(part5) as part5_len, LENGTH(part6) as part6_len FROM analysis_results WHERE session_id = 'test-apex-demo-LAIdJqey' OR session_id = 'demo-session' LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'session_id' in 'where clause'"
+  ]
+}

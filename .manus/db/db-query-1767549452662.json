@@ -1,0 +1,20 @@
+{
+  "query": "SELECT `sessionId`, tier, part1 IS NOT NULL as has_part1, part2 IS NOT NULL as has_part2, part3 IS NOT NULL as has_part3, part4 IS NOT NULL as has_part4, part5 IS NOT NULL as has_part5, part6 IS NOT NULL as has_part6 FROM analysis_results WHERE `sessionId` LIKE '%demo%' OR `sessionId` LIKE '%test%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 269oH2rcit4kEnZ.root --database fiP8RUkhdLoJLqK2jRAup2 --execute SELECT `sessionId`, tier, part1 IS NOT NULL as has_part1, part2 IS NOT NULL as has_part2, part3 IS NOT NULL as has_part3, part4 IS NOT NULL as has_part4, part5 IS NOT NULL as has_part5, part6 IS NOT NULL as has_part6 FROM analysis_results WHERE `sessionId` LIKE '%demo%' OR `sessionId` LIKE '%test%' LIMIT 5;",
+  "rows": [
+    {
+      "sessionId": "test-apex-demo-LAIdJqey",
+      "tier": "full",
+      "has_part1": "1",
+      "has_part2": "1",
+      "has_part3": "1",
+      "has_part4": "1",
+      "has_part5": "0",
+      "has_part6": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\ttier\thas_part1\thas_part2\thas_part3\thas_part4\thas_part5\thas_part6\ntest-apex-demo-LAIdJqey\tfull\t1\t1\t1\t1\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

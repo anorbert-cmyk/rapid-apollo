@@ -1,0 +1,15 @@
+{
+  "query": "SELECT `sessionId`, LEFT(part5, 100) as part5_preview, LEFT(part6, 100) as part6_preview FROM analysis_results WHERE `sessionId` = 'test-apex-demo-LAIdJqey' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 269oH2rcit4kEnZ.root --database fiP8RUkhdLoJLqK2jRAup2 --execute SELECT `sessionId`, LEFT(part5, 100) as part5_preview, LEFT(part6, 100) as part6_preview FROM analysis_results WHERE `sessionId` = 'test-apex-demo-LAIdJqey' LIMIT 1;",
+  "rows": [
+    {
+      "sessionId": "test-apex-demo-LAIdJqey",
+      "part5_preview": "NULL",
+      "part6_preview": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\tpart5_preview\tpart6_preview\ntest-apex-demo-LAIdJqey\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

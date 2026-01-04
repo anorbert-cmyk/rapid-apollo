@@ -1,0 +1,20 @@
+{
+  "query": "SELECT `sessionId`, tier, LENGTH(part1) as p1_len, LENGTH(part2) as p2_len, LENGTH(part3) as p3_len, LENGTH(part4) as p4_len, LENGTH(part5) as p5_len, LENGTH(part6) as p6_len FROM analysis_results WHERE `sessionId` LIKE '%demo%' OR `sessionId` LIKE '%test%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 269oH2rcit4kEnZ.root --database fiP8RUkhdLoJLqK2jRAup2 --execute SELECT `sessionId`, tier, LENGTH(part1) as p1_len, LENGTH(part2) as p2_len, LENGTH(part3) as p3_len, LENGTH(part4) as p4_len, LENGTH(part5) as p5_len, LENGTH(part6) as p6_len FROM analysis_results WHERE `sessionId` LIKE '%demo%' OR `sessionId` LIKE '%test%' LIMIT 5;",
+  "rows": [
+    {
+      "sessionId": "test-apex-demo-LAIdJqey",
+      "tier": "full",
+      "p1_len": "13518",
+      "p2_len": "24675",
+      "p3_len": "40676",
+      "p4_len": "34668",
+      "p5_len": "NULL",
+      "p6_len": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "sessionId\ttier\tp1_len\tp2_len\tp3_len\tp4_len\tp5_len\tp6_len\ntest-apex-demo-LAIdJqey\tfull\t13518\t24675\t40676\t34668\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}
