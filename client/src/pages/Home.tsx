@@ -702,7 +702,7 @@ export default function Home() {
                   <span className="text-sm text-muted-foreground line-through">$1,500 agency value</span>
                 </div>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold  text-green-400">${TIER_CONFIGS.standard.priceUsd}</span>
+                  <span className="text-4xl font-bold  text-foreground">${TIER_CONFIGS.standard.priceUsd}</span>
                   <span className="text-muted-foreground ml-2">USD</span>
                 </div>
 
@@ -773,7 +773,7 @@ export default function Home() {
                   <span className="text-sm text-muted-foreground line-through">$5,000 agency value</span>
                 </div>
                 <div className="mb-6">
-                  <span className="text-6xl font-bold  text-green-400">${TIER_CONFIGS.medium.priceUsd}</span>
+                  <span className="text-6xl font-bold  text-foreground">${TIER_CONFIGS.medium.priceUsd}</span>
                   <span className="text-muted-foreground ml-2">USD</span>
                 </div>
 
@@ -855,7 +855,7 @@ export default function Home() {
                     <span className="ml-2 px-2 py-0.5 text-[10px] bg-red-500/10 text-red-400 rounded-full border border-red-500/20">90% SAVINGS</span>
                   </div>
                   <div className="mb-6">
-                    <span className="text-4xl font-bold  text-green-400">${TIER_CONFIGS.full.priceUsd}</span>
+                    <span className="text-4xl font-bold  text-foreground">${TIER_CONFIGS.full.priceUsd}</span>
                     <span className="text-muted-foreground ml-2">USD</span>
                   </div>
 
