@@ -601,10 +601,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold mb-2  tracking-tight">
-              The Logic Pipeline
+              AI Product Validation Process
             </h2>
             <p className="text-muted-foreground font-mono text-xs uppercase tracking-[0.2em]">
-              Transmuting Ambiguity into Strategy
+              From Idea to Strategic Roadmap
             </p>
           </div>
 
@@ -667,7 +667,7 @@ export default function Home() {
                 <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-primary">Deployment Tiers</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-                Choose Your <span className="text-primary">Weapon</span>
+                Product Validation <span className="text-primary">Pricing</span>
               </h2>
             </div>
             <p className="text-muted-foreground text-sm font-mono md:text-right max-w-xs">
