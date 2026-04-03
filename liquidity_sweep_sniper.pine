@@ -1,0 +1,709 @@
+//@version=5
+indicator("Liquidity Sweep Sniper Entry", overlay=true, max_boxes_count=500, max_labels_count=500, max_lines_count=500, max_bars_back=5000)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 1: INPUTS
+// ──────────────────────────────────────────────────────────────────────────────
+
+// Group: Detection
+string GRP_DET = "Detection"
+string sensitivityMode = input.string("Normal", "Sensitivity Mode", options=["Strict", "Normal", "Aggressive"], group=GRP_DET, tooltip="Strict: fewer but higher quality signals. Aggressive: more signals with relaxed filters.")
+int    atrLen          = input.int(14, "ATR Length", group=GRP_DET)
+int    swingLen        = input.int(5, "Swing Lookback", minval=2, maxval=50, group=GRP_DET, tooltip="Bars to look back for swing high/low detection. Higher = stronger swings required.")
+bool   showBullish     = input.bool(true, "Show Bullish Patterns", group=GRP_DET)
+bool   showBearish     = input.bool(true, "Show Bearish Patterns", group=GRP_DET)
+int    cooldownBars    = input.int(4, "Cooldown Bars", minval=1, group=GRP_DET, tooltip="Minimum bars between signals to prevent duplicate entries.")
+
+// Group: Risk Management
+string GRP_RISK = "Risk Management"
+float  slBufferMult = input.float(0.10, "SL Buffer (x ATR)", tooltip="Buffer below/above the extreme wick for stop loss placement.", group=GRP_RISK)
+float  accountSize  = input.float(10000, "Account Size ($)", group=GRP_RISK)
+float  riskPct      = input.float(1.0, "Risk Per Trade (%)", group=GRP_RISK)
+float  pipValue     = input.float(0.0001, "Pip/Point Size", tooltip="0.0001 for forex, 0.01 for JPY pairs, 1.0 for indices.", group=GRP_RISK)
+
+// Group: Targets
+string GRP_TP = "Targets"
+bool showTP1 = input.bool(true, "Show TP1 (1R)", group=GRP_TP)
+bool showTP2 = input.bool(true, "Show TP2 (2R)", group=GRP_TP)
+bool showTP3 = input.bool(true, "Show TP3 (3R)", group=GRP_TP)
+
+// Group: Visuals
+string GRP_VIS = "Visuals"
+bool showZones        = input.bool(true, "Show Entry Zones", group=GRP_VIS)
+bool showCandleLabels = input.bool(true, "Show Candle Labels (C1-C4)", group=GRP_VIS)
+bool showSLLines      = input.bool(true, "Show SL Lines", group=GRP_VIS)
+bool showSignals      = input.bool(true, "Show Entry Arrows", group=GRP_VIS)
+bool showBG           = input.bool(true, "Pattern Background Highlight", group=GRP_VIS)
+bool showStrength     = input.bool(true, "Show Sweep Strength %", group=GRP_VIS)
+int  zoneExtendBars   = input.int(20, "Zone Extension (bars)", minval=5, maxval=100, group=GRP_VIS)
+
+// Group: Dashboard
+string GRP_DASH = "Dashboard"
+bool   showInfoDash     = input.bool(true, "Show Info Panel", group=GRP_DASH)
+bool   showBacktestDash = input.bool(true, "Show Backtest Stats", group=GRP_DASH)
+string infoDashPos      = input.string("Bottom Right", "Info Panel Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group=GRP_DASH)
+string backtestDashPos  = input.string("Top Right", "Backtest Stats Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left"], group=GRP_DASH)
+
+// Group: Colors
+string GRP_COL = "Colors"
+color bullColor = input.color(color.new(#2196F3, 0), "Bullish Color", group=GRP_COL)
+color bearColor = input.color(color.new(#FF5252, 0), "Bearish Color", group=GRP_COL)
+color slColor   = input.color(color.new(#FF9800, 0), "Stop Loss Color", group=GRP_COL)
+
+// Group: Alerts
+string GRP_ALR = "Alerts"
+string alertFormat = input.string("TradingView", "Alert Format", options=["TradingView", "Webhook JSON"], group=GRP_ALR)
+
+// Group: Backtesting
+string GRP_BT = "Backtesting"
+int maxOpenTrades = input.int(20, "Max Open Trades", minval=1, maxval=50, group=GRP_BT)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 2: CONSTANTS & COLORS
+// ──────────────────────────────────────────────────────────────────────────────
+
+int DIR_BULL =  1
+int DIR_BEAR = -1
+
+color bullZoneFill = color.new(bullColor, 82)
+color bearZoneFill = color.new(bearColor, 82)
+color bullBorder   = color.new(bullColor, 30)
+color bearBorder   = color.new(bearColor, 30)
+color slLineCol    = color.new(slColor, 30)
+color tpLineCol    = color.new(color.green, 50)
+color winCol       = color.new(color.green, 70)
+color lossCol      = color.new(color.red, 70)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 3: CORE CALCULATIONS
+// ──────────────────────────────────────────────────────────────────────────────
+
+float atr = ta.atr(atrLen)
+
+float swingLowVal  = ta.pivotlow(low, swingLen, swingLen)
+float swingHighVal = ta.pivothigh(high, swingLen, swingLen)
+
+var float recentSwingLow  = na
+var float recentSwingHigh = na
+
+if not na(swingLowVal)
+    recentSwingLow := swingLowVal
+if not na(swingHighVal)
+    recentSwingHigh := swingHighVal
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 4: PATTERN DETECTION ENGINE
+// ──────────────────────────────────────────────────────────────────────────────
+
+// --- Sensitivity thresholds ---
+float wickRatioMin = switch sensitivityMode
+    "Strict"     => 0.40
+    "Normal"     => 0.33
+    "Aggressive" => 0.25
+    => 0.33
+
+float sweepDepthMin = switch sensitivityMode
+    "Strict"     => 0.15
+    "Normal"     => 0.10
+    "Aggressive" => 0.05
+    => 0.10
+
+float sweepDepthMax = switch sensitivityMode
+    "Strict"     => 1.20
+    "Normal"     => 1.50
+    "Aggressive" => 2.00
+    => 1.50
+
+bool c4ReclaimReq = switch sensitivityMode
+    "Strict"     => true
+    "Normal"     => true
+    "Aggressive" => false
+    => true
+
+bool swingValidation = switch sensitivityMode
+    "Strict"     => true
+    "Normal"     => true
+    "Aggressive" => false
+    => true
+
+bool c3NotInsideC2 = switch sensitivityMode
+    "Strict"     => true
+    "Normal"     => true
+    "Aggressive" => false
+    => true
+
+// --- Candle references ---
+float c1Low   = low[3],  float c1High  = high[3]
+float c2Low   = low[2],  float c2High  = high[2]
+float c2Open  = open[2], float c2Close = close[2]
+float c3Low   = low[1],  float c3High  = high[1]
+float c3Open  = open[1], float c3Close = close[1]
+float c4Low   = low[0],  float c4High  = high[0]
+float c4Close = close[0]
+
+// --- Cooldown tracking ---
+var int lastSignalBar = 0
+bool cooldownOk = bar_index - lastSignalBar >= cooldownBars
+
+// --- BULLISH detection ---
+// C2 sweeps below C1 low and closes back above (liquidity block)
+// C3 prints a low and closes bullish
+// C4 sweeps below C3 low (trigger) and closes back above
+bool bullC2Sweep     = c2Low < c1Low
+bool bullC2Reclaim   = c2Close > c1Low
+float bullWickLen    = math.min(c2Open, c2Close) - c2Low
+float bullWickRatio  = bullWickLen / (c2High - c2Low + 1e-10)
+bool bullWickOk      = bullWickRatio >= wickRatioMin
+float bullSweepDepth = c1Low - c2Low
+float atrRef         = nz(atr[2], atr)
+bool bullDepthOk     = bullSweepDepth >= atrRef * sweepDepthMin and bullSweepDepth <= atrRef * sweepDepthMax
+bool bullC3Bullish   = c3Close > c3Open
+bool bullC3NotInside = c3NotInsideC2 ? not (c3High <= c2High and c3Low >= c2Low) : true
+bool bullC4Sweep     = c4Low < c3Low
+bool bullC4Reclaim   = c4ReclaimReq ? c4Close >= c3Low - nz(atr) * 0.05 : true
+bool bullSwingOk     = swingValidation ? (not na(recentSwingLow) ? c1Low <= recentSwingLow * 1.005 : false) : true
+
+bool bullPattern = barstate.isconfirmed and showBullish
+     and bullC2Sweep and bullC2Reclaim and bullWickOk
+     and bullDepthOk and bullC3Bullish and bullC3NotInside
+     and bullC4Sweep and bullC4Reclaim and bullSwingOk and cooldownOk
+
+// --- BEARISH detection ---
+// C2 sweeps above C1 high and closes back below (bearish liquidity block)
+// C3 prints a high and closes bearish
+// C4 sweeps above C3 high (trigger) and closes back below
+bool bearC2Sweep     = c2High > c1High
+bool bearC2Reclaim   = c2Close < c1High
+float bearWickLen    = c2High - math.max(c2Open, c2Close)
+float bearWickRatio  = bearWickLen / (c2High - c2Low + 1e-10)
+bool bearWickOk      = bearWickRatio >= wickRatioMin
+float bearSweepDepth = c2High - c1High
+bool bearDepthOk     = bearSweepDepth >= atrRef * sweepDepthMin and bearSweepDepth <= atrRef * sweepDepthMax
+bool bearC3Bearish   = c3Close < c3Open
+bool bearC3NotInside = c3NotInsideC2 ? not (c3High <= c2High and c3Low >= c2Low) : true
+bool bearC4Sweep     = c4High > c3High
+bool bearC4Reclaim   = c4ReclaimReq ? c4Close <= c3High + nz(atr) * 0.05 : true
+bool bearSwingOk     = swingValidation ? (not na(recentSwingHigh) ? c1High >= recentSwingHigh * 0.995 : false) : true
+
+bool bearPattern = barstate.isconfirmed and showBearish
+     and bearC2Sweep and bearC2Reclaim and bearWickOk
+     and bearDepthOk and bearC3Bearish and bearC3NotInside
+     and bearC4Sweep and bearC4Reclaim and bearSwingOk and cooldownOk
+
+// --- Update cooldown ---
+if bullPattern or bearPattern
+    lastSignalBar := bar_index
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 5: SWEEP STRENGTH SCORE
+// ──────────────────────────────────────────────────────────────────────────────
+
+float bullStrength = 0.0
+float bearStrength = 0.0
+
+if bullPattern
+    float wS = math.min(bullWickLen / (c2High - c2Low + 1e-10), 1.0)
+    float dS = math.min(bullSweepDepth / (atrRef * 0.5 + 1e-10), 1.0)
+    float rS = c4Close > c3Low ? 1.0 : 0.5
+    float bS = math.abs(c3Close - c3Open) / (c3High - c3Low + 1e-10)
+    bullStrength := math.max(0.0, math.min(1.0, wS * 0.30 + dS * 0.25 + rS * 0.25 + bS * 0.20))
+
+if bearPattern
+    float wS = math.min(bearWickLen / (c2High - c2Low + 1e-10), 1.0)
+    float dS = math.min(bearSweepDepth / (atrRef * 0.5 + 1e-10), 1.0)
+    float rS = c4Close < c3High ? 1.0 : 0.5
+    float bS = math.abs(c3Close - c3Open) / (c3High - c3Low + 1e-10)
+    bearStrength := math.max(0.0, math.min(1.0, wS * 0.30 + dS * 0.25 + rS * 0.25 + bS * 0.20))
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 6: TRADE REGISTRATION & STATE MANAGEMENT
+// ──────────────────────────────────────────────────────────────────────────────
+
+// --- Parallel arrays for open trades ---
+var int[]   tradeDir       = array.new_int()
+var float[] tradeEntry     = array.new_float()
+var float[] tradeSL        = array.new_float()
+var float[] tradeRisk      = array.new_float()
+var float[] tradeTP1       = array.new_float()
+var float[] tradeTP2       = array.new_float()
+var float[] tradeTP3       = array.new_float()
+var int[]   tradeBarIdx    = array.new_int()
+var float[] tradeStrength  = array.new_float()
+var box[]   tradeZoneBox   = array.new_box()
+var line[]  tradeSLLine    = array.new_line()
+var line[]  tradeTP1Line   = array.new_line()
+var line[]  tradeTP2Line   = array.new_line()
+var line[]  tradeTP3Line   = array.new_line()
+
+// --- Outcome storage ---
+var int[]   resultDir = array.new_int()
+var float[] resultR   = array.new_float()
+
+// --- Aggregate counters ---
+var int   totalBull    = 0
+var int   totalBear    = 0
+var int   wins1R       = 0
+var int   wins2R       = 0
+var int   wins3R       = 0
+var int   losses       = 0
+var float sumR         = 0.0
+var float grossProfit  = 0.0
+var float grossLoss    = 0.0
+var int   streakCount  = 0
+var bool  lastWasWin   = false
+
+// --- Last signal info for dashboard ---
+var int   lastDir      = 0
+var float lastEntry    = na
+var float lastSL       = na
+var float lastTP1val   = na
+var float lastTP2val   = na
+var float lastTP3val   = na
+var float lastRisk     = na
+var float lastStrength = na
+
+// --- Register bullish trade ---
+if bullPattern
+    float entry = c3Low
+    float sl    = c4Low - nz(atr) * slBufferMult
+    float risk  = entry - sl
+    if risk > 0 and array.size(tradeDir) < maxOpenTrades
+        float tp1 = entry + risk
+        float tp2 = entry + risk * 2
+        float tp3 = entry + risk * 3
+        array.push(tradeDir,      DIR_BULL)
+        array.push(tradeEntry,    entry)
+        array.push(tradeSL,       sl)
+        array.push(tradeRisk,     risk)
+        array.push(tradeTP1,      tp1)
+        array.push(tradeTP2,      tp2)
+        array.push(tradeTP3,      tp3)
+        array.push(tradeBarIdx,   bar_index)
+        array.push(tradeStrength, bullStrength)
+        // Zone box
+        box zb = showZones ? box.new(bar_index - 1, entry, bar_index + zoneExtendBars, sl, bgcolor=bullZoneFill, border_color=bullBorder, border_width=1) : na
+        array.push(tradeZoneBox, zb)
+        // SL line
+        line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
+        array.push(tradeSLLine, slL)
+        // TP lines
+        line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
+        line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
+        line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
+        array.push(tradeTP1Line, tp1L)
+        array.push(tradeTP2Line, tp2L)
+        array.push(tradeTP3Line, tp3L)
+        // Candle labels
+        if showCandleLabels
+            label.new(bar_index - 3, low[3], "C1", style=label.style_none, textcolor=bullColor, size=size.tiny)
+            label.new(bar_index - 2, c2Low,  "C2\nLiq", style=label.style_none, textcolor=bullColor, size=size.tiny)
+            label.new(bar_index - 1, c3Low,  "C3", style=label.style_none, textcolor=bullColor, size=size.tiny)
+            string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bullStrength * 100, "#") + "%" : "C4\nEntry"
+            label.new(bar_index, c4Low, c4Txt, style=label.style_none, textcolor=bullColor, size=size.tiny)
+        // Update dashboard state
+        lastDir      := DIR_BULL
+        lastEntry    := entry
+        lastSL       := sl
+        lastTP1val   := tp1
+        lastTP2val   := tp2
+        lastTP3val   := tp3
+        lastRisk     := risk
+        lastStrength := bullStrength
+        totalBull    += 1
+
+// --- Register bearish trade ---
+if bearPattern
+    float entry = c3High
+    float sl    = c4High + nz(atr) * slBufferMult
+    float risk  = sl - entry
+    if risk > 0 and array.size(tradeDir) < maxOpenTrades
+        float tp1 = entry - risk
+        float tp2 = entry - risk * 2
+        float tp3 = entry - risk * 3
+        array.push(tradeDir,      DIR_BEAR)
+        array.push(tradeEntry,    entry)
+        array.push(tradeSL,       sl)
+        array.push(tradeRisk,     risk)
+        array.push(tradeTP1,      tp1)
+        array.push(tradeTP2,      tp2)
+        array.push(tradeTP3,      tp3)
+        array.push(tradeBarIdx,   bar_index)
+        array.push(tradeStrength, bearStrength)
+        // Zone box
+        box zb = showZones ? box.new(bar_index - 1, sl, bar_index + zoneExtendBars, entry, bgcolor=bearZoneFill, border_color=bearBorder, border_width=1) : na
+        array.push(tradeZoneBox, zb)
+        // SL line
+        line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
+        array.push(tradeSLLine, slL)
+        // TP lines
+        line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
+        line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
+        line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
+        array.push(tradeTP1Line, tp1L)
+        array.push(tradeTP2Line, tp2L)
+        array.push(tradeTP3Line, tp3L)
+        // Candle labels
+        if showCandleLabels
+            label.new(bar_index - 3, high[3], "C1", style=label.style_none, textcolor=bearColor, size=size.tiny)
+            label.new(bar_index - 2, c2High,  "C2\nLiq", style=label.style_none, textcolor=bearColor, size=size.tiny)
+            label.new(bar_index - 1, c3High,  "C3", style=label.style_none, textcolor=bearColor, size=size.tiny)
+            string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bearStrength * 100, "#") + "%" : "C4\nEntry"
+            label.new(bar_index, c4High, c4Txt, style=label.style_none, textcolor=bearColor, size=size.tiny)
+        // Update dashboard state
+        lastDir      := DIR_BEAR
+        lastEntry    := entry
+        lastSL       := sl
+        lastTP1val   := tp1
+        lastTP2val   := tp2
+        lastTP3val   := tp3
+        lastRisk     := risk
+        lastStrength := bearStrength
+        totalBear    += 1
+
+// --- Enforce max open trades (remove oldest) ---
+while array.size(tradeDir) > maxOpenTrades
+    box.delete(array.shift(tradeZoneBox))
+    line.delete(array.shift(tradeSLLine))
+    line.delete(array.shift(tradeTP1Line))
+    line.delete(array.shift(tradeTP2Line))
+    line.delete(array.shift(tradeTP3Line))
+    array.shift(tradeDir)
+    array.shift(tradeEntry)
+    array.shift(tradeSL)
+    array.shift(tradeRisk)
+    array.shift(tradeTP1)
+    array.shift(tradeTP2)
+    array.shift(tradeTP3)
+    array.shift(tradeBarIdx)
+    array.shift(tradeStrength)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 7: TRADE OUTCOME RESOLUTION (BACKTESTING)
+// ──────────────────────────────────────────────────────────────────────────────
+
+if array.size(tradeDir) > 0
+    for i = array.size(tradeDir) - 1 to 0
+        int   dir      = array.get(tradeDir, i)
+        float entry    = array.get(tradeEntry, i)
+        float sl       = array.get(tradeSL, i)
+        float risk     = array.get(tradeRisk, i)
+        float tp1      = array.get(tradeTP1, i)
+        float tp2      = array.get(tradeTP2, i)
+        float tp3      = array.get(tradeTP3, i)
+        int   entryBar = array.get(tradeBarIdx, i)
+
+        // Skip entry bar — trade starts next bar
+        if bar_index <= entryBar
+            continue
+
+        bool slHit  = false
+        bool tp1Hit = false
+        bool tp2Hit = false
+        bool tp3Hit = false
+
+        if dir == DIR_BULL
+            slHit  := low  <= sl
+            tp1Hit := high >= tp1
+            tp2Hit := high >= tp2
+            tp3Hit := high >= tp3
+        else
+            slHit  := high >= sl
+            tp1Hit := low  <= tp1
+            tp2Hit := low  <= tp2
+            tp3Hit := low  <= tp3
+
+        // --- Resolution (conservative: SL wins on ambiguous bars) ---
+        bool  resolved = false
+        float rResult  = 0.0
+
+        if slHit and not tp1Hit
+            resolved := true
+            rResult  := -1.0
+            losses   += 1
+        else if slHit and tp1Hit
+            // Ambiguous bar — assume loss (conservative)
+            resolved := true
+            rResult  := -1.0
+            losses   += 1
+        else if tp3Hit
+            resolved := true
+            rResult  := 3.0
+            wins1R   += 1
+            wins2R   += 1
+            wins3R   += 1
+        else if tp2Hit
+            resolved := true
+            rResult  := 2.0
+            wins1R   += 1
+            wins2R   += 1
+        else if tp1Hit
+            resolved := true
+            rResult  := 1.0
+            wins1R   += 1
+
+        if resolved
+            // Store outcome
+            array.push(resultDir, dir)
+            array.push(resultR, rResult)
+
+            // Update aggregates
+            sumR += rResult
+            if rResult > 0
+                grossProfit += rResult
+            else
+                grossLoss += math.abs(rResult)
+
+            // Streak tracking
+            bool isWin = rResult > 0
+            if isWin
+                streakCount := lastWasWin ? streakCount + 1 : 1
+            else
+                streakCount := (not lastWasWin and streakCount != 0) ? streakCount - 1 : -1
+            lastWasWin := isWin
+
+            // --- Visual markers ---
+            box  zBox = array.get(tradeZoneBox, i)
+            line slL  = array.get(tradeSLLine, i)
+            line t1L  = array.get(tradeTP1Line, i)
+            line t2L  = array.get(tradeTP2Line, i)
+            line t3L  = array.get(tradeTP3Line, i)
+
+            // Recolor zone box
+            if not na(zBox)
+                color zCol = rResult > 0 ? winCol : lossCol
+                box.set_bgcolor(zBox, zCol)
+                box.set_border_color(zBox, zCol)
+                box.set_right(zBox, bar_index)
+
+            // Win/loss label
+            if rResult > 0
+                string txt = "+" + str.tostring(rResult, "#.#") + "R"
+                label.new(bar_index, dir == DIR_BULL ? low * 0.999 : high * 1.001, txt,
+                     style=dir == DIR_BULL ? label.style_label_up : label.style_label_down,
+                     color=color.green, textcolor=color.white, size=size.tiny)
+            else
+                label.new(bar_index, dir == DIR_BULL ? low * 0.999 : high * 1.001, "SL",
+                     style=dir == DIR_BULL ? label.style_label_up : label.style_label_down,
+                     color=color.red, textcolor=color.white, size=size.tiny)
+
+            // Delete trade lines
+            line.delete(slL)
+            line.delete(t1L)
+            line.delete(t2L)
+            line.delete(t3L)
+
+            // Remove from all arrays
+            array.remove(tradeDir, i)
+            array.remove(tradeEntry, i)
+            array.remove(tradeSL, i)
+            array.remove(tradeRisk, i)
+            array.remove(tradeTP1, i)
+            array.remove(tradeTP2, i)
+            array.remove(tradeTP3, i)
+            array.remove(tradeBarIdx, i)
+            array.remove(tradeStrength, i)
+            array.remove(tradeZoneBox, i)
+            array.remove(tradeSLLine, i)
+            array.remove(tradeTP1Line, i)
+            array.remove(tradeTP2Line, i)
+            array.remove(tradeTP3Line, i)
+        else
+            // Still open — extend drawings
+            box zBox = array.get(tradeZoneBox, i)
+            if not na(zBox)
+                box.set_right(zBox, bar_index + zoneExtendBars)
+            line slL = array.get(tradeSLLine, i)
+            if not na(slL)
+                line.set_x2(slL, bar_index + zoneExtendBars)
+            line t1L = array.get(tradeTP1Line, i)
+            if not na(t1L)
+                line.set_x2(t1L, bar_index + zoneExtendBars)
+            line t2L = array.get(tradeTP2Line, i)
+            if not na(t2L)
+                line.set_x2(t2L, bar_index + zoneExtendBars)
+            line t3L = array.get(tradeTP3Line, i)
+            if not na(t3L)
+                line.set_x2(t3L, bar_index + zoneExtendBars)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 9: SIGNAL MARKERS & BACKGROUND
+// ──────────────────────────────────────────────────────────────────────────────
+
+plotshape(showSignals and bullPattern, title="Bull Entry", style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.small, text="LONG", textcolor=bullColor)
+plotshape(showSignals and bearPattern, title="Bear Entry", style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.small, text="SHORT", textcolor=bearColor)
+
+bgcolor(showBG ? (bullPattern ? color.new(bullColor, 92) : bearPattern ? color.new(bearColor, 92) : na) : na, title="Pattern Background")
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 10: DASHBOARD
+// ──────────────────────────────────────────────────────────────────────────────
+
+f_resolvePos(string posStr) =>
+    switch posStr
+        "Top Left"     => position.top_left
+        "Top Right"    => position.top_right
+        "Bottom Left"  => position.bottom_left
+        "Bottom Right" => position.bottom_right
+        => position.top_right
+
+var table infoDash     = na
+var table backtestDash = na
+
+if barstate.islast and showInfoDash
+    if not na(infoDash)
+        table.delete(infoDash)
+    infoDash := table.new(f_resolvePos(infoDashPos), 2, 10, border_width=1, border_color=color.new(color.gray, 60))
+    color _bg  = color.new(color.black, 80)
+    color _lbl = color.silver
+    color _val = color.white
+
+    table.cell(infoDash, 0, 0, "SWEEP SNIPER", text_color=color.white, text_size=size.small, bgcolor=color.new(bullColor, 30))
+    table.cell(infoDash, 1, 0, "", bgcolor=color.new(bullColor, 30))
+    table.merge_cells(infoDash, 0, 0, 1, 0)
+
+    table.cell(infoDash, 0, 1, "Mode",      text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 1, sensitivityMode, text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _dirStr = lastDir == DIR_BULL ? "LONG" : lastDir == DIR_BEAR ? "SHORT" : "--"
+    color  _dirClr = lastDir == DIR_BULL ? color.green : lastDir == DIR_BEAR ? color.red : color.gray
+    table.cell(infoDash, 0, 2, "Direction", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 2, _dirStr,     text_color=_dirClr, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _entS = not na(lastEntry) ? str.tostring(lastEntry, format.mintick) : "--"
+    table.cell(infoDash, 0, 3, "Entry",     text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 3, _entS,       text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _slS = not na(lastSL) ? str.tostring(lastSL, format.mintick) : "--"
+    table.cell(infoDash, 0, 4, "Stop Loss", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 4, _slS,        text_color=slColor, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _t1S = not na(lastTP1val) ? str.tostring(lastTP1val, format.mintick) : "--"
+    table.cell(infoDash, 0, 5, "TP1 (1R)",  text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 5, _t1S,        text_color=color.green, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _t2S = not na(lastTP2val) ? str.tostring(lastTP2val, format.mintick) : "--"
+    table.cell(infoDash, 0, 6, "TP2 (2R)",  text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 6, _t2S,        text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _t3S = not na(lastTP3val) ? str.tostring(lastTP3val, format.mintick) : "--"
+    table.cell(infoDash, 0, 7, "TP3 (3R)",  text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 7, _t3S,        text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _rpS = not na(lastRisk) and lastRisk > 0 ? str.tostring(lastRisk / pipValue, "#.1") : "--"
+    table.cell(infoDash, 0, 8, "Risk (pips)", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 8, _rpS,          text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _psS = not na(lastRisk) and lastRisk > 0 ? str.tostring((accountSize * riskPct / 100) / lastRisk, "#.2") + " units" : "--"
+    table.cell(infoDash, 0, 9, "Pos. Size", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(infoDash, 1, 9, _psS,        text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+// --- Backtest Dashboard ---
+if barstate.islast and showBacktestDash
+    if not na(backtestDash)
+        table.delete(backtestDash)
+    backtestDash := table.new(f_resolvePos(backtestDashPos), 2, 15, border_width=1, border_color=color.new(color.gray, 60))
+    color _bg  = color.new(color.black, 80)
+    color _lbl = color.silver
+    color _val = color.white
+
+    table.cell(backtestDash, 0, 0, "BACKTEST STATS", text_color=color.white, text_size=size.small, bgcolor=color.new(color.purple, 40))
+    table.cell(backtestDash, 1, 0, "", bgcolor=color.new(color.purple, 40))
+    table.merge_cells(backtestDash, 0, 0, 1, 0)
+
+    int _totalSig  = totalBull + totalBear
+    int _resolved  = array.size(resultR)
+    int _openCount = array.size(tradeDir)
+
+    table.cell(backtestDash, 0, 1, "Total Signals", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 1, str.tostring(_totalSig) + " (B:" + str.tostring(totalBull) + " S:" + str.tostring(totalBear) + ")", text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    table.cell(backtestDash, 0, 2, "Resolved / Open", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 2, str.tostring(_resolved) + " / " + str.tostring(_openCount), text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    color _wlC = wins1R >= losses ? color.green : color.red
+    table.cell(backtestDash, 0, 3, "Wins / Losses", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 3, str.tostring(wins1R) + " / " + str.tostring(losses), text_color=_wlC, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _wr1 = _resolved > 0 ? wins1R / _resolved * 100.0 : 0.0
+    table.cell(backtestDash, 0, 4, "Win Rate @ 1R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 4, str.tostring(_wr1, "#.1") + "%", text_color=_wr1 >= 50 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _wr2 = _resolved > 0 ? wins2R / _resolved * 100.0 : 0.0
+    table.cell(backtestDash, 0, 5, "Win Rate @ 2R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 5, str.tostring(_wr2, "#.1") + "%", text_color=_wr2 >= 33 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _wr3 = _resolved > 0 ? wins3R / _resolved * 100.0 : 0.0
+    table.cell(backtestDash, 0, 6, "Win Rate @ 3R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 6, str.tostring(_wr3, "#.1") + "%", text_color=_wr3 >= 25 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _avgR = _resolved > 0 ? sumR / _resolved : 0.0
+    table.cell(backtestDash, 0, 7, "Average R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 7, str.tostring(_avgR, "#.2") + "R", text_color=_avgR > 0 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _bestR  = array.size(resultR) > 0 ? array.max(resultR) : 0.0
+    table.cell(backtestDash, 0, 8, "Best Trade", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 8, str.tostring(_bestR, "#.1") + "R", text_color=color.green, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _worstR = array.size(resultR) > 0 ? array.min(resultR) : 0.0
+    table.cell(backtestDash, 0, 9, "Worst Trade", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 9, str.tostring(_worstR, "#.1") + "R", text_color=color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _pfS = grossLoss == 0 ? (grossProfit > 0 ? "INF" : "0.00") : str.tostring(grossProfit / grossLoss, "#.2")
+    color  _pfC = grossLoss == 0 ? (grossProfit > 0 ? color.green : _val) : (grossProfit / grossLoss >= 1 ? color.green : color.red)
+    table.cell(backtestDash, 0, 10, "Profit Factor", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 10, _pfS, text_color=_pfC, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _skS = streakCount == 0 ? "--" : (lastWasWin ? "W" : "L") + str.tostring(math.abs(streakCount))
+    color  _skC = streakCount == 0 ? color.gray : lastWasWin ? color.green : color.red
+    table.cell(backtestDash, 0, 11, "Current Streak", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 11, _skS, text_color=_skC, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    table.cell(backtestDash, 0, 12, "Total R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 12, str.tostring(sumR, "#.1") + "R", text_color=sumR >= 0 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    float _exp = _resolved > 0 ? sumR / _resolved : 0.0
+    table.cell(backtestDash, 0, 13, "Expectancy", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 13, str.tostring(_exp, "#.3") + "R", text_color=_exp > 0 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+    string _stS = not na(lastStrength) ? str.tostring(lastStrength * 100, "#") + "%" : "--"
+    table.cell(backtestDash, 0, 14, "Last Strength", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
+    table.cell(backtestDash, 1, 14, _stS, text_color=_val, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
+
+// ──────────────────────────────────────────────────────────────────────────────
+// SECTION 11: ALERTS
+// ──────────────────────────────────────────────────────────────────────────────
+
+alertcondition(bullPattern, "Bullish Liquidity Sweep", "Bullish liquidity sweep on {{ticker}} {{interval}}")
+alertcondition(bearPattern, "Bearish Liquidity Sweep", "Bearish liquidity sweep on {{ticker}} {{interval}}")
+alertcondition(bullPattern or bearPattern, "Any Liquidity Sweep", "Liquidity sweep on {{ticker}} {{interval}}")
+
+if bullPattern or bearPattern
+    string _dir = bullPattern ? "LONG" : "SHORT"
+    float  _str = bullPattern ? bullStrength : bearStrength
+    string msg  = na
+
+    if alertFormat == "TradingView"
+        msg := "SWEEP SNIPER | " + _dir + " | " + syminfo.ticker + " " + timeframe.period +
+             "\nEntry: " + str.tostring(lastEntry, format.mintick) +
+             " | SL: " + str.tostring(lastSL, format.mintick) +
+             "\nTP1: " + str.tostring(lastTP1val, format.mintick) +
+             " | TP2: " + str.tostring(lastTP2val, format.mintick) +
+             " | TP3: " + str.tostring(lastTP3val, format.mintick) +
+             "\nRisk: " + str.tostring(lastRisk / pipValue, "#.1") + " pips" +
+             " | Strength: " + str.tostring(_str * 100, "#") + "%" +
+             " | Mode: " + sensitivityMode
+
+    else if alertFormat == "Webhook JSON"
+        msg := '{"ticker":"' + syminfo.ticker +
+             '","tf":"' + timeframe.period +
+             '","dir":"' + _dir +
+             '","entry":' + str.tostring(lastEntry) +
+             ',"sl":' + str.tostring(lastSL) +
+             ',"tp1":' + str.tostring(lastTP1val) +
+             ',"tp2":' + str.tostring(lastTP2val) +
+             ',"tp3":' + str.tostring(lastTP3val) +
+             ',"strength":' + str.tostring(_str * 100, "#") +
+             ',"mode":"' + sensitivityMode + '"}'
+
+    if not na(msg)
+        alert(msg, alert.freq_once_per_bar_close)
