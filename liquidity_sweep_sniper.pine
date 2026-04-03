@@ -273,98 +273,100 @@ if bullPattern
     float entry = c3Low
     float sl    = c4Low - atrRef * slBufferMult
     float risk  = entry - sl
-    if risk > 0 and array.size(tradeDir) < maxOpenTrades
+    // Always update dashboard/alert state (even if trade rejected by capacity)
+    lastDir      := DIR_BULL
+    lastEntry    := entry
+    lastSL       := sl
+    lastRisk     := risk
+    lastStrength := bullStrength
+    totalBull    += 1
+    if risk > 0
         float tp1 = entry + risk
         float tp2 = entry + risk * 2
         float tp3 = entry + risk * 3
-        array.push(tradeDir,      DIR_BULL)
-        array.push(tradeEntry,    entry)
-        array.push(tradeSL,       sl)
-        array.push(tradeRisk,     risk)
-        array.push(tradeTP1,      tp1)
-        array.push(tradeTP2,      tp2)
-        array.push(tradeTP3,      tp3)
-        array.push(tradeBarIdx,   bar_index)
-        array.push(tradeStrength, bullStrength)
-        // Zone box
-        box zb = showZones ? box.new(bar_index - 1, entry, bar_index + zoneExtendBars, sl, bgcolor=bullZoneFill, border_color=bullBorder, border_width=1) : na
-        array.push(tradeZoneBox, zb)
-        // SL line
-        line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
-        array.push(tradeSLLine, slL)
-        // TP lines
-        line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
-        line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
-        line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
-        array.push(tradeTP1Line, tp1L)
-        array.push(tradeTP2Line, tp2L)
-        array.push(tradeTP3Line, tp3L)
-        // Candle labels
-        if showCandleLabels
-            label.new(bar_index - 3, low[3], "C1", style=label.style_none, textcolor=bullColor, size=size.tiny)
-            label.new(bar_index - 2, c2Low,  "C2\nLiq", style=label.style_none, textcolor=bullColor, size=size.tiny)
-            label.new(bar_index - 1, c3Low,  "C3", style=label.style_none, textcolor=bullColor, size=size.tiny)
-            string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bullStrength * 100, "#") + "%" : "C4\nEntry"
-            label.new(bar_index, c4Low, c4Txt, style=label.style_none, textcolor=bullColor, size=size.tiny)
-        // Update dashboard state
-        lastDir      := DIR_BULL
-        lastEntry    := entry
-        lastSL       := sl
-        lastTP1val   := tp1
-        lastTP2val   := tp2
-        lastTP3val   := tp3
-        lastRisk     := risk
-        lastStrength := bullStrength
-        totalBull    += 1
+        lastTP1val := tp1
+        lastTP2val := tp2
+        lastTP3val := tp3
+        if array.size(tradeDir) < maxOpenTrades
+            array.push(tradeDir,      DIR_BULL)
+            array.push(tradeEntry,    entry)
+            array.push(tradeSL,       sl)
+            array.push(tradeRisk,     risk)
+            array.push(tradeTP1,      tp1)
+            array.push(tradeTP2,      tp2)
+            array.push(tradeTP3,      tp3)
+            array.push(tradeBarIdx,   bar_index)
+            array.push(tradeStrength, bullStrength)
+            // Zone box
+            box zb = showZones ? box.new(bar_index - 1, entry, bar_index + zoneExtendBars, sl, bgcolor=bullZoneFill, border_color=bullBorder, border_width=1) : na
+            array.push(tradeZoneBox, zb)
+            // SL line
+            line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
+            array.push(tradeSLLine, slL)
+            // TP lines
+            line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
+            line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
+            line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
+            array.push(tradeTP1Line, tp1L)
+            array.push(tradeTP2Line, tp2L)
+            array.push(tradeTP3Line, tp3L)
+            // Candle labels
+            if showCandleLabels
+                label.new(bar_index - 3, low[3], "C1", style=label.style_none, textcolor=bullColor, size=size.tiny)
+                label.new(bar_index - 2, c2Low,  "C2\nLiq", style=label.style_none, textcolor=bullColor, size=size.tiny)
+                label.new(bar_index - 1, c3Low,  "C3", style=label.style_none, textcolor=bullColor, size=size.tiny)
+                string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bullStrength * 100, "#") + "%" : "C4\nEntry"
+                label.new(bar_index, c4Low, c4Txt, style=label.style_none, textcolor=bullColor, size=size.tiny)
 
 // --- Register bearish trade ---
 if bearPattern
     float entry = c3High
     float sl    = c4High + atrRef * slBufferMult
     float risk  = sl - entry
-    if risk > 0 and array.size(tradeDir) < maxOpenTrades
+    // Always update dashboard/alert state (even if trade rejected by capacity)
+    lastDir      := DIR_BEAR
+    lastEntry    := entry
+    lastSL       := sl
+    lastRisk     := risk
+    lastStrength := bearStrength
+    totalBear    += 1
+    if risk > 0
         float tp1 = entry - risk
         float tp2 = entry - risk * 2
         float tp3 = entry - risk * 3
-        array.push(tradeDir,      DIR_BEAR)
-        array.push(tradeEntry,    entry)
-        array.push(tradeSL,       sl)
-        array.push(tradeRisk,     risk)
-        array.push(tradeTP1,      tp1)
-        array.push(tradeTP2,      tp2)
-        array.push(tradeTP3,      tp3)
-        array.push(tradeBarIdx,   bar_index)
-        array.push(tradeStrength, bearStrength)
-        // Zone box
-        box zb = showZones ? box.new(bar_index - 1, sl, bar_index + zoneExtendBars, entry, bgcolor=bearZoneFill, border_color=bearBorder, border_width=1) : na
-        array.push(tradeZoneBox, zb)
-        // SL line
-        line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
-        array.push(tradeSLLine, slL)
-        // TP lines
-        line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
-        line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
-        line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
-        array.push(tradeTP1Line, tp1L)
-        array.push(tradeTP2Line, tp2L)
-        array.push(tradeTP3Line, tp3L)
-        // Candle labels
-        if showCandleLabels
-            label.new(bar_index - 3, high[3], "C1", style=label.style_none, textcolor=bearColor, size=size.tiny)
-            label.new(bar_index - 2, c2High,  "C2\nLiq", style=label.style_none, textcolor=bearColor, size=size.tiny)
-            label.new(bar_index - 1, c3High,  "C3", style=label.style_none, textcolor=bearColor, size=size.tiny)
-            string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bearStrength * 100, "#") + "%" : "C4\nEntry"
-            label.new(bar_index, c4High, c4Txt, style=label.style_none, textcolor=bearColor, size=size.tiny)
-        // Update dashboard state
-        lastDir      := DIR_BEAR
-        lastEntry    := entry
-        lastSL       := sl
-        lastTP1val   := tp1
-        lastTP2val   := tp2
-        lastTP3val   := tp3
-        lastRisk     := risk
-        lastStrength := bearStrength
-        totalBear    += 1
+        lastTP1val := tp1
+        lastTP2val := tp2
+        lastTP3val := tp3
+        if array.size(tradeDir) < maxOpenTrades
+            array.push(tradeDir,      DIR_BEAR)
+            array.push(tradeEntry,    entry)
+            array.push(tradeSL,       sl)
+            array.push(tradeRisk,     risk)
+            array.push(tradeTP1,      tp1)
+            array.push(tradeTP2,      tp2)
+            array.push(tradeTP3,      tp3)
+            array.push(tradeBarIdx,   bar_index)
+            array.push(tradeStrength, bearStrength)
+            // Zone box
+            box zb = showZones ? box.new(bar_index - 1, sl, bar_index + zoneExtendBars, entry, bgcolor=bearZoneFill, border_color=bearBorder, border_width=1) : na
+            array.push(tradeZoneBox, zb)
+            // SL line
+            line slL = showSLLines ? line.new(bar_index, sl, bar_index + zoneExtendBars, sl, color=slLineCol, style=line.style_dashed, width=1) : na
+            array.push(tradeSLLine, slL)
+            // TP lines
+            line tp1L = showTP1 ? line.new(bar_index, tp1, bar_index + zoneExtendBars, tp1, color=tpLineCol, style=line.style_dotted, width=1) : na
+            line tp2L = showTP2 ? line.new(bar_index, tp2, bar_index + zoneExtendBars, tp2, color=tpLineCol, style=line.style_dotted, width=1) : na
+            line tp3L = showTP3 ? line.new(bar_index, tp3, bar_index + zoneExtendBars, tp3, color=tpLineCol, style=line.style_dotted, width=1) : na
+            array.push(tradeTP1Line, tp1L)
+            array.push(tradeTP2Line, tp2L)
+            array.push(tradeTP3Line, tp3L)
+            // Candle labels
+            if showCandleLabels
+                label.new(bar_index - 3, high[3], "C1", style=label.style_none, textcolor=bearColor, size=size.tiny)
+                label.new(bar_index - 2, c2High,  "C2\nLiq", style=label.style_none, textcolor=bearColor, size=size.tiny)
+                label.new(bar_index - 1, c3High,  "C3", style=label.style_none, textcolor=bearColor, size=size.tiny)
+                string c4Txt = showStrength ? "C4 Entry\n" + str.tostring(bearStrength * 100, "#") + "%" : "C4\nEntry"
+                label.new(bar_index, c4High, c4Txt, style=label.style_none, textcolor=bearColor, size=size.tiny)
 
 // --- Enforce max open trades (remove oldest, record as expired) ---
 while array.size(tradeDir) > maxOpenTrades
