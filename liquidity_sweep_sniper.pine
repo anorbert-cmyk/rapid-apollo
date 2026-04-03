@@ -172,10 +172,10 @@ bool bullC4Sweep     = c4Low < c3Low
 bool bullC4Reclaim   = c4ReclaimReq ? c4Close >= c3Low - nz(atr) * 0.01 : true
 bool bullSwingOk     = swingValidation ? (not na(recentSwingLow) ? c1Low <= recentSwingLow + atrRef * 0.15 : true) : true
 
-bool bullPattern = hasEnoughBars and barstate.isconfirmed and showBullish
+bool bullPattern = (hasEnoughBars and barstate.isconfirmed and showBullish
      and bullC2Sweep and bullC2Reclaim and bullWickOk
      and bullDepthOk and bullC3Bullish and bullC3NotInside
-     and bullC4Sweep and bullC4Reclaim and bullSwingOk and cooldownOk
+     and bullC4Sweep and bullC4Reclaim and bullSwingOk and cooldownOk)
 
 // --- BEARISH detection ---
 // C2 sweeps above C1 high and closes back below (bearish liquidity block)
@@ -194,10 +194,10 @@ bool bearC4Sweep     = c4High > c3High
 bool bearC4Reclaim   = c4ReclaimReq ? c4Close <= c3High + nz(atr) * 0.01 : true
 bool bearSwingOk     = swingValidation ? (not na(recentSwingHigh) ? c1High >= recentSwingHigh - atrRef * 0.15 : true) : true
 
-bool bearPattern = hasEnoughBars and barstate.isconfirmed and showBearish
+bool bearPattern = (hasEnoughBars and barstate.isconfirmed and showBearish
      and bearC2Sweep and bearC2Reclaim and bearWickOk
      and bearDepthOk and bearC3Bearish and bearC3NotInside
-     and bearC4Sweep and bearC4Reclaim and bearSwingOk and cooldownOk
+     and bearC4Sweep and bearC4Reclaim and bearSwingOk and cooldownOk)
 
 // --- Update cooldown ---
 if bullPattern or bearPattern
