@@ -271,7 +271,7 @@ var float lastStrength = na
 // --- Register bullish trade ---
 if bullPattern
     float entry = c3Low
-    float sl    = c4Low - nz(atr) * slBufferMult
+    float sl    = c4Low - atrRef * slBufferMult
     float risk  = entry - sl
     if risk > 0 and array.size(tradeDir) < maxOpenTrades
         float tp1 = entry + risk
@@ -320,7 +320,7 @@ if bullPattern
 // --- Register bearish trade ---
 if bearPattern
     float entry = c3High
-    float sl    = c4High + nz(atr) * slBufferMult
+    float sl    = c4High + atrRef * slBufferMult
     float risk  = sl - entry
     if risk > 0 and array.size(tradeDir) < maxOpenTrades
         float tp1 = entry - risk
@@ -366,8 +366,11 @@ if bearPattern
         lastStrength := bearStrength
         totalBear    += 1
 
-// --- Enforce max open trades (remove oldest) ---
+// --- Enforce max open trades (remove oldest, record as expired) ---
 while array.size(tradeDir) > maxOpenTrades
+    // Record evicted trade as 0R (expired, not win or loss) to avoid survivorship bias
+    array.push(resultDir, array.get(tradeDir, 0))
+    array.push(resultR, 0.0)
     box.delete(array.shift(tradeZoneBox))
     line.delete(array.shift(tradeSLLine))
     line.delete(array.shift(tradeTP1Line))
