@@ -19,7 +19,7 @@ string GRP_RISK = "Risk Management"
 float  slBufferMult = input.float(0.10, "SL Buffer (x ATR)", tooltip="Buffer below/above the extreme wick for stop loss placement.", group=GRP_RISK)
 float  accountSize  = input.float(10000, "Account Size ($)", group=GRP_RISK)
 float  riskPct      = input.float(1.0, "Risk Per Trade (%)", group=GRP_RISK)
-float  pipValue     = input.float(0.0001, "Pip/Point Size", tooltip="0.0001 for forex, 0.01 for JPY pairs, 1.0 for indices.", group=GRP_RISK)
+float  pipValue     = input.float(0.0001, "Pip/Point Size", minval=0.0000001, tooltip="0.0001 for forex, 0.01 for JPY pairs, 1.0 for indices.", group=GRP_RISK)
 
 // Group: Targets
 string GRP_TP = "Targets"
@@ -133,12 +133,18 @@ bool c3NotInsideC2 = switch sensitivityMode
     => true
 
 // --- Candle references ---
-float c1Low   = low[3],  float c1High  = high[3]
-float c2Low   = low[2],  float c2High  = high[2]
-float c2Open  = open[2], float c2Close = close[2]
-float c3Low   = low[1],  float c3High  = high[1]
-float c3Open  = open[1], float c3Close = close[1]
-float c4Low   = low[0],  float c4High  = high[0]
+float c1Low   = low[3]
+float c1High  = high[3]
+float c2Low   = low[2]
+float c2High  = high[2]
+float c2Open  = open[2]
+float c2Close = close[2]
+float c3Low   = low[1]
+float c3High  = high[1]
+float c3Open  = open[1]
+float c3Close = close[1]
+float c4Low   = low[0]
+float c4High  = high[0]
 float c4Close = close[0]
 
 // --- Cooldown tracking ---
@@ -160,8 +166,8 @@ bool bullDepthOk     = bullSweepDepth >= atrRef * sweepDepthMin and bullSweepDep
 bool bullC3Bullish   = c3Close > c3Open
 bool bullC3NotInside = c3NotInsideC2 ? not (c3High <= c2High and c3Low >= c2Low) : true
 bool bullC4Sweep     = c4Low < c3Low
-bool bullC4Reclaim   = c4ReclaimReq ? c4Close >= c3Low - nz(atr) * 0.05 : true
-bool bullSwingOk     = swingValidation ? (not na(recentSwingLow) ? c1Low <= recentSwingLow * 1.005 : false) : true
+bool bullC4Reclaim   = c4ReclaimReq ? c4Close >= c3Low - nz(atr) * 0.01 : true
+bool bullSwingOk     = swingValidation ? (not na(recentSwingLow) ? c1Low <= recentSwingLow + atrRef * 0.15 : true) : true
 
 bool bullPattern = barstate.isconfirmed and showBullish
      and bullC2Sweep and bullC2Reclaim and bullWickOk
@@ -182,8 +188,8 @@ bool bearDepthOk     = bearSweepDepth >= atrRef * sweepDepthMin and bearSweepDep
 bool bearC3Bearish   = c3Close < c3Open
 bool bearC3NotInside = c3NotInsideC2 ? not (c3High <= c2High and c3Low >= c2Low) : true
 bool bearC4Sweep     = c4High > c3High
-bool bearC4Reclaim   = c4ReclaimReq ? c4Close <= c3High + nz(atr) * 0.05 : true
-bool bearSwingOk     = swingValidation ? (not na(recentSwingHigh) ? c1High >= recentSwingHigh * 0.995 : false) : true
+bool bearC4Reclaim   = c4ReclaimReq ? c4Close <= c3High + nz(atr) * 0.01 : true
+bool bearSwingOk     = swingValidation ? (not na(recentSwingHigh) ? c1High >= recentSwingHigh - atrRef * 0.15 : true) : true
 
 bool bearPattern = barstate.isconfirmed and showBearish
      and bearC2Sweep and bearC2Reclaim and bearWickOk
@@ -624,15 +630,15 @@ if barstate.islast and showBacktestDash
     table.cell(backtestDash, 0, 3, "Wins / Losses", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
     table.cell(backtestDash, 1, 3, str.tostring(wins1R) + " / " + str.tostring(losses), text_color=_wlC, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
 
-    float _wr1 = _resolved > 0 ? wins1R / _resolved * 100.0 : 0.0
+    float _wr1 = _resolved > 0 ? wins1R * 100.0 / _resolved : 0.0
     table.cell(backtestDash, 0, 4, "Win Rate @ 1R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
     table.cell(backtestDash, 1, 4, str.tostring(_wr1, "#.1") + "%", text_color=_wr1 >= 50 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
 
-    float _wr2 = _resolved > 0 ? wins2R / _resolved * 100.0 : 0.0
+    float _wr2 = _resolved > 0 ? wins2R * 100.0 / _resolved : 0.0
     table.cell(backtestDash, 0, 5, "Win Rate @ 2R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
     table.cell(backtestDash, 1, 5, str.tostring(_wr2, "#.1") + "%", text_color=_wr2 >= 33 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
 
-    float _wr3 = _resolved > 0 ? wins3R / _resolved * 100.0 : 0.0
+    float _wr3 = _resolved > 0 ? wins3R * 100.0 / _resolved : 0.0
     table.cell(backtestDash, 0, 6, "Win Rate @ 3R", text_color=_lbl, text_size=size.small, bgcolor=_bg, text_halign=text.align_left)
     table.cell(backtestDash, 1, 6, str.tostring(_wr3, "#.1") + "%", text_color=_wr3 >= 25 ? color.green : color.red, text_size=size.small, bgcolor=_bg, text_halign=text.align_right)
 
@@ -677,7 +683,7 @@ alertcondition(bullPattern, "Bullish Liquidity Sweep", "Bullish liquidity sweep 
 alertcondition(bearPattern, "Bearish Liquidity Sweep", "Bearish liquidity sweep on {{ticker}} {{interval}}")
 alertcondition(bullPattern or bearPattern, "Any Liquidity Sweep", "Liquidity sweep on {{ticker}} {{interval}}")
 
-if bullPattern or bearPattern
+if (bullPattern or bearPattern) and not na(lastEntry) and not na(lastSL)
     string _dir = bullPattern ? "LONG" : "SHORT"
     float  _str = bullPattern ? bullStrength : bearStrength
     string msg  = na
@@ -689,7 +695,7 @@ if bullPattern or bearPattern
              "\nTP1: " + str.tostring(lastTP1val, format.mintick) +
              " | TP2: " + str.tostring(lastTP2val, format.mintick) +
              " | TP3: " + str.tostring(lastTP3val, format.mintick) +
-             "\nRisk: " + str.tostring(lastRisk / pipValue, "#.1") + " pips" +
+             "\nRisk: " + str.tostring(nz(lastRisk) / pipValue, "#.1") + " pips" +
              " | Strength: " + str.tostring(_str * 100, "#") + "%" +
              " | Mode: " + sensitivityMode
 
@@ -697,11 +703,12 @@ if bullPattern or bearPattern
         msg := '{"ticker":"' + syminfo.ticker +
              '","tf":"' + timeframe.period +
              '","dir":"' + _dir +
-             '","entry":' + str.tostring(lastEntry) +
-             ',"sl":' + str.tostring(lastSL) +
-             ',"tp1":' + str.tostring(lastTP1val) +
-             ',"tp2":' + str.tostring(lastTP2val) +
-             ',"tp3":' + str.tostring(lastTP3val) +
+             '","entry":' + str.tostring(lastEntry, format.mintick) +
+             ',"sl":' + str.tostring(lastSL, format.mintick) +
+             ',"tp1":' + str.tostring(nz(lastTP1val), format.mintick) +
+             ',"tp2":' + str.tostring(nz(lastTP2val), format.mintick) +
+             ',"tp3":' + str.tostring(nz(lastTP3val), format.mintick) +
+             ',"risk":' + str.tostring(nz(lastRisk), format.mintick) +
              ',"strength":' + str.tostring(_str * 100, "#") +
              ',"mode":"' + sensitivityMode + '"}'
 
