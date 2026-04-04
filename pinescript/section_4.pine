@@ -1,0 +1,232 @@
+
+// ═══════════════ INFO DASHBOARD TABLE ═══════════════
+
+// --- Date formatting helper ---
+formatDate(int t) =>
+    str.tostring(year(t)) + "-" + str.tostring(month(t), "00") + "-" + str.tostring(dayofmonth(t), "00")
+
+// --- Table position mapping ---
+dashPos = switch i_dashPosition
+    "Top Right"     => position.top_right
+    "Top Left"      => position.top_left
+    "Bottom Right"  => position.bottom_right
+    "Bottom Left"   => position.bottom_left
+    => position.top_right
+
+var color DASH_BG      = #1a1a2e
+var color DASH_BORDER  = #16213e
+var color LABEL_COLOR  = #8892b0
+
+var table dashTable = table.new(dashPos, 2, 14, bgcolor = DASH_BG, border_color = DASH_BORDER, border_width = 1, frame_color = DASH_BORDER, frame_width = 2)
+
+if barstate.islast and i_showDashboard
+    // Row 0 — Header
+    table.cell(dashTable, 0, 0, "BTC CYCLE MASTER", text_color = color.yellow, text_size = size.normal, text_halign = text.align_center, bgcolor = DASH_BG)
+    table.merge_cells(dashTable, 0, 0, 1, 0)
+
+    // Row 1 — Days Since Halving
+    table.cell(dashTable, 0, 1, "Days Since Halving", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    table.cell(dashTable, 1, 1, str.tostring(daysSinceHalving) + "d", text_color = color.white, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 2 — Days Since Bottom
+    table.cell(dashTable, 0, 2, "Days Since Bottom", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    dsbText = daysSinceBottom > 0 ? str.tostring(daysSinceBottom) + "d" : "N/A"
+    table.cell(dashTable, 1, 2, dsbText, text_color = color.white, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 3 — Days Since Last ATH
+    table.cell(dashTable, 0, 3, "Days Since Last ATH", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    athColor = daysSinceATH < 30 ? color.green : daysSinceATH < 100 ? color.yellow : color.red
+    table.cell(dashTable, 1, 3, str.tostring(daysSinceATH) + "d", text_color = athColor, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 4 — Current Phase
+    table.cell(dashTable, 0, 4, "Current Phase", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    table.cell(dashTable, 1, 4, currentPhase, text_color = phaseColor, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 5 — Phase Progress
+    table.cell(dashTable, 0, 5, "Phase Progress", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    table.cell(dashTable, 1, 5, str.tostring(phaseProgress, "#.0") + "%", text_color = phaseColor, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 6 — Current ATH
+    table.cell(dashTable, 0, 6, "Current ATH", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    table.cell(dashTable, 1, 6, "$" + str.tostring(ath, "#,###"), text_color = color.lime, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 7 — ATH Break Days (historical)
+    table.cell(dashTable, 0, 7, "ATH Break Days (hist)", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    athBreakStr = ""
+    athArrSize  = array.size(athBreakDaysArray)
+    if athArrSize > 0
+        startIdx = math.max(0, athArrSize - 3)
+        for idx = startIdx to athArrSize - 1
+            if idx > startIdx
+                athBreakStr := athBreakStr + ", "
+            athBreakStr := athBreakStr + str.tostring(array.get(athBreakDaysArray, idx)) + "d"
+    else
+        athBreakStr := "--"
+    table.cell(dashTable, 1, 7, athBreakStr, text_color = color.white, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 8 — Avg Peak-to-Peak
+    table.cell(dashTable, 0, 8, "Avg Peak-to-Peak", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    p2pText = avgPeakToPeak > 0 ? str.tostring(avgPeakToPeak, "#.0") + "d" : "N/A"
+    table.cell(dashTable, 1, 8, p2pText, text_color = color.white, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 9 — Cycle Compression
+    table.cell(dashTable, 0, 9, "Cycle Compression", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    compColor = cycleCompression < 0 ? color.orange : color.white
+    table.cell(dashTable, 1, 9, str.tostring(cycleCompression, "#.0") + "%", text_color = compColor, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 10 — Seq: Next P2P
+    table.cell(dashTable, 0, 10, "Seq: Next P2P", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    seqP2PText = seqNextPeakToPeak > 0 ? str.tostring(seqNextPeakToPeak, "#.0") + "d" : "N/A"
+    table.cell(dashTable, 1, 10, seqP2PText, text_color = color.aqua, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 11 — Seq: Next B2T
+    table.cell(dashTable, 0, 11, "Seq: Next B2T", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    seqB2TText = seqNextBottomToTop > 0 ? str.tostring(seqNextBottomToTop, "#.0") + "d" : "N/A"
+    table.cell(dashTable, 1, 11, seqB2TText, text_color = color.aqua, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 12 — Projected Top
+    table.cell(dashTable, 0, 12, "Projected Top", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    projTopText = projectedPeakRangeStart > 0 and projectedPeakRangeEnd > 0 ? formatDate(projectedPeakRangeStart) + " to " + formatDate(projectedPeakRangeEnd) : "N/A"
+    table.cell(dashTable, 1, 12, projTopText, text_color = color.orange, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+
+    // Row 13 — Warning
+    table.cell(dashTable, 0, 13, "", text_color = LABEL_COLOR, text_size = size.small, text_halign = text.align_left, bgcolor = DASH_BG)
+    table.cell(dashTable, 1, 13, "", text_color = color.red, text_size = size.small, text_halign = text.align_right, bgcolor = DASH_BG)
+    if str.length(phaseWarning) > 0
+        table.cell_set_text(dashTable, 0, 13, "⚠ Warning")
+        table.cell_set_text_color(dashTable, 0, 13, color.red)
+        table.cell_set_text(dashTable, 1, 13, phaseWarning)
+
+
+// ═══════════════ PROJECTED ZONES ═══════════════
+
+var box projTopBox      = na
+var box athBreakBox     = na
+var box lateCycleBox    = na
+var box projBottomBox   = na
+var label projTopLbl    = na
+var label athBreakLbl   = na
+var label lateCycleLbl  = na
+var label projBottomLbl = na
+
+if barstate.islast and i_showProjections
+    // --- Clean up previous drawings ---
+    if not na(projTopBox)
+        box.delete(projTopBox)
+    if not na(athBreakBox)
+        box.delete(athBreakBox)
+    if not na(lateCycleBox)
+        box.delete(lateCycleBox)
+    if not na(projBottomBox)
+        box.delete(projBottomBox)
+    if not na(projTopLbl)
+        label.delete(projTopLbl)
+    if not na(athBreakLbl)
+        label.delete(athBreakLbl)
+    if not na(lateCycleLbl)
+        label.delete(lateCycleLbl)
+    if not na(projBottomLbl)
+        label.delete(projBottomLbl)
+
+    // --- 1. Projected Top Time Zone ---
+    if projectedPeakRangeStart > 0 and projectedPeakRangeEnd > 0
+        boxTop    = high * 1.5
+        boxBottom = low * 0.5
+        projTopBox := box.new(
+             left     = projectedPeakRangeStart,
+             top      = boxTop,
+             right    = projectedPeakRangeEnd,
+             bottom   = boxBottom,
+             xloc     = xloc.bar_time,
+             bgcolor  = color.new(i_projTopColor, 85),
+             border_color = i_projTopColor,
+             border_width = 1)
+        projTopLbl := label.new(
+             x        = math.round((projectedPeakRangeStart + projectedPeakRangeEnd) / 2),
+             y        = boxTop,
+             text     = "Projected Top Zone",
+             xloc     = xloc.bar_time,
+             yloc     = yloc.price,
+             style    = label.style_label_down,
+             color    = color.new(i_projTopColor, 70),
+             textcolor = color.white,
+             size     = size.small)
+
+    // --- 2. ATH Break Zone After Halving ---
+    athBreakStart = HALVING_4 + 170 * MS_PER_DAY
+    athBreakEnd   = HALVING_4 + 400 * MS_PER_DAY
+    athBreakBox := box.new(
+         left     = athBreakStart,
+         top      = high * 1.5,
+         right    = athBreakEnd,
+         bottom   = low * 0.5,
+         xloc     = xloc.bar_time,
+         bgcolor  = color.new(color.aqua, 90),
+         border_color = color.new(color.aqua, 60),
+         border_width = 1)
+    athBreakLbl := label.new(
+         x        = math.round((athBreakStart + athBreakEnd) / 2),
+         y        = high * 1.3,
+         text     = "ATH Break Window\n170-400d post-halving",
+         xloc     = xloc.bar_time,
+         yloc     = yloc.price,
+         style    = label.style_label_down,
+         color    = color.new(color.aqua, 80),
+         textcolor = color.aqua,
+         size     = size.small)
+
+    // --- 3. End of Cycle Warning Zone ---
+    if daysSinceHalving > 500
+        lateCycleStart = time
+        lateCycleEnd   = projectedPeakRangeEnd > 0 ? projectedPeakRangeEnd : time + 120 * MS_PER_DAY
+        lateCycleBox := box.new(
+             left     = lateCycleStart,
+             top      = high * 1.2,
+             right    = lateCycleEnd,
+             bottom   = low * 0.8,
+             xloc     = xloc.bar_time,
+             bgcolor  = color.new(color.red, 92),
+             border_color = color.new(color.red, 70),
+             border_width = 1,
+             border_style = line.style_dashed)
+        lateCycleLbl := label.new(
+             x        = math.round((lateCycleStart + lateCycleEnd) / 2),
+             y        = high * 1.15,
+             text     = "Late Cycle Warning\n100-120d may remain",
+             xloc     = xloc.bar_time,
+             yloc     = yloc.price,
+             style    = label.style_label_down,
+             color    = color.new(color.red, 80),
+             textcolor = color.red,
+             size     = size.small)
+
+    // --- 4. Projected Bottom Zone (bear market bottom after projected top) ---
+    if projectedPeakTime > 0
+        projBottomStart = projectedPeakTime + 300 * MS_PER_DAY
+        projBottomEnd   = projectedPeakTime + 420 * MS_PER_DAY
+        projBottomBox := box.new(
+             left     = projBottomStart,
+             top      = high * 1.0,
+             right    = projBottomEnd,
+             bottom   = low * 0.3,
+             xloc     = xloc.bar_time,
+             bgcolor  = color.new(i_projBottomColor, 85),
+             border_color = i_projBottomColor,
+             border_width = 1)
+        projBottomLbl := label.new(
+             x        = math.round((projBottomStart + projBottomEnd) / 2),
+             y        = high * 0.9,
+             text     = "Projected Bottom Zone",
+             xloc     = xloc.bar_time,
+             yloc     = yloc.price,
+             style    = label.style_label_down,
+             color    = color.new(i_projBottomColor, 70),
+             textcolor = color.white,
+             size     = size.small)
+
+
+// ═══════════════ TICKER WARNING ═══════════════
+var bool isBTC = str.contains(str.upper(syminfo.ticker), "BTC") or str.contains(str.upper(syminfo.basecurrency), "BTC")
+if barstate.islast and not isBTC
+    label.new(bar_index, close, "⚠ This indicator is designed for BTC charts only",
+              style = label.style_label_center, color = color.red, textcolor = color.white, size = size.large)

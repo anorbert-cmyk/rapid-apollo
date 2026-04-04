@@ -1,0 +1,195 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 9: MATHEMATICAL SEQUENCE CALCULATOR
+// Based on @killaxbt's chart analysis - decreasing interval pattern
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Historical peak-to-peak intervals (days)
+var float ptpInterval1 = 1476.0   // Peak 1 → Peak 2
+var float ptpInterval2 = 1420.0   // Peak 2 → Peak 3
+var float ptpInterval3 = 1418.0   // Peak 3 → Peak 4
+
+// Historical halving-to-top intervals (days, approximate from chart)
+var float h2tInterval1 = 367.0    // Halving 1 → Peak 2
+var float h2tInterval2 = 525.0    // Halving 2 → Peak 3
+var float h2tInterval3 = 549.0    // Halving 3 → Peak 4
+
+// Historical bottom-to-top intervals (days)
+var float b2tInterval1 = 742.0    // Bottom 1 → Peak 2
+var float b2tInterval2 = 1064.0   // Bottom 2 → Peak 3
+var float b2tInterval3 = 1057.0   // Bottom 3 → Peak 4
+
+// ATH break intervals (days) from chart
+var float athBreak1 = 1170.0
+var float athBreak2 = 983.0
+var float athBreak3 = 364.0
+
+// Sequence values noted on chart: 277, 228, 496
+var float seqVal1 = 277.0
+var float seqVal2 = 228.0
+var float seqVal3 = 496.0
+
+// Output variables
+var float seqNextPeakToPeak       = 0.0
+var float seqNextBottomToTop      = 0.0
+var float seqNextHalvingToTop     = 0.0
+var int   seqProjectedTopFromHalving = 0
+var int   seqProjectedTopFromBottom  = 0
+
+// ── Method A: Linear Trend (decreasing/stable interval extrapolation) ──
+
+// Peak-to-peak: differences are -56, -2 → compressing toward ~1400d
+float ptpDiff1_A = ptpInterval2 - ptpInterval1   // -56
+float ptpDiff2_A = ptpInterval3 - ptpInterval2   // -2
+// Trend of differences: the deceleration is itself shrinking
+// Linear extrapolation of the difference: next diff ≈ ptpDiff2_A + (ptpDiff2_A - ptpDiff1_A)
+float ptpDiff3_A = ptpDiff2_A + (ptpDiff2_A - ptpDiff1_A)  // -2 + 54 = 52 (rebound)
+// Clamp: intervals unlikely to grow, so cap the next diff at 0
+float ptpNextLinear = ptpInterval3 + math.min(ptpDiff3_A, 0.0)
+
+// Bottom-to-top: differences are +322, -7
+float b2tDiff1_A = b2tInterval2 - b2tInterval1   // 322
+float b2tDiff2_A = b2tInterval3 - b2tInterval2   // -7
+float b2tDiff3_A = b2tDiff2_A + (b2tDiff2_A - b2tDiff1_A)  // -7 + (-329) = -336
+float b2tNextLinear = b2tInterval3 + b2tDiff3_A
+
+// Halving-to-top: differences are +158, +24
+float h2tDiff1_A = h2tInterval2 - h2tInterval1   // 158
+float h2tDiff2_A = h2tInterval3 - h2tInterval2   // 24
+float h2tDiff3_A = h2tDiff2_A + (h2tDiff2_A - h2tDiff1_A)  // 24 + (-134) = -110
+float h2tNextLinear = h2tInterval3 + h2tDiff3_A
+
+// ── Method B: Halve the Difference ──
+// From the chart's method:
+//   Step 1: Find difference between last two intervals
+//   Step 2: Halve it
+//   Step 3: Subtract from last interval
+
+// Peak-to-peak halve-the-difference
+float ptpLastDiff    = math.abs(ptpInterval3 - ptpInterval2)  // |−2| = 2
+float ptpHalved      = ptpLastDiff / 2.0                       // 1
+float ptpNextHalve   = ptpInterval3 - ptpHalved                // 1418 - 1 = 1417
+
+// Bottom-to-top halve-the-difference
+float b2tLastDiff    = math.abs(b2tInterval3 - b2tInterval2)  // |−7| = 7
+float b2tHalved      = b2tLastDiff / 2.0                       // 3.5
+float b2tNextHalve   = b2tInterval3 - b2tHalved                // 1057 - 3.5 = 1053.5
+
+// Halving-to-top halve-the-difference
+float h2tLastDiff    = math.abs(h2tInterval3 - h2tInterval2)  // |24| = 24
+float h2tHalved      = h2tLastDiff / 2.0                       // 12
+float h2tNextHalve   = h2tInterval3 + h2tHalved                // 549 + 12 = 561
+// Note: halving-to-top was increasing, so we add (extending the trend)
+
+// ── Combine: Average of Method A and Method B ──
+seqNextPeakToPeak    := (ptpNextLinear + ptpNextHalve) / 2.0
+seqNextBottomToTop   := math.max((b2tNextLinear + b2tNextHalve) / 2.0, 300.0)  // floor at 300d
+seqNextHalvingToTop  := (h2tNextLinear + h2tNextHalve) / 2.0
+
+// ── Projected top timestamps ──
+seqProjectedTopFromHalving := HALVING_4 + math.round(seqNextHalvingToTop) * MS_PER_DAY
+seqProjectedTopFromBottom  := BOTTOM_4  + math.round(seqNextBottomToTop)  * MS_PER_DAY
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 10: CYCLE PHASE INDICATOR
+// Cycle phases with compression adjustment
+// Historical patterns show cycle compression ~2-5% per cycle
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var string currentPhase  = "Unknown"
+var color  phaseColor    = color.gray
+var float  phaseProgress = 0.0
+var string phaseWarning  = ""
+
+// Phase boundaries (days since halving)
+int PHASE_ACCUM_END = 200    // 0-200d:   Accumulation
+int PHASE_EARLY_END = 400    // 200-400d: Early Bull
+int PHASE_PARA_END  = 550    // 400-550d: Parabolic
+int PHASE_DIST_END  = 700    // 550-700d: Distribution
+                              // 700d+:    Bear Market
+
+// ── Determine current phase ──
+if daysSinceHalving <= PHASE_ACCUM_END
+    currentPhase := "Accumulation"
+    phaseColor   := color.gray
+    phaseProgress := (daysSinceHalving / PHASE_ACCUM_END) * 100.0
+else if daysSinceHalving <= PHASE_EARLY_END
+    currentPhase := "Early Bull"
+    phaseColor   := color.green
+    phaseProgress := ((daysSinceHalving - PHASE_ACCUM_END) / (PHASE_EARLY_END - PHASE_ACCUM_END)) * 100.0
+else if daysSinceHalving <= PHASE_PARA_END
+    currentPhase := "Parabolic"
+    phaseColor   := color.aqua
+    phaseProgress := ((daysSinceHalving - PHASE_EARLY_END) / (PHASE_PARA_END - PHASE_EARLY_END)) * 100.0
+else if daysSinceHalving <= PHASE_DIST_END
+    currentPhase := "Distribution"
+    phaseColor   := color.orange
+    phaseProgress := ((daysSinceHalving - PHASE_PARA_END) / (PHASE_DIST_END - PHASE_PARA_END)) * 100.0
+else
+    currentPhase := "Bear Market"
+    phaseColor   := color.red
+    // In bear market, measure from distribution end; cap at 100%
+    phaseProgress := math.min(((daysSinceHalving - PHASE_DIST_END) / 300.0) * 100.0, 100.0)
+
+// ── Late-cycle warnings ──
+phaseWarning := ""
+if daysSinceHalving > 600
+    phaseWarning := "🔴 Very late cycle"
+else if daysSinceHalving > 500
+    phaseWarning := "⚠ Late cycle - 100-120 days may remain"
+
+// ── Visual output ──
+if i_showPhases
+    if i_phaseStyle == "Background"
+        bgcolor(color.new(phaseColor, 90))
+    else if i_phaseStyle == "Bars"
+        barcolor(phaseColor)
+    // "None" → no visual output, phase still calculated for dashboard
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 11: LOGARITHMIC GROWTH CURVES
+// Simplified log growth model for Bitcoin cycle analysis
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Bitcoin's long-term log growth rate approximately halves each cycle
+// Cycle 1: ~0.5% daily, Cycle 2: ~0.25%, Cycle 3: ~0.12%, Cycle 4: ~0.06%
+var float logGrowthRate = 0.0006   // ~0.06% daily in log terms for current cycle
+var float cycleBasePrice = 15500.0 // BOTTOM_4 approximate price
+
+// Curve values (na when disabled so plots draw nothing)
+var float fairValue  = na
+var float upperBand2 = na
+var float upperBand1 = na
+var float lowerBand1 = na
+var float lowerBand2 = na
+
+if i_showLogCurves and lastBottomTime > 0 and daysSinceBottom > 0
+    // Expected log-linear price at current day since cycle bottom
+    float expectedLogPrice = math.log(cycleBasePrice) + logGrowthRate * daysSinceBottom
+    fairValue  := math.exp(expectedLogPrice)
+
+    // Bands at multipliers of fair value
+    upperBand2 := fairValue * 5.0    // Extreme overbought
+    upperBand1 := fairValue * 2.5    // Overbought
+    lowerBand1 := fairValue * 0.5    // Oversold
+    lowerBand2 := fairValue * 0.25   // Extreme oversold
+else if not i_showLogCurves
+    fairValue  := na
+    upperBand2 := na
+    upperBand1 := na
+    lowerBand1 := na
+    lowerBand2 := na
+
+// ── Plot logarithmic growth curves ──
+fvPlot  = plot(i_showLogCurves ? fairValue  : na, "Fair Value",         color.new(color.white,  50), linewidth=2)
+ub2Plot = plot(i_showLogCurves ? upperBand2 : na, "Extreme Overbought", color.new(color.red,    60), linewidth=1)
+ub1Plot = plot(i_showLogCurves ? upperBand1 : na, "Overbought",         color.new(color.orange, 60), linewidth=1)
+lb1Plot = plot(i_showLogCurves ? lowerBand1 : na, "Oversold",           color.new(color.green,  60), linewidth=1)
+lb2Plot = plot(i_showLogCurves ? lowerBand2 : na, "Extreme Oversold",   color.new(color.teal,   60), linewidth=1)
+
+// ── Rainbow fill between bands ──
+fill(ub2Plot, ub1Plot, color.new(color.red,    92), title="Extreme Overbought Zone")
+fill(ub1Plot, fvPlot,  color.new(color.orange, 92), title="Overbought Zone")
+fill(fvPlot,  lb1Plot, color.new(color.green,  92), title="Oversold Zone")
+fill(lb1Plot, lb2Plot, color.new(color.teal,   92), title="Extreme Oversold Zone")

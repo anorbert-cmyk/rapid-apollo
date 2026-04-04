@@ -1,0 +1,194 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 5: FEATURE 3 - ATH DETECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var float ath = 0.0
+var int   athBarTime = 0
+var int   prevAthBarTime = 0
+var bool  isNewATH = false
+var int   athCount = 0
+
+// Reset flag each bar
+isNewATH := false
+
+if high > ath
+    prevAthBarTime := athBarTime
+    ath            := high
+    athBarTime     := time
+    isNewATH       := true
+    athCount       += 1
+
+int daysSinceATH = athBarTime > 0 ? daysFromMs(time - athBarTime) : 0
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 6: FEATURE 3 - ATH BREAK DAYS & ATH VISUAL MARKERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// --- ATH Break Days (days from halving to first new ATH after that halving) ---
+var int   halvingForATHBreak = 0
+var bool  athBrokenAfterHalving = false
+var int[] athBreakDaysArray = array.new_int(0)
+
+// Detect when we cross any halving date and reset ATH break tracking
+for i = 0 to array.size(halvingDates) - 1
+    int hDate = array.get(halvingDates, i)
+    if crossesDate(hDate)
+        halvingForATHBreak    := hDate
+        athBrokenAfterHalving := false
+
+// When a new ATH is detected and we haven't broken ATH yet after the current halving
+if isNewATH and halvingForATHBreak > 0 and not athBrokenAfterHalving
+    int breakDays = daysFromMs(time - halvingForATHBreak)
+    array.push(athBreakDaysArray, breakDays)
+    athBrokenAfterHalving := true
+    if i_showATHBreakDays
+        string breakText = "ATH Break\n" + str.tostring(breakDays) + "d"
+        label.new(x=time, y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=breakText, style=label.style_label_down, color=i_athColor, textcolor=color.black, size=size.small)
+
+// --- ATH Visual Markers (only significant ones: 30+ day gap from previous ATH) ---
+if isNewATH and i_showATH
+    int gapFromPrevATH = prevAthBarTime > 0 ? daysFromMs(time - prevAthBarTime) : 9999
+    if gapFromPrevATH >= 30
+        label.new(x=time, y=low, xloc=xloc.bar_time, yloc=yloc.belowbar, text="", style=label.style_triangleup, color=i_athColor, size=size.tiny)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 7: FEATURE 4 - CYCLE BOTTOM DETECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var int lastBottomTime = 0
+var int currentBottomIdx = -1
+
+// Detect when the bar crosses a bottom date
+for i = 0 to array.size(bottomDates) - 1
+    int bDate = array.get(bottomDates, i)
+    if crossesDate(bDate)
+        lastBottomTime  := bDate
+        currentBottomIdx := i
+        if i_showBottomMarkers
+            string dateStr = str.format("{0,date,yyyy-MM-dd}", bDate)
+            string lblText = "Cycle Bottom\n" + dateStr
+            label.new(x=bDate, y=low, xloc=xloc.bar_time, yloc=yloc.belowbar, text=lblText, style=label.style_triangledown, color=i_bottomColor, textcolor=color.black, size=size.small)
+
+int daysSinceBottom = lastBottomTime > 0 ? daysFromMs(time - lastBottomTime) : 0
+
+// --- Bottom-to-Top Measurements ---
+// Draw lines and labels connecting each bottom to the next cycle peak.
+// BOTTOM_1 -> PEAK_2, BOTTOM_2 -> PEAK_3, BOTTOM_3 -> PEAK_4, BOTTOM_4 -> projected
+// We draw these once, on the bar that crosses the peak date (or last bar for projection).
+
+var bool drewB1toP2 = false
+var bool drewB2toP3 = false
+var bool drewB3toP4 = false
+var bool drewB4toProj = false
+
+// BOTTOM_1 to PEAK_2
+if crossesDate(PEAK_2) and not drewB1toP2 and i_showBottomMarkers
+    int dur = daysFromMs(PEAK_2 - BOTTOM_1)
+    string durText = "bottom to top\n" + str.tostring(dur) + "d"
+    line.new(x1=BOTTOM_1, y1=close, x2=PEAK_2, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
+    label.new(x=math.round((BOTTOM_1 + PEAK_2) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.tiny)
+    drewB1toP2 := true
+
+// BOTTOM_2 to PEAK_3
+if crossesDate(PEAK_3) and not drewB2toP3 and i_showBottomMarkers
+    int dur = daysFromMs(PEAK_3 - BOTTOM_2)
+    string durText = "bottom to top\n" + str.tostring(dur) + "d"
+    line.new(x1=BOTTOM_2, y1=close, x2=PEAK_3, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
+    label.new(x=math.round((BOTTOM_2 + PEAK_3) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.tiny)
+    drewB2toP3 := true
+
+// BOTTOM_3 to PEAK_4
+if crossesDate(PEAK_4) and not drewB3toP4 and i_showBottomMarkers
+    int dur = daysFromMs(PEAK_4 - BOTTOM_3)
+    string durText = "bottom to top\n" + str.tostring(dur) + "d"
+    line.new(x1=BOTTOM_3, y1=close, x2=PEAK_4, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
+    label.new(x=math.round((BOTTOM_3 + PEAK_4) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.tiny)
+    drewB3toP4 := true
+
+// BOTTOM_4 to projected peak (drawn on last bar)
+// projectedPeakTime is computed in section 8 below, so we draw this after that section.
+// We use a forward reference placeholder; actual drawing is at the end of this file.
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 8: FEATURE 5 - PEAK-TO-PEAK ANALYSIS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var int lastPeakTime = 0
+
+// Detect when the bar crosses a peak date and draw markers
+for i = 0 to array.size(peakDates) - 1
+    int pDate = array.get(peakDates, i)
+    if crossesDate(pDate)
+        lastPeakTime := pDate
+        if i_showPeakAnalysis
+            string dateStr = str.format("{0,date,yyyy-MM-dd}", pDate)
+            string lblText = "Peak #" + str.tostring(i + 1) + "\n" + dateStr
+            label.new(x=pDate, y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=lblText, style=label.style_diamond, color=color.orange, textcolor=color.white, size=size.small)
+
+// --- Peak-to-Peak Intervals ---
+int p1_to_p2 = daysFromMs(PEAK_2 - PEAK_1)
+int p2_to_p3 = daysFromMs(PEAK_3 - PEAK_2)
+int p3_to_p4 = daysFromMs(PEAK_4 - PEAK_3)
+
+// Draw peak-to-peak connecting lines and labels (once, when crossing PEAK_2, PEAK_3, PEAK_4)
+var bool drewP1toP2 = false
+var bool drewP2toP3 = false
+var bool drewP3toP4 = false
+
+if crossesDate(PEAK_2) and not drewP1toP2 and i_showPeakAnalysis
+    string pText = "peak to peak\n" + str.tostring(p1_to_p2) + "d"
+    line.new(x1=PEAK_1, y1=high, x2=PEAK_2, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
+    label.new(x=math.round((PEAK_1 + PEAK_2) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=size.tiny)
+    drewP1toP2 := true
+
+if crossesDate(PEAK_3) and not drewP2toP3 and i_showPeakAnalysis
+    string pText = "peak to peak\n" + str.tostring(p2_to_p3) + "d"
+    line.new(x1=PEAK_2, y1=high, x2=PEAK_3, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
+    label.new(x=math.round((PEAK_2 + PEAK_3) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=size.tiny)
+    drewP2toP3 := true
+
+if crossesDate(PEAK_4) and not drewP3toP4 and i_showPeakAnalysis
+    string pText = "peak to peak\n" + str.tostring(p3_to_p4) + "d"
+    line.new(x1=PEAK_3, y1=high, x2=PEAK_4, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
+    label.new(x=math.round((PEAK_3 + PEAK_4) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=size.tiny)
+    drewP3toP4 := true
+
+// --- Compression Analysis ---
+float avgPeakToPeak = (p1_to_p2 + p2_to_p3 + p3_to_p4) / 3.0
+
+// Compression: how much shorter each successive cycle is vs the prior one (as %)
+// Negative value = cycle is compressing (getting shorter)
+float compression_2_vs_1 = ((p2_to_p3 - p1_to_p2) / p1_to_p2) * 100.0
+float compression_3_vs_2 = ((p3_to_p4 - p2_to_p3) / p2_to_p3) * 100.0
+float cycleCompression = (compression_2_vs_1 + compression_3_vs_2) / 2.0
+
+// --- Peak Projection ---
+// Estimate next cycle length by applying average compression to last interval
+float compressFactor = 1.0 + (cycleCompression / 100.0)
+int   estimatedNextCycle = math.round(p3_to_p4 * compressFactor)
+// Clamp: don't let estimated cycle go below 1,000 days or above 1,600 days
+int   clampedNextCycle = math.max(1000, math.min(1600, estimatedNextCycle))
+
+var int projectedPeakTime = 0
+var int projectedPeakRangeStart = 0
+var int projectedPeakRangeEnd = 0
+
+projectedPeakTime       := PEAK_4 + clampedNextCycle * MS_PER_DAY
+projectedPeakRangeStart := PEAK_4 + math.round(clampedNextCycle * 0.9) * MS_PER_DAY   // optimistic (earlier)
+projectedPeakRangeEnd   := PEAK_4 + math.round(clampedNextCycle * 1.1) * MS_PER_DAY   // conservative (later)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 7b: BOTTOM_4 TO PROJECTED PEAK (deferred from Section 7)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Draw BOTTOM_4 to projected peak on the last bar
+if barstate.islast and not drewB4toProj and i_showBottomMarkers
+    int estDur = 1064
+    string durText = "bottom to top\n" + str.tostring(estDur) + "d?"
+    line.new(x1=BOTTOM_4, y1=close, x2=projectedPeakTime, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
+    label.new(x=math.round((BOTTOM_4 + projectedPeakTime) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.tiny)
+    drewB4toProj := true
