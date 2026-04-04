@@ -1,9 +1,76 @@
 // ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 4b: AUTO-DETECTION (pivot-based)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Reference variables (from section_1 inputs):
+// i_autoDetect (bool), i_pivotLeft (int), i_pivotRight (int), i_minCycleDays (int)
+
+// Auto-detected peaks and bottoms (collected during historical scan)
+var array<int> autoBottoms = array.new_int(0)
+var array<int> autoPeaks   = array.new_int(0)
+
+if i_autoDetect
+    // ta.pivothigh/pivotlow return the pivot value, offset by pivotRight bars
+    float ph = ta.pivothigh(high, i_pivotLeft, i_pivotRight)
+    float pl = ta.pivotlow(low, i_pivotLeft, i_pivotRight)
+
+    if not na(ph)
+        int pivotTime = time[i_pivotRight]
+        // Add if far enough from last detected peak
+        if array.size(autoPeaks) == 0 or (pivotTime - array.get(autoPeaks, array.size(autoPeaks) - 1)) >= i_minCycleDays * MS_PER_DAY
+            array.push(autoPeaks, pivotTime)
+
+    if not na(pl)
+        int pivotTime = time[i_pivotRight]
+        if array.size(autoBottoms) == 0 or (pivotTime - array.get(autoBottoms, array.size(autoBottoms) - 1)) >= i_minCycleDays * MS_PER_DAY
+            array.push(autoBottoms, pivotTime)
+
+// Build effective arrays: use auto-detected if autoDetect enabled AND we have enough points, else use user inputs
+var array<int> effectiveBottoms = array.new_int(0)
+var array<int> effectivePeaks   = array.new_int(0)
+
+// Rebuild on last bar to finalize
+if barstate.islast
+    array.clear(effectiveBottoms)
+    array.clear(effectivePeaks)
+
+    if i_autoDetect and array.size(autoBottoms) >= 3
+        for i = 0 to array.size(autoBottoms) - 1
+            array.push(effectiveBottoms, array.get(autoBottoms, i))
+    else
+        array.push(effectiveBottoms, BOTTOM_1)
+        array.push(effectiveBottoms, BOTTOM_2)
+        array.push(effectiveBottoms, BOTTOM_3)
+        array.push(effectiveBottoms, BOTTOM_4)
+
+    if i_autoDetect and array.size(autoPeaks) >= 3
+        for i = 0 to array.size(autoPeaks) - 1
+            array.push(effectivePeaks, array.get(autoPeaks, i))
+    else
+        array.push(effectivePeaks, PEAK_1)
+        array.push(effectivePeaks, PEAK_2)
+        array.push(effectivePeaks, PEAK_3)
+        array.push(effectivePeaks, PEAK_4)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION 4c: DYNAMIC CYCLE BASE PRICE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Dynamic cycle base price: price at the last bottom
+var float cycleBasePrice = 15500.0  // fallback default
+
+// Update cycleBasePrice when we cross the last bottom
+if crossesDate(BOTTOM_4)
+    cycleBasePrice := close
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 5: FEATURE 3 - ATH DETECTION
 // ═══════════════════════════════════════════════════════════════════════════════
 
-var float ath = 0.0
-var int   athBarTime = 0
+var float ath = na
+var int   athBarTime = na
 var int   prevAthBarTime = 0
 var bool  isNewATH = false
 var int   athCount = 0
@@ -11,14 +78,14 @@ var int   athCount = 0
 // Reset flag each bar
 isNewATH := false
 
-if high > ath
-    prevAthBarTime := athBarTime
+if na(ath) or high > ath
+    prevAthBarTime := na(athBarTime) ? 0 : athBarTime
     ath            := high
     athBarTime     := time
-    isNewATH       := true
+    isNewATH       := athCount > 0  // suppress first-bar false positive
     athCount       += 1
 
-int daysSinceATH = athBarTime > 0 ? daysFromMs(time - athBarTime) : 0
+int daysSinceATH = not na(athBarTime) ? daysFromMs(time - athBarTime) : 0
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -47,7 +114,7 @@ if isNewATH and halvingForATHBreak > 0 and not athBrokenAfterHalving
         label.new(x=time, y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=breakText, style=label.style_label_down, color=i_athColor, textcolor=color.black, size=size.small)
 
 // --- ATH Visual Markers (only significant ones: 30+ day gap from previous ATH) ---
-if isNewATH and i_showATH
+if isNewATH and i_showATH and athCount > 1
     int gapFromPrevATH = prevAthBarTime > 0 ? daysFromMs(time - prevAthBarTime) : 9999
     if gapFromPrevATH >= 30
         label.new(x=time, y=low, xloc=xloc.bar_time, yloc=yloc.belowbar, text="", style=label.style_triangleup, color=i_athColor, size=size.tiny)
@@ -60,16 +127,16 @@ if isNewATH and i_showATH
 var int lastBottomTime = 0
 var int currentBottomIdx = -1
 
-// Detect when the bar crosses a bottom date
-for i = 0 to array.size(bottomDates) - 1
-    int bDate = array.get(bottomDates, i)
+// Detect when the bar crosses a bottom date (BOTTOM_1..4 user inputs)
+for i = 0 to 3
+    int bDate = i == 0 ? BOTTOM_1 : i == 1 ? BOTTOM_2 : i == 2 ? BOTTOM_3 : BOTTOM_4
     if crossesDate(bDate)
         lastBottomTime  := bDate
         currentBottomIdx := i
-        if i_showBottomMarkers
+        if i_showBottomMarkers and barstate.isconfirmed
             string dateStr = str.format("{0,date,yyyy-MM-dd}", bDate)
             string lblText = "Cycle Bottom\n" + dateStr
-            label.new(x=bDate, y=low, xloc=xloc.bar_time, yloc=yloc.belowbar, text=lblText, style=label.style_triangledown, color=i_bottomColor, textcolor=color.black, size=size.small)
+            label.new(x=bDate, y=low, xloc=xloc.bar_time, yloc=yloc.belowbar, text=lblText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.small)
 
 int daysSinceBottom = lastBottomTime > 0 ? daysFromMs(time - lastBottomTime) : 0
 
@@ -118,15 +185,15 @@ if crossesDate(PEAK_4) and not drewB3toP4 and i_showBottomMarkers
 
 var int lastPeakTime = 0
 
-// Detect when the bar crosses a peak date and draw markers
-for i = 0 to array.size(peakDates) - 1
-    int pDate = array.get(peakDates, i)
+// Detect when the bar crosses a peak date (PEAK_1..4 user inputs)
+for i = 0 to 3
+    int pDate = i == 0 ? PEAK_1 : i == 1 ? PEAK_2 : i == 2 ? PEAK_3 : PEAK_4
     if crossesDate(pDate)
         lastPeakTime := pDate
-        if i_showPeakAnalysis
+        if i_showPeakAnalysis and barstate.isconfirmed
             string dateStr = str.format("{0,date,yyyy-MM-dd}", pDate)
             string lblText = "Peak #" + str.tostring(i + 1) + "\n" + dateStr
-            label.new(x=pDate, y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=lblText, style=label.style_diamond, color=color.orange, textcolor=color.white, size=size.small)
+            label.new(x=pDate, y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=lblText, style=label.style_square, color=color.orange, textcolor=color.white, size=size.small)
 
 // --- Peak-to-Peak Intervals ---
 int p1_to_p2 = daysFromMs(PEAK_2 - PEAK_1)
@@ -161,8 +228,8 @@ float avgPeakToPeak = (p1_to_p2 + p2_to_p3 + p3_to_p4) / 3.0
 
 // Compression: how much shorter each successive cycle is vs the prior one (as %)
 // Negative value = cycle is compressing (getting shorter)
-float compression_2_vs_1 = ((p2_to_p3 - p1_to_p2) / p1_to_p2) * 100.0
-float compression_3_vs_2 = ((p3_to_p4 - p2_to_p3) / p2_to_p3) * 100.0
+float compression_2_vs_1 = ((p2_to_p3 - p1_to_p2) / float(p1_to_p2)) * 100.0
+float compression_3_vs_2 = ((p3_to_p4 - p2_to_p3) / float(p2_to_p3)) * 100.0
 float cycleCompression = (compression_2_vs_1 + compression_3_vs_2) / 2.0
 
 // --- Peak Projection ---
@@ -172,13 +239,9 @@ int   estimatedNextCycle = math.round(p3_to_p4 * compressFactor)
 // Clamp: don't let estimated cycle go below 1,000 days or above 1,600 days
 int   clampedNextCycle = math.max(1000, math.min(1600, estimatedNextCycle))
 
-var int projectedPeakTime = 0
-var int projectedPeakRangeStart = 0
-var int projectedPeakRangeEnd = 0
-
-projectedPeakTime       := PEAK_4 + clampedNextCycle * MS_PER_DAY
-projectedPeakRangeStart := PEAK_4 + math.round(clampedNextCycle * 0.9) * MS_PER_DAY   // optimistic (earlier)
-projectedPeakRangeEnd   := PEAK_4 + math.round(clampedNextCycle * 1.1) * MS_PER_DAY   // conservative (later)
+int projectedPeakTime       = PEAK_4 + clampedNextCycle * MS_PER_DAY
+int projectedPeakRangeStart = PEAK_4 + math.round(clampedNextCycle * 0.9) * MS_PER_DAY   // optimistic (earlier)
+int projectedPeakRangeEnd   = PEAK_4 + math.round(clampedNextCycle * 1.1) * MS_PER_DAY   // conservative (later)
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -187,7 +250,7 @@ projectedPeakRangeEnd   := PEAK_4 + math.round(clampedNextCycle * 1.1) * MS_PER_
 
 // Draw BOTTOM_4 to projected peak on the last bar
 if barstate.islast and not drewB4toProj and i_showBottomMarkers
-    int estDur = 1064
+    int estDur = daysFromMs(projectedPeakTime - BOTTOM_4)
     string durText = "bottom to top\n" + str.tostring(estDur) + "d?"
     line.new(x1=BOTTOM_4, y1=close, x2=projectedPeakTime, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
     label.new(x=math.round((BOTTOM_4 + projectedPeakTime) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=size.tiny)

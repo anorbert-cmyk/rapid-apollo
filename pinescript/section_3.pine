@@ -3,20 +3,18 @@
 // Based on @killaxbt's chart analysis - decreasing interval pattern
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Historical peak-to-peak intervals (days)
-var float ptpInterval1 = 1476.0   // Peak 1 → Peak 2
-var float ptpInterval2 = 1420.0   // Peak 2 → Peak 3
-var float ptpInterval3 = 1418.0   // Peak 3 → Peak 4
+// DYNAMIC intervals - calculated from actual cycle dates
+float ptpInterval1 = daysFromMs(PEAK_2 - PEAK_1)   // Peak 1 → Peak 2
+float ptpInterval2 = daysFromMs(PEAK_3 - PEAK_2)   // Peak 2 → Peak 3
+float ptpInterval3 = daysFromMs(PEAK_4 - PEAK_3)   // Peak 3 → Peak 4
 
-// Historical halving-to-top intervals (days, approximate from chart)
-var float h2tInterval1 = 367.0    // Halving 1 → Peak 2
-var float h2tInterval2 = 525.0    // Halving 2 → Peak 3
-var float h2tInterval3 = 549.0    // Halving 3 → Peak 4
+float h2tInterval1 = daysFromMs(PEAK_2 - HALVING_1)   // Halving 1 → Peak 2
+float h2tInterval2 = daysFromMs(PEAK_3 - HALVING_2)   // Halving 2 → Peak 3
+float h2tInterval3 = daysFromMs(PEAK_4 - HALVING_3)   // Halving 3 → Peak 4
 
-// Historical bottom-to-top intervals (days)
-var float b2tInterval1 = 742.0    // Bottom 1 → Peak 2
-var float b2tInterval2 = 1064.0   // Bottom 2 → Peak 3
-var float b2tInterval3 = 1057.0   // Bottom 3 → Peak 4
+float b2tInterval1 = daysFromMs(PEAK_2 - BOTTOM_1)   // Bottom 1 → Peak 2
+float b2tInterval2 = daysFromMs(PEAK_3 - BOTTOM_2)   // Bottom 2 → Peak 3
+float b2tInterval3 = daysFromMs(PEAK_4 - BOTTOM_3)   // Bottom 3 → Peak 4
 
 // ATH break intervals (days) from chart
 var float athBreak1 = 1170.0
@@ -29,11 +27,11 @@ var float seqVal2 = 228.0
 var float seqVal3 = 496.0
 
 // Output variables
-var float seqNextPeakToPeak       = 0.0
-var float seqNextBottomToTop      = 0.0
-var float seqNextHalvingToTop     = 0.0
-var int   seqProjectedTopFromHalving = 0
-var int   seqProjectedTopFromBottom  = 0
+float seqNextPeakToPeak       = 0.0
+float seqNextBottomToTop      = 0.0
+float seqNextHalvingToTop     = 0.0
+int   seqProjectedTopFromHalving = 0
+int   seqProjectedTopFromBottom  = 0
 
 // ── Method A: Linear Trend (decreasing/stable interval extrapolation) ──
 
@@ -77,8 +75,10 @@ float b2tNextHalve   = b2tInterval3 - b2tHalved                // 1057 - 3.5 = 1
 // Halving-to-top halve-the-difference
 float h2tLastDiff    = math.abs(h2tInterval3 - h2tInterval2)  // |24| = 24
 float h2tHalved      = h2tLastDiff / 2.0                       // 12
-float h2tNextHalve   = h2tInterval3 + h2tHalved                // 549 + 12 = 561
-// Note: halving-to-top was increasing, so we add (extending the trend)
+// If the trend (last diff) is positive, continue adding (trend continues)
+// If negative, subtract (compression)
+float h2tDirection = (h2tInterval3 - h2tInterval2) > 0 ? 1.0 : -1.0
+float h2tNextHalve   = h2tInterval3 + h2tDirection * (math.abs(h2tInterval3 - h2tInterval2) / 2.0)
 
 // ── Combine: Average of Method A and Method B ──
 seqNextPeakToPeak    := (ptpNextLinear + ptpNextHalve) / 2.0
@@ -96,10 +96,10 @@ seqProjectedTopFromBottom  := BOTTOM_4  + math.round(seqNextBottomToTop)  * MS_P
 // Historical patterns show cycle compression ~2-5% per cycle
 // ═══════════════════════════════════════════════════════════════════════════════
 
-var string currentPhase  = "Unknown"
-var color  phaseColor    = color.gray
-var float  phaseProgress = 0.0
-var string phaseWarning  = ""
+string currentPhase  = "Unknown"
+color  phaseColor    = color.gray
+float  phaseProgress = 0.0
+string phaseWarning  = ""
 
 // Phase boundaries (days since halving)
 int PHASE_ACCUM_END = 200    // 0-200d:   Accumulation
@@ -112,19 +112,19 @@ int PHASE_DIST_END  = 700    // 550-700d: Distribution
 if daysSinceHalving <= PHASE_ACCUM_END
     currentPhase := "Accumulation"
     phaseColor   := color.gray
-    phaseProgress := (daysSinceHalving / PHASE_ACCUM_END) * 100.0
+    phaseProgress := (daysSinceHalving / float(PHASE_ACCUM_END)) * 100.0
 else if daysSinceHalving <= PHASE_EARLY_END
     currentPhase := "Early Bull"
     phaseColor   := color.green
-    phaseProgress := ((daysSinceHalving - PHASE_ACCUM_END) / (PHASE_EARLY_END - PHASE_ACCUM_END)) * 100.0
+    phaseProgress := ((daysSinceHalving - PHASE_ACCUM_END) / float(PHASE_EARLY_END - PHASE_ACCUM_END)) * 100.0
 else if daysSinceHalving <= PHASE_PARA_END
     currentPhase := "Parabolic"
     phaseColor   := color.aqua
-    phaseProgress := ((daysSinceHalving - PHASE_EARLY_END) / (PHASE_PARA_END - PHASE_EARLY_END)) * 100.0
+    phaseProgress := ((daysSinceHalving - PHASE_EARLY_END) / float(PHASE_PARA_END - PHASE_EARLY_END)) * 100.0
 else if daysSinceHalving <= PHASE_DIST_END
     currentPhase := "Distribution"
     phaseColor   := color.orange
-    phaseProgress := ((daysSinceHalving - PHASE_PARA_END) / (PHASE_DIST_END - PHASE_PARA_END)) * 100.0
+    phaseProgress := ((daysSinceHalving - PHASE_PARA_END) / float(PHASE_DIST_END - PHASE_PARA_END)) * 100.0
 else
     currentPhase := "Bear Market"
     phaseColor   := color.red
@@ -139,12 +139,8 @@ else if daysSinceHalving > 500
     phaseWarning := "⚠ Late cycle - 100-120 days may remain"
 
 // ── Visual output ──
-if i_showPhases
-    if i_phaseStyle == "Background"
-        bgcolor(color.new(phaseColor, 90))
-    else if i_phaseStyle == "Bars"
-        barcolor(phaseColor)
-    // "None" → no visual output, phase still calculated for dashboard
+bgcolor(i_showPhases and i_phaseStyle == "Background" ? color.new(phaseColor, 90) : na)
+barcolor(i_showPhases and i_phaseStyle == "Bars" ? phaseColor : na)
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -153,9 +149,8 @@ if i_showPhases
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Bitcoin's long-term log growth rate approximately halves each cycle
-// Cycle 1: ~0.5% daily, Cycle 2: ~0.25%, Cycle 3: ~0.12%, Cycle 4: ~0.06%
-var float logGrowthRate = 0.0006   // ~0.06% daily in log terms for current cycle
-var float cycleBasePrice = 15500.0 // BOTTOM_4 approximate price
+// Cycle 1: ~0.5% daily, Cycle 2: ~0.25%, Cycle 3: ~0.12%, Cycle 4: ~0.3% (~0.003 reasonable default)
+// Log growth rate now comes from input i_logGrowthRate (defined in section_1)
 
 // Curve values (na when disabled so plots draw nothing)
 var float fairValue  = na
@@ -166,7 +161,7 @@ var float lowerBand2 = na
 
 if i_showLogCurves and lastBottomTime > 0 and daysSinceBottom > 0
     // Expected log-linear price at current day since cycle bottom
-    float expectedLogPrice = math.log(cycleBasePrice) + logGrowthRate * daysSinceBottom
+    float expectedLogPrice = math.log(cycleBasePrice) + i_logGrowthRate * daysSinceBottom
     fairValue  := math.exp(expectedLogPrice)
 
     // Bands at multipliers of fair value
