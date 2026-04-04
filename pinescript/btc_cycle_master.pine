@@ -79,21 +79,21 @@ ELECTION_2020 = timestamp("UTC", 2020, 11,  3, 0, 0)
 ELECTION_2024 = timestamp("UTC", 2024, 11,  5, 0, 0)
 ELECTION_2028 = timestamp("UTC", 2028, 11,  7, 0, 0)
 
-// --- Cycle Bottom Dates (User Override) ---
-BOTTOM_1 = input.time(timestamp("UTC", 2011, 11, 18, 0, 0), "Bottom 1 (2011)", group="Cycle Dates (Manual Override)", confirm=false, tooltip="First Bitcoin cycle bottom")
-BOTTOM_2 = input.time(timestamp("UTC", 2015,  1, 14, 0, 0), "Bottom 2 (2015)", group="Cycle Dates (Manual Override)", confirm=false)
-BOTTOM_3 = input.time(timestamp("UTC", 2018, 12, 15, 0, 0), "Bottom 3 (2018)", group="Cycle Dates (Manual Override)", confirm=false)
-BOTTOM_4 = input.time(timestamp("UTC", 2022, 11, 21, 0, 0), "Bottom 4 (2022)", group="Cycle Dates (Manual Override)", confirm=false)
+// --- Cycle Bottom Dates (User Override) - Unix ms timestamps (const int required) ---
+BOTTOM_1 = input.time(1321574400000, "Bottom 1 (2011-11-18)", group="Cycle Dates (Manual Override)", confirm=false, tooltip="First Bitcoin cycle bottom")
+BOTTOM_2 = input.time(1421193600000, "Bottom 2 (2015-01-14)", group="Cycle Dates (Manual Override)", confirm=false)
+BOTTOM_3 = input.time(1544832000000, "Bottom 3 (2018-12-15)", group="Cycle Dates (Manual Override)", confirm=false)
+BOTTOM_4 = input.time(1669017600000, "Bottom 4 (2022-11-21)", group="Cycle Dates (Manual Override)", confirm=false)
 
-// --- Cycle Peak Dates (User Override) ---
-PEAK_1 = input.time(timestamp("UTC", 2011,  6,  8, 0, 0), "Peak 1 (2011)", group="Cycle Dates (Manual Override)", confirm=false)
-PEAK_2 = input.time(timestamp("UTC", 2013, 11, 30, 0, 0), "Peak 2 (2013)", group="Cycle Dates (Manual Override)", confirm=false)
-PEAK_3 = input.time(timestamp("UTC", 2017, 12, 17, 0, 0), "Peak 3 (2017)", group="Cycle Dates (Manual Override)", confirm=false)
-PEAK_4 = input.time(timestamp("UTC", 2021, 11, 10, 0, 0), "Peak 4 (2021)", group="Cycle Dates (Manual Override)", confirm=false)
+// --- Cycle Peak Dates (User Override) - Unix ms timestamps ---
+PEAK_1 = input.time(1307491200000, "Peak 1 (2011-06-08)", group="Cycle Dates (Manual Override)", confirm=false)
+PEAK_2 = input.time(1385769600000, "Peak 2 (2013-11-30)", group="Cycle Dates (Manual Override)", confirm=false)
+PEAK_3 = input.time(1513468800000, "Peak 3 (2017-12-17)", group="Cycle Dates (Manual Override)", confirm=false)
+PEAK_4 = input.time(1636502400000, "Peak 4 (2021-11-10)", group="Cycle Dates (Manual Override)", confirm=false)
 
-// --- 2025 Cycle (5th Peak) - Set to actual top when confirmed ---
+// --- 2025 Cycle (5th Peak) - Unix ms timestamp (2025-01-20) ---
 i_usePeak5 = input.bool(false, "Use Peak 5 (2025 Top)", group="Cycle Dates (Manual Override)", tooltip="Enable once the 2025 cycle top is confirmed. When enabled, projections use PEAK_5 as the latest top instead of PEAK_4.")
-PEAK_5 = input.time(timestamp("UTC", 2025,  1, 20, 0, 0), "Peak 5 (2025) - default: 2025-01-20", group="Cycle Dates (Manual Override)", confirm=false, tooltip="Date of the 5th BTC cycle top (2025). Adjust to the actual peak date.")
+PEAK_5 = input.time(1737331200000, "Peak 5 (2025-01-20)", group="Cycle Dates (Manual Override)", confirm=false, tooltip="Date of the 5th BTC cycle top (2025). Adjust to the actual peak date.")
 
 // --- Helper Constant ---
 MS_PER_DAY = 86400000
@@ -281,7 +281,7 @@ if crossesDate(PEAK_2) and not drewB1toP2 and i_showBottomMarkers and barstate.i
     int dur = daysFromMs(PEAK_2 - BOTTOM_1)
     string durText = "bottom to top\n" + str.tostring(dur) + "d"
     line.new(x1=BOTTOM_1, y1=close, x2=PEAK_2, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
-    label.new(x=math.round((BOTTOM_1 + PEAK_2) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
+    label.new(x=int(math.round((BOTTOM_1 + PEAK_2)) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
     drewB1toP2 := true
 
 // BOTTOM_2 to PEAK_3
@@ -289,7 +289,7 @@ if crossesDate(PEAK_3) and not drewB2toP3 and i_showBottomMarkers and barstate.i
     int dur = daysFromMs(PEAK_3 - BOTTOM_2)
     string durText = "bottom to top\n" + str.tostring(dur) + "d"
     line.new(x1=BOTTOM_2, y1=close, x2=PEAK_3, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
-    label.new(x=math.round((BOTTOM_2 + PEAK_3) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
+    label.new(x=int(math.round((BOTTOM_2 + PEAK_3)) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
     drewB2toP3 := true
 
 // BOTTOM_3 to PEAK_4
@@ -297,7 +297,7 @@ if crossesDate(PEAK_4) and not drewB3toP4 and i_showBottomMarkers and barstate.i
     int dur = daysFromMs(PEAK_4 - BOTTOM_3)
     string durText = "bottom to top\n" + str.tostring(dur) + "d"
     line.new(x1=BOTTOM_3, y1=close, x2=PEAK_4, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
-    label.new(x=math.round((BOTTOM_3 + PEAK_4) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
+    label.new(x=int(math.round((BOTTOM_3 + PEAK_4)) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
     drewB3toP4 := true
 
 // BOTTOM_4 to projected peak (drawn on last bar)
@@ -335,19 +335,19 @@ var bool drewP3toP4 = false
 if crossesDate(PEAK_2) and not drewP1toP2 and i_showPeakAnalysis and barstate.isconfirmed
     string pText = "peak to peak\n" + str.tostring(p1_to_p2) + "d"
     line.new(x1=PEAK_1, y1=high, x2=PEAK_2, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
-    label.new(x=math.round((PEAK_1 + PEAK_2) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
+    label.new(x=int(math.round((PEAK_1 + PEAK_2)) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
     drewP1toP2 := true
 
 if crossesDate(PEAK_3) and not drewP2toP3 and i_showPeakAnalysis and barstate.isconfirmed
     string pText = "peak to peak\n" + str.tostring(p2_to_p3) + "d"
     line.new(x1=PEAK_2, y1=high, x2=PEAK_3, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
-    label.new(x=math.round((PEAK_2 + PEAK_3) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
+    label.new(x=int(math.round((PEAK_2 + PEAK_3)) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
     drewP2toP3 := true
 
 if crossesDate(PEAK_4) and not drewP3toP4 and i_showPeakAnalysis and barstate.isconfirmed
     string pText = "peak to peak\n" + str.tostring(p3_to_p4) + "d"
     line.new(x1=PEAK_3, y1=high, x2=PEAK_4, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
-    label.new(x=math.round((PEAK_3 + PEAK_4) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
+    label.new(x=int(math.round((PEAK_3 + PEAK_4)) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text=pText, style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
     drewP3toP4 := true
 
 // PEAK_4 → PEAK_5 connection (draw on last bar if Peak 5 enabled)
@@ -355,7 +355,7 @@ var bool drewP4toP5 = false
 if i_usePeak5 and barstate.islast and not drewP4toP5 and i_showPeakAnalysis
     int p4_to_p5 = daysFromMs(PEAK_5 - PEAK_4)
     line.new(x1=PEAK_4, y1=high, x2=PEAK_5, y2=high, xloc=xloc.bar_time, color=color.orange, style=line.style_dashed, width=1)
-    label.new(x=math.round((PEAK_4 + PEAK_5) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text="peak to peak\n" + str.tostring(p4_to_p5) + "d", style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
+    label.new(x=int(math.round((PEAK_4 + PEAK_5)) / 2), y=high, xloc=xloc.bar_time, yloc=yloc.abovebar, text="peak to peak\n" + str.tostring(p4_to_p5) + "d", style=label.style_label_down, color=color.orange, textcolor=color.white, size=lblSizeMinor)
     drewP4toP5 := true
 
 // --- Compression Analysis ---
@@ -370,15 +370,15 @@ float cycleCompression = (compression_2_vs_1 + compression_3_vs_2) / 2.0
 // --- Peak Projection ---
 // Estimate next cycle length by applying average compression to last interval
 float compressFactor = 1.0 + (cycleCompression / 100.0)
-int   estimatedNextCycle = math.round(p3_to_p4 * compressFactor)
+int   estimatedNextCycle = int(math.round(p3_to_p4 * compressFactor))
 // Clamp: don't let estimated cycle go below 1,000 days or above 1,600 days
 int   clampedNextCycle = math.max(1000, math.min(1600, estimatedNextCycle))
 
 // Use PEAK_5 as anchor if enabled (2025 top already confirmed), else PEAK_4
 int latestPeak = i_usePeak5 ? PEAK_5 : PEAK_4
 int projectedPeakTime       = latestPeak + clampedNextCycle * MS_PER_DAY
-int projectedPeakRangeStart = latestPeak + math.round(clampedNextCycle * 0.9) * MS_PER_DAY   // optimistic (earlier)
-int projectedPeakRangeEnd   = latestPeak + math.round(clampedNextCycle * 1.1) * MS_PER_DAY   // conservative (later)
+int projectedPeakRangeStart = latestPeak + int(math.round(clampedNextCycle * 0.9)) * MS_PER_DAY   // optimistic (earlier)
+int projectedPeakRangeEnd   = latestPeak + int(math.round(clampedNextCycle * 1.1)) * MS_PER_DAY   // conservative (later)
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -390,7 +390,7 @@ if barstate.islast and not drewB4toProj and i_showBottomMarkers
     int estDur = daysFromMs(projectedPeakTime - BOTTOM_4)
     string durText = "bottom to top\n" + str.tostring(estDur) + "d?"
     line.new(x1=BOTTOM_4, y1=close, x2=projectedPeakTime, y2=close, xloc=xloc.bar_time, color=i_bottomColor, style=line.style_arrow_right, width=1)
-    label.new(x=math.round((BOTTOM_4 + projectedPeakTime) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
+    label.new(x=int(math.round((BOTTOM_4 + projectedPeakTime)) / 2), y=close, xloc=xloc.bar_time, text=durText, style=label.style_label_up, color=i_bottomColor, textcolor=color.black, size=lblSizeMinor)
     drewB4toProj := true
 // ═══════════════════════════════════════════════════════════════════════════════
 // SECTION 9: MATHEMATICAL SEQUENCE CALCULATOR
@@ -477,8 +477,8 @@ seqNextBottomToTop   := math.max((b2tNextLinear + b2tNextHalve) / 2.0, 300.0)  /
 seqNextHalvingToTop  := (h2tNextLinear + h2tNextHalve) / 2.0
 
 // ── Projected top timestamps ──
-seqProjectedTopFromHalving := HALVING_4 + math.round(seqNextHalvingToTop) * MS_PER_DAY
-seqProjectedTopFromBottom  := BOTTOM_4  + math.round(seqNextBottomToTop)  * MS_PER_DAY
+seqProjectedTopFromHalving := HALVING_4 + int(math.round(seqNextHalvingToTop)) * MS_PER_DAY
+seqProjectedTopFromBottom  := BOTTOM_4  + int(math.round(seqNextBottomToTop))  * MS_PER_DAY
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -717,7 +717,7 @@ if barstate.islast and i_showProjections
              border_color = i_projTopColor,
              border_width = 1)
         projTopLbl := label.new(
-             x        = math.round((projectedPeakRangeStart + projectedPeakRangeEnd) / 2),
+             x        = int(math.round((projectedPeakRangeStart + projectedPeakRangeEnd)) / 2),
              y        = boxTop,
              text     = "Projected Top Zone",
              xloc     = xloc.bar_time,
@@ -741,7 +741,7 @@ if barstate.islast and i_showProjections
              border_color = color.new(color.aqua, 60),
              border_width = 1)
         athBreakLbl := label.new(
-             x        = math.round((athBreakStart + athBreakEnd) / 2),
+             x        = int(math.round((athBreakStart + athBreakEnd)) / 2),
              y        = high * 1.3,
              text     = "ATH Break Window\n170-400d post-halving",
              xloc     = xloc.bar_time,
@@ -765,7 +765,7 @@ if barstate.islast and i_showProjections
              border_color = color.new(color.red, 70),
              border_width = 1)
         lateCycleLbl := label.new(
-             x        = math.round((lateCycleStart + lateCycleEnd) / 2),
+             x        = int(math.round((lateCycleStart + lateCycleEnd)) / 2),
              y        = high * 1.15,
              text     = "Late Cycle Warning\n100-120d may remain",
              xloc     = xloc.bar_time,
@@ -789,7 +789,7 @@ if barstate.islast and i_showProjections
              border_color = i_projBottomColor,
              border_width = 1)
         projBottomLbl := label.new(
-             x        = math.round((projBottomStart + projBottomEnd) / 2),
+             x        = int(math.round((projBottomStart + projBottomEnd)) / 2),
              y        = high * 0.9,
              text     = "Projected Bottom Zone",
              xloc     = xloc.bar_time,
@@ -815,46 +815,39 @@ if barstate.islast and not isBTC and na(btcWarningLbl)
 var table helpTable = table.new(position.middle_center, 1, 1, bgcolor=color.new(#1a1a2e, 10), border_color=color.yellow, border_width=2, frame_color=color.yellow, frame_width=2)
 
 if barstate.islast and i_showHelp
-    string helpText = "═══ BTC CYCLE MASTER - HOW TO USE ═══\n"
-    helpText += "\n"
-    helpText += "📋 SETUP:\n"
-    helpText += "• Use on BTCUSD Daily chart (Bitstamp/Coinbase recommended)\n"
-    helpText += "• Switch to logarithmic price scale for best results\n"
-    helpText += "\n"
-    helpText += "⚙️  KEY SETTINGS:\n"
-    helpText += "• Display Settings: Toggle each feature on/off\n"
-    helpText += "• Colors: Customize all visual elements\n"
-    helpText += "• Label Sizes: Adjust for your screen (tiny→huge)\n"
-    helpText += "• Cycle Dates: Override historical peak/bottom dates\n"
-    helpText += "• Log Growth Rate: Fair-value curve steepness (default 0.003)\n"
-    helpText += "\n"
-    helpText += "🎯 2025 CYCLE:\n"
-    helpText += "• Enable 'Use Peak 5 (2025 Top)' when top confirmed\n"
-    helpText += "• Adjust Peak 5 date to actual top\n"
-    helpText += "• Projections will re-anchor to Peak 5\n"
-    helpText += "\n"
-    helpText += "📊 DASHBOARD COLUMNS:\n"
-    helpText += "• Days Since Halving → current cycle position\n"
-    helpText += "• Current Phase → Accumulation/Bull/Parabolic/Distribution/Bear\n"
-    helpText += "• ATH Break Days → historical: 1170d→983d→364d (compressing)\n"
-    helpText += "• Avg Peak-to-Peak → average cycle length from your data\n"
-    helpText += "• Seq: Next P2P/B2T → projected next cycle via 2 methods\n"
-    helpText += "• Projected Top → date range for next cycle top\n"
-    helpText += "\n"
-    helpText += "🎨 VISUAL ELEMENTS:\n"
-    helpText += "• Yellow dashed lines → Halving dates\n"
-    helpText += "• Red dashed lines → US Election dates\n"
-    helpText += "• Orange lines → Peak-to-peak intervals\n"
-    helpText += "• Cyan arrows → Bottom-to-top duration\n"
-    helpText += "• Green triangles → Recent new ATHs\n"
-    helpText += "• Rainbow bands → Log growth valuation zones\n"
-    helpText += "• Orange/Teal boxes → Projected top/bottom zones\n"
-    helpText += "\n"
-    helpText += "🔬 THEORY (killaxbt):\n"
-    helpText += "• Each cycle compresses vs. previous (~2-5% shorter)\n"
-    helpText += "• 'Top sooner, bottom sooner' pattern\n"
-    helpText += "• ATH Break window: 170-400d post-halving\n"
-    helpText += "• Late cycle warning after 500d from halving\n"
-    helpText += "\n"
-    helpText += "❓ Toggle this panel off when done reading.\n"
+    string helpText = "=== BTC CYCLE MASTER - HOW TO USE ===\n\n" +
+         "SETUP:\n" +
+         "- Use on BTCUSD Daily chart (Bitstamp/Coinbase)\n" +
+         "- Switch to logarithmic price scale\n\n" +
+         "KEY SETTINGS:\n" +
+         "- Display Settings: Toggle each feature on/off\n" +
+         "- Colors: Customize all visual elements\n" +
+         "- Label Sizes: Adjust for your screen (tiny to huge)\n" +
+         "- Cycle Dates: Override historical peak/bottom dates\n" +
+         "- Log Growth Rate: Fair value curve (default 0.003)\n\n" +
+         "2025 CYCLE:\n" +
+         "- Enable 'Use Peak 5 (2025 Top)' when top confirmed\n" +
+         "- Adjust Peak 5 date to actual top\n" +
+         "- Projections will re-anchor to Peak 5\n\n" +
+         "DASHBOARD COLUMNS:\n" +
+         "- Days Since Halving: current cycle position\n" +
+         "- Current Phase: Accum/Bull/Para/Dist/Bear\n" +
+         "- ATH Break Days: 1170->983->364 (compressing)\n" +
+         "- Avg Peak-to-Peak: average cycle length\n" +
+         "- Seq Next P2P/B2T: projected via 2 methods\n" +
+         "- Projected Top: date range for next top\n\n" +
+         "VISUAL ELEMENTS:\n" +
+         "- Yellow dashed: Halving dates\n" +
+         "- Red dashed: US Election dates\n" +
+         "- Orange lines: Peak-to-peak intervals\n" +
+         "- Cyan arrows: Bottom-to-top duration\n" +
+         "- Green triangles: Recent new ATHs\n" +
+         "- Rainbow bands: Log growth valuation\n" +
+         "- Orange/Teal boxes: Projected zones\n\n" +
+         "THEORY (killaxbt):\n" +
+         "- Each cycle compresses 2-5% shorter\n" +
+         "- 'Top sooner, bottom sooner' pattern\n" +
+         "- ATH Break window: 170-400d post-halving\n" +
+         "- Late cycle warning after 500d\n\n" +
+         "Toggle panel off when done reading."
     table.cell(helpTable, 0, 0, helpText, text_color=color.white, text_size=size.normal, text_halign=text.align_left, bgcolor=color.new(#1a1a2e, 10))
