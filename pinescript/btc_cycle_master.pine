@@ -2,7 +2,7 @@
 // SECTION 0: HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-//@version=5
+//@version=6
 indicator("BTC Cycle Master - @killaxbt Analysis", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
 
 
